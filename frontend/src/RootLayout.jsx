@@ -36,7 +36,7 @@ function RootLayout() {
       <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
       <div className={`main-content ${isCollapsed ? 'collapsed' : ''}`}>
         <Header />
-        <main style={{ minHeight: "80vh" }}>
+        <main>
           <Outlet />
         </main>
         <Footer />

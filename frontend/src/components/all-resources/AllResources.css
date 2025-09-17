@@ -1,10 +1,19 @@
 /* AllResources.css */
 
+/* Add this new rule */
+.resources-page-content {
+  width: 100%; /* Ensure it takes up the full width available from the main content area */
+  /* If you want internal padding for this specific page, you can add it here */
+  /* padding: 1rem 0; /* Example: add some top/bottom padding */
+}
+
+
 /* Search Row */
 .search-row {
   display: flex;
   gap: 1rem;
   margin-bottom: 2rem;
+  width: 100%; /* Ensure search row spans full width */
 }
 
 .search-bar {
@@ -119,6 +128,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
+  width: 100%; /* Ensure grid spans full width */
 }
 
 .resource-card {
@@ -190,5 +200,3 @@
   color: #6e8e9c;
   transform: scale(1.1);
 }
-
-/* No PDF viewer modal styles needed here, as it's a separate page */

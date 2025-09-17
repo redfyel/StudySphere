@@ -54,7 +54,7 @@ export default function ResourcesPage() {
    author: "Tutor Sam",
    type: "pdf",
    subject: "Math",
-   thumbnail: "https://www.bing.com/th/id/OIP.iFm6d6nB3T4gP42yX4z4HwHaJl?w=160&h=211&c=8&rs=1&qlt=70&o=7&cb=thws5&dpr=1.5&pid=3.1&rm=3",
+   thumbnail: "https://www.edn.com/eeweb-content/wp-content/uploads/algebra.png",
    url: "https://arxiv.org/pdf/quant-ph/0410100.pdf", // Sample PDF
   },
  ];
