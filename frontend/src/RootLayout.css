@@ -1,0 +1,18 @@
+/* Add this to your RootLayout.css */
+
+.app-container {
+  display: flex;
+}
+
+.main-content {
+  margin-left: 250px; /* Base margin for expanded sidebar */
+  flex-grow: 1;
+  padding: 2rem; /* Consistent padding for the content area */
+  box-sizing: border-box;
+  transition: margin-left 0.3s ease-in-out;
+}
+
+/* Adjust margin when sidebar is collapsed */
+.main-content.collapsed {
+  margin-left: 80px; /* Reduced margin for collapsed sidebar */
+}
