@@ -5,6 +5,7 @@ import { BiLike } from "react-icons/bi";
 import { IoSaveOutline, IoDocumentsOutline, IoCloudUploadOutline, IoBookmarkOutline, IoPeopleOutline, IoStatsChartOutline } from "react-icons/io5";
 import { FaRegComments } from "react-icons/fa6";
 import { GrAttachment } from "react-icons/gr";
+import Sidebar from "../sidebar/Sidebar";
 
 // Import your PDF files directly from the src/assets/pdfs directory
 import mathNotes from "../../assets/pdfs/mathNotes.pdf";
