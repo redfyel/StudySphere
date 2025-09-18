@@ -464,7 +464,7 @@ function VideoCall() {
       <div className="content-container">
         {/* Left Sidebar for Participants */}
         <div className="left-sidebar">
-          <h3>Participants</h3>
+          
           <div className="participant-list-vertical">
             {localUserId && localStream && !isScreenSharing && (
               <div
@@ -515,7 +515,7 @@ function VideoCall() {
 
         {/* Right Sidebar for Tools */}
         <div className="right-sidebar">
-          <h3>Tools</h3>
+        
           {!isScreenSharing && (
             <div className="tools-panel-stack">
               {showNotesPanel && (

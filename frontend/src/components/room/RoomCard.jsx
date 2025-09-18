@@ -7,7 +7,7 @@ function RoomCard({ room }) {
       <h3>{room.name}</h3>
       <p>Topic: {room.topic}</p>
       <p> {room.participants}</p>
-      <Link to={`/room/${room.id}`}>
+      <Link to={`/rooms/${room.id}`}>
         <button>Join Room</button>
       </Link>
     </div>

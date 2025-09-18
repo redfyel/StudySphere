@@ -3,8 +3,8 @@
   --notes-text-color: #1F2937;
   --notes-placeholder-color: #89A8B2;
   --notes-border-color: #B3C8CF;
-  --notes-hover-color: #E5E1DA;
-  --notes-background: #F1F0E8;
+  --notes-hover-color:#89A8B2;
+  --notes-background:#89A8B2;
   --notes-focus-color: #89A8B2;
   --notes-stats-color: #6B7280;
   --notes-saved-color: #89A8B2;
@@ -36,7 +36,7 @@
 .notes h3 {
   margin: 0;
   font-size: 1.25rem;
-  font-weight: 600;
+  /* font-weight: 600; */
   color: var(--notes-focus-color);
 }
 
@@ -47,7 +47,7 @@
 
 .action-btn {
   padding: 6px 10px;
-  border: 1px solid var(--notes-border-color);
+  /* border: 1px solid var(--notes-border-color); */
   border-radius: 6px;
   background: var(--notes-background);
   color: var(--notes-text-color);
@@ -60,7 +60,7 @@
 .action-btn:hover:not(:disabled) {
   background: var(--notes-hover-color);
   transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+ 
 }
 
 .action-btn:disabled {
@@ -75,6 +75,7 @@
 
 .textarea-container {
   position: relative;
+  color:#89A8B2;
 }
 
 .notes-textarea {
@@ -82,14 +83,14 @@
   min-height: 120px;
   max-height: 400px;
   padding: 16px;
-  border: 2px solid var(--notes-border-color);
+  /* border: 2px solid var(--notes-border-color); */
   border-radius: 8px;
   font-size: 14px;
   line-height: 1.5;
   font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
   resize: vertical;
   background: var(--notes-background);
-  color: var(--notes-text-color);
+  color: #89A8B2;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   box-sizing: border-box;
 }
@@ -97,7 +98,7 @@
 .notes-textarea:focus {
   outline: none;
   border-color: var(--notes-focus-color);
-  box-shadow: 0 0 0 3px rgba(137, 168, 178, 0.5);
+  /* box-shadow: 0 0 0 3px rgba(137, 168, 178, 0.5); */
 }
 
 .notes-textarea::placeholder {
