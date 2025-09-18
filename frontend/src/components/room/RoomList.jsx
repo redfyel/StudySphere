@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import RoomCard from './RoomCard';
-import CreateRoomModal from './CreateRoomModal';
+import CreateRoomModal from './createRoomModal';
 
 // Helper to manage rooms in localStorage
 const getStoredRooms = () => {

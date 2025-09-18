@@ -1,0 +1,131 @@
+:root {
+  --color-primary: #89A8B2;
+  --color-secondary: #B3C8CF;
+  --color-accent: #E5E1DA;
+  --color-background: #F1F0E8;
+  --color-text: #333;
+}
+
+.upload-page-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.upload-form-card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 600px;
+}
+
+.upload-form-card h2 {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  color: var(--color-primary);
+  font-weight: 600;
+  text-align: center;
+}
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="url"],
+.form-group select {
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--color-secondary);
+  border-radius: 8px;
+  background: var(--color-background);
+  color: var(--color-text);
+  transition: border-color 0.3s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="url"]:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.resource-type-selection .radio-group,
+.scope-options {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.resource-type-selection label,
+.scope-options label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: normal;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.file-input-group {
+  border: 2px dashed var(--color-secondary);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.file-input-group:hover {
+  border-color: var(--color-primary);
+}
+
+.file-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.file-upload-label svg {
+  color: var(--color-primary);
+}
+
+.file-name {
+  font-size: 0.9rem;
+  color: var(--color-primary);
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.submit-btn {
+  padding: 1rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.submit-btn:hover {
+  background: #6e8e9c;
+  transform: translateY(-2px);
+}

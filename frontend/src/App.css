@@ -530,3 +530,9 @@ button:active {
     font-size: 2rem;
   }
 }
+:root {
+  --color-primary: #89A8B2;
+  --color-secondary: #B3C8CF;
+  --color-accent: #E5E1DA;
+  --color-background:#F1F0E8;
+}
