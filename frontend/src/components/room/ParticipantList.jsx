@@ -1,12 +1,14 @@
 import React from 'react';
 
-function ParticipantList({ participants }) {
+function ParticipantList({ participants, localUserId }) {
   return (
     <div className="participant-list">
       <h3>Participants ({participants.length})</h3>
       <ul>
-        {participants.map((participant, index) => (
-          <li key={index}>{participant}</li>
+        {participants.map((participant) => (
+          <li key={participant.id}>
+            {participant.name} {participant.id === localUserId && '(You)'}
+          </li>
         ))}
       </ul>
     </div>
