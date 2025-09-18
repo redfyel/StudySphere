@@ -1,4 +1,6 @@
+// StudyVibeLogger.js
 import React, { useState } from 'react';
+import './MoodTracker.css';
 
 const DUMMY_STUDY_VIBES = [
   { id: 'energized', icon: '💪', label: 'ENERGIZED', desc: 'Ready to tackle tasks!' },
@@ -9,7 +11,7 @@ const DUMMY_STUDY_VIBES = [
   { id: 'burntout', icon: '⏰', label: 'BURNT OUT', desc: 'Running on empty' },
 ];
 
-const StudyVibeLogger = ({ onLog, styles }) => {
+const StudyVibeLogger = ({ onLog }) => {
   const [selectedStudyVibe, setSelectedStudyVibe] = useState(null);
   const [studySubject, setStudySubject] = useState('');
 
@@ -18,33 +20,24 @@ const StudyVibeLogger = ({ onLog, styles }) => {
       alert('Please select a study vibe!');
       return;
     }
-    onLog({ vibe: selectedStudyVibe, subject: studySubject });
+    onLog({ vibe: selectedStudyVibe.id, subject: studySubject });
     setSelectedStudyVibe(null);
     setStudySubject('');
   };
 
   return (
-    <div style={styles.card}>
-      <h2 style={styles.cardTitle}>Log Your *Study* Vibe</h2>
-      <div style={styles.studyVibeGrid}>
+    <div className="card">
+      <h2 className="card-title">Log Your <span style={{ color: '#000' }}>Study</span> Vibe</h2>
+      <div className="study-vibe-grid">
         {DUMMY_STUDY_VIBES.map((vibe) => (
           <div
             key={vibe.id}
             onClick={() => setSelectedStudyVibe(vibe)}
-            style={{
-              ...styles.studyVibeCard,
-              ...(selectedStudyVibe?.id === vibe.id ? styles.studyVibeCardSelected : {}),
-              background: vibe.id === 'energized' ? '#ffedd5' :
-                          vibe.id === 'focused' ? '#dcfce7' :
-                          vibe.id === 'accomplished' ? '#e0f2fe' :
-                          vibe.id === 'calm' ? '#e0f2fe' :
-                          vibe.id === 'overwhelmed' ? '#fee2e2' :
-                          vibe.id === 'burntout' ? '#ffe4e6' : '#f0f4f8'
-            }}
+            className={`study-vibe-card ${selectedStudyVibe?.id === vibe.id ? 'selected' : ''} vibe-${vibe.id}`}
           >
-            <span style={styles.studyVibeIcon}>{vibe.icon}</span>
-            <span style={styles.studyVibeLabel}>{vibe.label}</span>
-            <span style={styles.studyVibeDesc}>{vibe.desc}</span>
+            <span className="study-vibe-icon">{vibe.icon}</span>
+            <span className="study-vibe-label">{vibe.label}</span>
+            <span className="study-vibe-desc">{vibe.desc}</span>
           </div>
         ))}
       </div>
@@ -53,9 +46,9 @@ const StudyVibeLogger = ({ onLog, styles }) => {
         placeholder="E.g., Which subject was this for?"
         value={studySubject}
         onChange={(e) => setStudySubject(e.target.value)}
-        style={styles.inputField}
+        className="input-field"
       />
-      <button onClick={handleLog} style={styles.logButton}>
+      <button onClick={handleLog} className="log-button">
         Log Study Vibe
       </button>
     </div>

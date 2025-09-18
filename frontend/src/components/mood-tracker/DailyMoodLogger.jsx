@@ -9,7 +9,7 @@ const DUMMY_OVERALL_MOODS = [
   { id: 6, emoji: '🤩', label: 'Awesome' },
 ];
 
-const DailyMoodLogger = ({ onLog, styles }) => {
+const DailyMoodLogger = ({ onLog }) => { // Removed 'styles' prop
   const [selectedOverallMood, setSelectedOverallMood] = useState(DUMMY_OVERALL_MOODS[3]); // Default to 'Balanced'
   const [overallMoodNotes, setOverallMoodNotes] = useState('');
 
@@ -23,12 +23,12 @@ const DailyMoodLogger = ({ onLog, styles }) => {
   };
 
   return (
-    <div style={styles.card}>
-      <h2 style={styles.cardTitle}>Log Your *Daily Overall* Vibe</h2>
-      <div style={styles.overallMoodSliderContainer}>
-        <div style={styles.overallMoodDisplay}>
+    <div className="card"> {/* Use className="card" */}
+      <h2 className="card-title">Log Your <span style={{ color: '#000' }}>Daily Overall </span>Vibe</h2> {/* Use className="card-title" */}
+      <div className="overall-mood-slider-container"> {/* Assuming you'll add this class if needed, or remove this div */}
+        <div className="overall-mood-display"> {/* Use className="overall-mood-display" */}
           {selectedOverallMood.emoji}
-          <p style={styles.overallMoodLabel}>{selectedOverallMood.label}</p>
+          <p className="overall-mood-label">{selectedOverallMood.label}</p> {/* Use className="overall-mood-label" */}
         </div>
         <input
           type="range"
@@ -36,16 +36,16 @@ const DailyMoodLogger = ({ onLog, styles }) => {
           max={DUMMY_OVERALL_MOODS.length - 1}
           value={DUMMY_OVERALL_MOODS.indexOf(selectedOverallMood)}
           onChange={(e) => setSelectedOverallMood(DUMMY_OVERALL_MOODS[parseInt(e.target.value)])}
-          className="mood-slider" // Use className instead of style
+          className="mood-slider"
         />
       </div>
       <textarea
         placeholder="Why this mood? (Optional notes)"
         value={overallMoodNotes}
         onChange={(e) => setOverallMoodNotes(e.target.value)}
-        style={styles.textArea}
+        className="text-area" // Use className="text-area"
       />
-      <button onClick={handleLog} style={styles.logButton}>
+      <button onClick={handleLog} className="log-button"> {/* Use className="log-button" */}
         Log Daily Mood
       </button>
     </div>
