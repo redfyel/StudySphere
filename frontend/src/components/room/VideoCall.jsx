@@ -2,13 +2,23 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import FloatingToolbar from './FloatingToolbar';
-import Notes from './Notes';
+import MusicPlayer from './MusicPlayer';
 import Timer from './Timer';
-import StudyTargets from './StudyTargets';
-import ParticipantList from './ParticipantList';
-import JoinRequests from './JoinRequests';
-import MusicPlayer from './MusicPlayer'; // New: Import MusicPlayer
-import './VideoCall.css'; // New: Import component-specific CSS
+import Notes from './Notes'; // Re-import Notes for floating panel
+// StudyTargets, ParticipantList, JoinRequests are removed from direct render for this UI style
+// import StudyTargets from './StudyTargets';
+// import ParticipantList from './ParticipantList';
+// import JoinRequests from './JoinRequests';
+import './VideoCall.css';
+
+// Predefined background images
+const BACKGROUND_IMAGES = [
+  { name: 'Library View', url: 'https://images.unsplash.com/photo-1522204523234-8729aa607dc7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+  { name: 'Cozy Cafe', url: 'https://tse2.mm.bing.net/th/id/OIP.9gJhM-SjMV1Br2QhqpLM3AHaEo?pid=Api&P=0&h=180' },
+  { name: 'Mountain View', url: 'https://tse2.mm.bing.net/th/id/OIP._PWT_U9pKLrJuamO2WeLqgHaEo?pid=Api&P=0&h=180' },
+  { name: 'Forest Path', url: 'https://tse4.mm.bing.net/th/id/OIP.DZe4t3g9XPLF9L5Bk6cpygHaEK?pid=Api&P=0&h=180' },
+  { name: 'Abstract Art', url: 'https://tse4.mm.bing.net/th/id/OIP.Y-KLVE4OMHZDsVw4Kj22XwHaEo?pid=Api&P=0&h=180' },
+];
 
 // --- VideoCall Component ---
 function VideoCall() {
@@ -20,16 +30,23 @@ function VideoCall() {
   const [showUsernameModal, setShowUsernameModal] = useState(!localUsername);
 
   const [participants, setParticipants] = useState([]); // List of { id, name }
-  const [localStream, setLocalStream] = useState(null);
+  const [localStream, setLocalStream] = useState(null); // This will hold either camera or screen share
   const [remoteStreams, setRemoteStreams] = useState({}); // userId -> MediaStream
   const [isMuted, setIsMuted] = useState(false);
   const [isCameraOff, setIsCameraOff] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [notes, setNotes] = useState('');
   const [timer, setTimer] = useState(0);
-  const [targets, setTargets] = useState([]);
-  const [joinRequests, setJoinRequests] = useState([]); // { userId, username }
-  const localVideoRef = useRef(null);
+  const [targets, setTargets] = useState([]); // Kept for persistence, not rendered
+  const [joinRequests, setJoinRequests] = useState([]); // Kept for persistence, not rendered
+  const [selectedBackground, setSelectedBackground] = useState(BACKGROUND_IMAGES[0].url); // Default background
+
+  // New state for toggling visibility of overlay panels
+  const [showNotesPanel, setShowNotesPanel] = useState(true);
+  const [showTimerPanel, setShowTimerPanel] = useState(true);
+  const [showMusicPlayer, setShowMusicPlayer] = useState(true);
+
+  const localVideoRef = useRef(null); // For local camera/screen share in grid/main view
   const socketRef = useRef(null);
   const peerConnectionsRef = useRef({}); // userId -> RTCPeerConnection
 
@@ -47,15 +64,13 @@ function VideoCall() {
     if (userId === latestLocalUserId.current) return `${localUsername} (You)`; // Use ref here
     const participant = participants.find(p => p.id === userId);
     return participant ? participant.name : `Guest ${userId ? userId.slice(-4) : 'Unknown'}`;
-  }, [localUsername, participants]); // Removed localUserId from dependencies
+  }, [localUsername, participants]);
 
   // --- WebRTC Setup: Define createPeerConnection and update its ref ---
   useEffect(() => {
     createPeerConnectionRef.current = (remoteUserId) => {
       const peerConnection = new RTCPeerConnection({
         iceServers: [{ urls: 'stun:stun.l.google.com:19302' }], // Public STUN server
-        // In production, you would also include TURN servers here:
-        // { urls: 'turn:your-turn-server.com:3478', username: 'user', credential: 'password' }
       });
 
       // Add local stream tracks if available
@@ -96,12 +111,11 @@ function VideoCall() {
       peerConnectionsRef.current[remoteUserId] = peerConnection;
       return peerConnection;
     };
-  }, [localStream]); // This effect re-runs only when localStream changes, updating the ref
+  }, [localStream]);
 
   // --- WebRTC Setup: Define handleSignal and update its ref ---
   useEffect(() => {
     handleSignalRef.current = async (senderUserId, signal) => {
-      // If localStream is not yet available, we can't process signals that require adding tracks.
       if (!localStream) {
         console.warn('Local stream not available, deferring signal handling.');
         return;
@@ -109,7 +123,6 @@ function VideoCall() {
 
       let peerConnection = peerConnectionsRef.current[senderUserId];
       if (!peerConnection) {
-        // Use the ref to call the latest createPeerConnection function
         peerConnection = createPeerConnectionRef.current(senderUserId);
       }
 
@@ -131,7 +144,7 @@ function VideoCall() {
           console.error('Error handling signal:', err);
       }
     };
-  }, [localStream]); // This effect re-runs only when localStream changes, updating the ref
+  }, [localStream]);
 
   // --- Get Local Media Stream ---
   useEffect(() => {
@@ -157,28 +170,23 @@ function VideoCall() {
         localStream.getTracks().forEach(track => track.stop());
       }
     };
-  }, [localUsername, showUsernameModal]); // Only re-run if username changes or modal state changes
+  }, [localUsername, showUsernameModal]);
 
-  // --- Socket Setup and Listeners (main effect, now with stable dependencies) ---
+  // --- Socket Setup and Listeners ---
   useEffect(() => {
-    // Only proceed if username is set and modal is closed
     if (!localUsername || showUsernameModal) {
       return;
     }
 
-    // Connect to the real backend server
-    socketRef.current = io('http://localhost:3001'); // Assuming backend runs on port 3001
+    socketRef.current = io('http://localhost:3001');
 
-    // Listen for the custom event for assigned user ID
     socketRef.current.on('user-id-assigned', (assignedUserId) => {
       console.log('Connected to signaling server, assigned userId:', assignedUserId);
       setLocalUserId(assignedUserId);
-      // Emit join-room ONLY after localUserId is assigned by the server
       socketRef.current.emit('join-room', { roomId, username: localUsername });
     });
 
     socketRef.current.on('room-state', ({ notes: initialNotes, timer: initialTimer, targets: initialTargets, participants: initialParticipants, joinRequests: initialJoinRequests, localUserId: assignedUserId }) => {
-      // setLocalUserId(assignedUserId); // This is already handled by 'user-id-assigned'
       setNotes(initialNotes);
       setTimer(initialTimer);
       setTargets(initialTargets);
@@ -186,10 +194,8 @@ function VideoCall() {
       setJoinRequests(initialJoinRequests);
       console.log('Received initial room state:', { initialNotes, initialTimer, initialTargets, initialParticipants, initialJoinRequests, assignedUserId });
 
-      // After getting initial participants, set up peer connections for existing ones
       initialParticipants.forEach(p => {
         if (p.id !== assignedUserId) {
-          // Use the ref to call the latest createPeerConnection function
           createPeerConnectionRef.current(p.id);
         }
       });
@@ -203,9 +209,7 @@ function VideoCall() {
         }
         return prev;
       });
-      // Initiate WebRTC connection for new user
-      if (userId !== latestLocalUserId.current) { // Use ref here
-        // Use the ref to call the latest createPeerConnection function
+      if (userId !== latestLocalUserId.current) {
         createPeerConnectionRef.current(userId);
       }
     });
@@ -225,7 +229,6 @@ function VideoCall() {
     });
 
     socketRef.current.on('signal', ({ userId, signal }) => {
-      // Use the ref to call the latest handleSignal function
       handleSignalRef.current(userId, signal);
     });
 
@@ -257,7 +260,7 @@ function VideoCall() {
       Object.values(peerConnectionsRef.current).forEach(pc => pc.close());
       peerConnectionsRef.current = {};
     };
-  }, [roomId, localUsername, showUsernameModal, navigate]); // Removed localUserId from dependencies
+  }, [roomId, localUsername, showUsernameModal, navigate]);
 
   // --- Update Peer Connection Tracks when localStream changes (e.g., screen share) ---
   useEffect(() => {
@@ -265,12 +268,10 @@ function VideoCall() {
       Object.values(peerConnectionsRef.current).forEach(pc => {
         pc.getSenders().forEach(sender => {
           if (sender.track) {
-            // Find the corresponding track in the new localStream
             const newTrack = localStream.getTracks().find(track => track.kind === sender.track.kind);
             if (newTrack) {
               sender.replaceTrack(newTrack);
             } else {
-              // If a track type is no longer available (e.g., audio during screen share without audio)
               sender.replaceTrack(null);
             }
           }
@@ -308,6 +309,7 @@ function VideoCall() {
       try {
         const newStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         setLocalStream(newStream);
+        // Local camera goes into the grid
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = newStream;
         }
@@ -323,18 +325,22 @@ function VideoCall() {
       try {
         const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
         setLocalStream(screenStream);
+        // Screen share goes to the main video ref
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = screenStream;
         }
         setIsScreenSharing(true);
         screenStream.getVideoTracks()[0].onended = () => {
-          // Automatically stop screen sharing if user stops it from browser UI
-          toggleScreenShare();
+          toggleScreenShare(); // Automatically stop screen sharing if user stops it from browser UI
         };
       } catch (err) {
         console.error('Error sharing screen:', err);
       }
     }
+  };
+
+  const handleBackgroundChange = (newBackgroundUrl) => {
+    setSelectedBackground(newBackgroundUrl === 'none' ? null : newBackgroundUrl);
   };
 
   // --- Collaborative Tool Handlers ---
@@ -349,15 +355,15 @@ function VideoCall() {
     socketRef.current.emit('timer-update', { roomId, timer: newTimer });
   };
 
+  // These are kept for backend persistence but not directly rendered in this UI
   const handleTargetsChange = (newTargets) => {
     setTargets(newTargets);
     socketRef.current.emit('targets-update', { roomId, targets: newTargets });
   };
 
   const handleJoinRequestResponse = (requesterId, action) => {
+    setJoinRequests(prev => prev.filter(req => req.userId !== requesterId)); // Optimistic update
     socketRef.current.emit('join-request-response', { roomId, userId: requesterId, action });
-    // The server will emit 'update-join-requests' back to the moderator,
-    // so no need to filter locally here.
   };
 
   const handleUsernameSubmit = (e) => {
@@ -365,7 +371,6 @@ function VideoCall() {
     if (localUsername.trim()) {
       localStorage.setItem('studyRoomUsername', localUsername.trim());
       setShowUsernameModal(false);
-      // Reload to re-initialize the component with the new username and connect to socket
       window.location.reload();
     }
   };
@@ -396,55 +401,73 @@ function VideoCall() {
     );
   }
 
-  // Determine if the current user is the "moderator" (first participant in the list)
-  const isModerator = localUserId && participants.length > 0 && participants[0].id === localUserId;
-
-  // Filter participants to display in the video strip (all except the main view)
-  const participantsInStrip = participants.filter(p => p.id !== localUserId);
-
-  // Determine which participant (local or remote) should be in the main view
-  const mainViewParticipantId = localUserId; // Default to local user in main view
+  // Combine local and remote participants for the grid
+  const allVideoParticipants = [
+    ...(localUserId && localStream && !isScreenSharing ? [{ id: localUserId, name: localUsername, stream: localStream, isLocal: true }] : []),
+    ...participants.filter(p => p.id !== localUserId).map(p => ({ ...p, stream: remoteStreams[p.id], isLocal: false }))
+  ];
 
   return (
     <div className="video-call">
-      <div className="video-main-content">
-        <div className="main-video-area">
-          {localStream && mainViewParticipantId === localUserId && (
-            <div className="local-video-wrapper main-view">
-              <video ref={localVideoRef} autoPlay playsInline muted={true} />
-              <div className="video-label">{getUserDisplayName(localUserId)}</div>
+      <div
+        className="top-study-area"
+        style={{ backgroundImage: selectedBackground ? `url(${selectedBackground})` : 'none' }}
+      >
+        {isScreenSharing && localStream ? (
+          <div className="main-screen-share-wrapper">
+            <video ref={localVideoRef} autoPlay playsInline muted={true} />
+            <div className="video-label">{getUserDisplayName(localUserId)} (Screen Share)</div>
+          </div>
+        ) : (
+          <div className="main-background-placeholder">
+            <p>Welcome to your study session!</p>
+          </div>
+        )}
+
+        {/* Overlay Widgets */}
+        <div className="overlay-widgets">
+          {showMusicPlayer && (
+            <div className="music-player-overlay">
+              <MusicPlayer />
             </div>
           )}
-          {/* If a remote user were to be in main view, render them here */}
-        </div>
-
-        <div className="video-strip">
-          {/* Remote participants in the strip */}
-          {participantsInStrip.map(p => (
-            <div key={p.id} className="video-wrapper">
-              {remoteStreams[p.id] ? (
-                <video autoPlay playsInline srcObject={remoteStreams[p.id]} />
-              ) : (
-                <div className="video-wrapper placeholder">
-                  <div className="video-label">{getUserDisplayName(p.id)} (Connecting...)</div>
-                </div>
-              )}
-              <div className="video-label">{getUserDisplayName(p.id)}</div>
+          {showTimerPanel && (
+            <div className="timer-overlay">
+              <Timer timer={timer} onTimerChange={handleTimerChange} />
             </div>
-          ))}
+          )}
+          {showNotesPanel && (
+            <div className="notes-overlay">
+              <Notes notes={notes} onNotesChange={handleNotesChange} />
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="sidebar">
-        <MusicPlayer /> {/* New: Music Player */}
-        <Notes notes={notes} onNotesChange={handleNotesChange} />
-        <Timer timer={timer} onTimerChange={handleTimerChange} />
-        <StudyTargets targets={targets} onTargetsChange={handleTargetsChange} />
-        <ParticipantList participants={participants} localUserId={localUserId} />
-        {isModerator && (
-          <JoinRequests requests={joinRequests} onRequestResponse={handleJoinRequestResponse} />
+      <div className="participant-video-grid">
+        {/* Local User's Camera Feed (if not screen sharing) */}
+        {localUserId && localStream && !isScreenSharing && (
+          <div className="video-wrapper local-video-grid-item">
+            <video ref={localVideoRef} autoPlay playsInline muted={true} />
+            <div className="video-label">{getUserDisplayName(localUserId)}</div>
+          </div>
         )}
+
+        {/* Remote Participants */}
+        {participants.filter(p => p.id !== localUserId).map(p => (
+          <div key={p.id} className="video-wrapper">
+            {remoteStreams[p.id] ? (
+              <video autoPlay playsInline srcObject={remoteStreams[p.id]} />
+            ) : (
+              <div className="video-wrapper placeholder">
+                <div className="video-label">{getUserDisplayName(p.id)} (Connecting...)</div>
+              </div>
+            )}
+            <div className="video-label">{getUserDisplayName(p.id)}</div>
+          </div>
+        ))}
       </div>
+
       <FloatingToolbar
         isMuted={isMuted}
         isCameraOff={isCameraOff}
@@ -452,6 +475,12 @@ function VideoCall() {
         onToggleMute={toggleMute}
         onToggleCamera={toggleCamera}
         onToggleScreenShare={toggleScreenShare}
+        backgroundImages={BACKGROUND_IMAGES}
+        selectedBackground={selectedBackground}
+        onSelectBackground={handleBackgroundChange}
+        onToggleNotes={() => setShowNotesPanel(prev => !prev)}
+        onToggleTimer={() => setShowTimerPanel(prev => !prev)}
+        onToggleMusicPlayer={() => setShowMusicPlayer(prev => !prev)}
       />
     </div>
   );

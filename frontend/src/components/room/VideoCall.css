@@ -1,82 +1,97 @@
-/* VideoCall - Room Page Layout */
+/* VideoCall - Room Page Layout (Studyverse Inspired) */
 .video-call {
   display: flex;
+  flex-direction: column; /* Stack top area, grid, and toolbar vertically */
   flex-grow: 1;
   position: relative;
   overflow: hidden;
-  /* Background image for the entire video call area */
-  /* You can replace this URL with your preferred image for learning/study! */
-  background-image: url('https://images.unsplash.com/photo-1522204523234-8729aa607dc7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); /* Placeholder image */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  color: white; /* Ensure text is visible on dark background */
+  color: white;
+  height: calc(100vh - var(--navbar-height)); /* Fill remaining viewport height */
 }
 
-.video-main-content {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* Push videos to bottom, main content to top */
-  padding: 20px;
-  background-color: rgba(0, 0, 0, 0.15); /* Reduced opacity for background image to show more */
-  position: relative; /* For toolbar positioning */
-}
-
-.main-video-area {
-  flex-grow: 1;
+/* Top Study Area (Background / Screen Share) */
+.top-study-area {
+  flex-grow: 1; /* Takes up available space */
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 15px; /* Space between main video and strip */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: background-image 0.3s ease-in-out;
+  padding: 20px; /* Padding around content */
+  background-color: rgba(0, 0, 0, 0.1); /* Subtle overlay */
 }
 
-.local-video-wrapper.main-view {
+.main-background-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  max-width: 900px; /* Max width for the main video */
   height: 100%;
-  max-height: 600px; /* Max height for the main video */
-  aspect-ratio: 16/9; /* Maintain aspect ratio */
-  background-color: #333; /* Fallback/background for video element */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.7);
+  text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+  pointer-events: none; /* Allow clicks to pass through */
+}
+
+.main-screen-share-wrapper {
+  width: 100%;
+  height: 100%;
+  max-width: 1200px; /* Max width for main screen share */
+  max-height: 800px; /* Max height for main screen share */
+  aspect-ratio: 16/9;
+  background-color: #333;
   border-radius: 12px;
   overflow: hidden;
   border: 3px solid var(--cards-highlights);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
   position: relative;
+  z-index: 1; /* Ensure screen share is above background */
 }
 
-.local-video-wrapper.main-view video {
+.main-screen-share-wrapper video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain; /* Use contain for screen share to show full content */
   display: block;
 }
 
-.video-strip {
-  display: flex;
-  gap: 10px;
-  padding: 10px 0;
-  overflow-x: auto; /* Enable horizontal scrolling */
-  flex-shrink: 0; /* Prevent shrinking */
-  justify-content: center; /* Center videos if few */
-  background-color: rgba(0, 0, 0, 0.2); /* Slightly transparent background for the strip */
-  border-radius: 10px;
-  padding: 10px;
+/* Participant Video Grid */
+.participant-video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Responsive grid */
+  gap: 15px;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.7); /* Darker background for video grid */
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0; /* Prevent grid from shrinking */
+  max-height: 300px; /* Limit height of the grid */
+  overflow-y: auto; /* Allow scrolling if many participants */
+  justify-content: center; /* Center grid items */
 }
 
-.video-strip .video-wrapper {
+.participant-video-grid .video-wrapper {
   position: relative;
-  width: 160px; /* Fixed width for small videos */
-  height: 90px; /* Fixed height for small videos (16:9 aspect) */
+  width: 100%;
+  padding-bottom: 56.25%; /* 16:9 Aspect Ratio (height / width = 9 / 16 = 0.5625) */
+  height: 0; /* Important for aspect ratio padding trick */
   background-color: #333;
   border-radius: 8px;
   overflow: hidden;
   border: 2px solid var(--border-color);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  flex-shrink: 0; /* Prevent videos from shrinking */
 }
 
-.video-strip .video-wrapper video {
+.participant-video-grid .video-wrapper video {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -95,7 +110,7 @@
   z-index: 10;
 }
 
-.video-strip .video-wrapper.placeholder {
+.participant-video-grid .video-wrapper.placeholder {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -104,291 +119,139 @@
   font-size: 0.9rem;
   text-align: center;
   background-color: #444;
+  position: absolute; /* For placeholder to fill wrapper */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
-.sidebar {
-  width: 350px;
-  min-width: 280px;
-  background-color: var(--secondary-bg-panels);
-  padding: 20px;
+/* Overlay Widgets (Music Player, Timer, Notes) */
+.overlay-widgets {
+  position: absolute;
+  top: 20px;
+  left: 20px; /* Positioned to top-left */
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  border-left: 1px solid var(--border-color);
-  overflow-y: auto;
-  max-height: 100vh;
+  gap: 15px;
+  z-index: 500; /* Above background, below screen share */
+  pointer-events: none; /* Allow clicks to pass through to elements below */
 }
 
-/* Common Panel Styles for Sidebar Components */
-.notes,
-.timer,
-.study-targets,
-.participant-list,
-.join-requests,
-.music-player { /* Added music-player */
-  background-color: var(--notes-timers-ui);
+.music-player-overlay,
+.timer-overlay,
+.notes-overlay {
+  background-color: rgba(var(--notes-timers-ui), 0.85); /* Semi-transparent background */
   border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  padding: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
   border: 1px solid var(--border-color);
-}
-
-.notes h3,
-.timer h3,
-.study-targets h3,
-.participant-list h3,
-.join-requests h3,
-.music-player h3 { /* Added music-player */
+  backdrop-filter: blur(3px);
   color: var(--text-color);
-  margin-top: 0;
-  margin-bottom: 15px;
-  font-size: 1.3rem;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 10px;
+  pointer-events: auto; /* Re-enable clicks for the widget itself */
+  max-width: 300px; /* Limit width for overlays */
 }
 
-/* Notes Component */
-.notes textarea {
-  width: 100%; /* Make it truly 100% of parent, padding handled by parent */
-  box-sizing: border-box; /* Include padding in width calculation */
-  min-height: 150px;
-  padding: 12px; /* Slightly more padding */
+.music-player-overlay h3,
+.timer-overlay h3,
+.notes-overlay h3 {
+  font-size: 1.1rem;
+  margin-top: 0;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 8px;
+}
+
+/* Adjustments for MusicPlayer within overlay */
+.music-player-overlay .player-controls {
+  margin-bottom: 10px;
+}
+.music-player-overlay .volume-control {
+  margin-top: 5px;
+}
+
+/* Adjustments for Timer within overlay */
+.timer-overlay .timer-display {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+}
+.timer-overlay .timer-controls button {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+}
+
+/* Adjustments for Notes within overlay */
+.notes-overlay textarea {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 120px; /* Slightly smaller for overlay */
+  padding: 10px;
   border: 1px solid var(--border-color);
-  border-radius: 8px; /* Slightly more rounded corners */
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Consistent font */
-  font-size: 1rem; /* Slightly larger font */
+  border-radius: 8px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 0.9rem;
   resize: vertical;
   background-color: white;
   color: var(--text-color);
   transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-.notes textarea:focus {
+.notes-overlay textarea:focus {
   outline: none;
-  border-color: var(--button-bg); /* Highlight border on focus */
-  box-shadow: 0 0 0 3px rgba(106, 138, 150, 0.2); /* Subtle glow on focus */
-}
-
-/* Timer Component */
-.timer-display {
-  font-size: 2.5rem;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 20px;
-  color: var(--button-bg);
-}
-
-.timer-controls {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.timer-controls button {
-  flex: 1;
-  max-width: 120px;
-}
-
-/* StudyTargets Component */
-.target-input {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.target-input input {
-  flex-grow: 1;
-  padding: 10px;
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  font-size: 0.95rem;
-  background-color: white;
-}
-
-.target-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.target-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px dashed var(--border-color);
-  font-size: 0.95rem;
-}
-
-.target-list li:last-child {
-  border-bottom: none;
-}
-
-.target-list li button {
-  padding: 5px 10px;
-  font-size: 0.8rem;
-  background-color: var(--danger-color); /* Red for remove */
-}
-
-.target-list li button:hover {
-  background-color: var(--danger-hover-color);
-}
-
-/* ParticipantList Component */
-.participant-list ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.participant-list li {
-  padding: 8px 0;
-  border-bottom: 1px dashed var(--border-color);
-  font-size: 0.95rem;
-  color: #444;
-}
-
-.participant-list li:last-child {
-  border-bottom: none;
-}
-
-/* JoinRequests Component */
-.join-requests ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.join-requests li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px dashed var(--border-color);
-}
-
-.join-requests li:last-child {
-  border-bottom: none;
-}
-
-.join-requests .request-actions button {
-  margin-left: 8px;
-  padding: 6px 12px;
-  font-size: 0.85rem;
-}
-
-.join-requests .request-actions button:first-child {
-  background-color: var(--success-color); /* Green for approve */
-}
-
-.join-requests .request-actions button:first-child:hover {
-  background-color: var(--success-hover-color);
-}
-
-.join-requests .request-actions button:last-child {
-  background-color: var(--danger-color); /* Red for reject */
-}
-
-.join-requests .request-actions button:last-child:hover {
-  background-color: var(--danger-hover-color);
-}
-
-.join-requests p {
-  text-align: center;
-  color: #666;
-  font-style: italic;
-}
-
-/* MusicPlayer Component */
-.music-player .player-controls {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.music-player .player-controls button {
-  flex-shrink: 0;
-  width: 80px;
-}
-
-.music-player .player-controls select {
-  flex-grow: 1;
-  padding: 8px;
-  border-radius: 5px;
-  border: 1px solid var(--border-color);
-  background-color: white;
-  font-size: 0.95rem;
-}
-
-.music-player .volume-control {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.music-player .volume-control span {
-  font-size: 0.95rem;
-  color: #555;
-}
-
-.music-player .volume-control input[type="range"] {
-  flex-grow: 1;
-  -webkit-appearance: none; /* Override default look */
-  appearance: none;
-  height: 8px;
-  background: var(--border-color);
-  border-radius: 5px;
-  outline: none;
-  opacity: 0.7;
-  transition: opacity .2s;
-}
-
-.music-player .volume-control input[type="range"]:hover {
-  opacity: 1;
-}
-
-.music-player .volume-control input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--button-bg);
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-
-.music-player .volume-control input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: var(--button-bg);
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  border-color: var(--button-bg);
+  box-shadow: 0 0 0 3px rgba(106, 138, 150, 0.2);
 }
 
 
-/* Floating Toolbar */
+/* Floating Toolbar (at the very bottom) */
 .floating-toolbar {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  position: relative; /* Changed from absolute to relative to stay in flow */
+  width: 100%;
   background-color: rgba(var(--cards-highlights), 0.95);
   padding: 15px 25px;
-  border-radius: 30px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
   display: flex;
   gap: 15px;
+  justify-content: center; /* Center controls */
+  align-items: center;
   z-index: 1000;
   backdrop-filter: blur(5px);
-  border: 1px solid var(--border-color);
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0; /* Prevent toolbar from shrinking */
 }
 
 .floating-toolbar button {
   padding: 10px 20px;
   font-size: 0.9rem;
   white-space: nowrap;
+}
+
+.floating-toolbar .background-selector-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.floating-toolbar .background-select {
+  padding: 8px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  background-color: rgba(255, 255, 255, 0.8);
+  color: var(--text-color);
+  font-size: 0.9rem;
+  cursor: pointer;
+  appearance: none;
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2C197.9L159.3%2C69.2c-3.7-3.7-9.7-3.7-13.4%2C0L5.4%2C197.9c-3.7%2C3.7-3.7%2C9.7%2C0%2C13.4l13.4%2C13.4c3.7%2C3.7%2C9.7%2C3.7%2C13.4%2C0l110.7-110.7l110.7%2C110.7c3.7%2C3.7%2C9.7%2C3.7%2C13.4%2C0l13.4-13.4C290.7%2C207.6%2C290.7%2C201.6%2C287%2C197.9z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 10px;
+  padding-right: 30px;
+}
+
+.floating-toolbar .background-select:focus {
+  outline: none;
+  border-color: var(--button-bg);
+  box-shadow: 0 0 0 3px rgba(106, 138, 150, 0.2);
 }
 
 /* Modal Styles (for Username Modal within VideoCall) */
@@ -474,68 +337,116 @@
     flex-direction: column;
   }
 
-  .sidebar {
-    width: 100%;
-    max-height: 50vh; /* Allow sidebar to scroll if content is long */
-    border-left: none;
-    border-top: 1px solid var(--border-color);
+  .top-study-area {
+    min-height: 300px; /* Ensure some height on smaller screens */
+    padding-bottom: 10px;
   }
 
-  .video-main-content {
-    max-height: 50vh; /* Adjust video container height */
-    padding-bottom: 80px; /* Make space for floating toolbar */
-  }
-
-  .main-video-area {
-    margin-bottom: 10px;
-  }
-
-  .video-strip {
-    padding: 5px 0;
-  }
-
-  .video-strip .video-wrapper {
-    width: 120px;
-    height: 67.5px; /* 16:9 aspect ratio */
+  .participant-video-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    padding: 15px;
+    max-height: 250px;
   }
 
   .floating-toolbar {
-    bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: auto;
-    max-width: 90%;
-    flex-wrap: wrap;
-    justify-content: center;
     padding: 10px 15px;
+    gap: 10px;
+    flex-wrap: wrap;
   }
 
   .floating-toolbar button {
     padding: 8px 15px;
     font-size: 0.85rem;
   }
+
+  .floating-toolbar .background-select {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    padding-right: 25px;
+  }
+
+  .overlay-widgets {
+    top: 10px;
+    left: 10px;
+    flex-direction: row; /* Arrange widgets horizontally on smaller screens */
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .music-player-overlay,
+  .timer-overlay,
+  .notes-overlay {
+    padding: 10px;
+    max-width: 250px;
+  }
+
+  .music-player-overlay h3,
+  .timer-overlay h3,
+  .notes-overlay h3 {
+    font-size: 1rem;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+  }
+
+  .timer-overlay .timer-display {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
 }
 
 @media (max-width: 768px) {
-  .video-main-content {
-    padding: 15px;
+  .top-study-area {
+    padding: 10px;
   }
 
-  .sidebar {
-    padding: 15px;
-    gap: 15px;
+  .main-background-placeholder {
+    font-size: 1.5rem;
   }
 
-  .notes h3,
-  .timer h3,
-  .study-targets h3,
-  .participant-list h3,
-  .join-requests h3,
-  .music-player h3 {
+  .participant-video-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    padding: 10px;
+    max-height: 200px;
+  }
+
+  .floating-toolbar {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+
+  .floating-toolbar button {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+  }
+
+  .floating-toolbar .background-select {
+    padding: 5px 8px;
+    font-size: 0.8rem;
+    padding-right: 20px;
+  }
+
+  .overlay-widgets {
+    flex-direction: column; /* Stack widgets vertically again if space is very tight */
+    top: 5px;
+    left: 5px;
+    right: auto;
+  }
+
+  .music-player-overlay,
+  .timer-overlay,
+  .notes-overlay {
+    padding: 8px;
+    max-width: 200px;
+  }
+
+  .music-player-overlay h3,
+  .timer-overlay h3,
+  .notes-overlay h3 {
+    font-size: 0.9rem;
+  }
+
+  .timer-overlay .timer-display {
     font-size: 1.2rem;
-  }
-
-  .timer-display {
-    font-size: 2rem;
   }
 }
