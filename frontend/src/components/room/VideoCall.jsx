@@ -4,19 +4,15 @@ import io from 'socket.io-client';
 import FloatingToolbar from './FloatingToolbar';
 import MusicPlayer from './MusicPlayer';
 import Timer from './Timer';
-import Notes from './Notes'; // Re-import Notes for floating panel
-// StudyTargets, ParticipantList, JoinRequests are removed from direct render for this UI style
-// import StudyTargets from './StudyTargets';
-// import ParticipantList from './ParticipantList';
-// import JoinRequests from './JoinRequests';
+import Notes from './Notes';
 import './VideoCall.css';
 
 // Predefined background images
 const BACKGROUND_IMAGES = [
-  { name: 'Library View', url: 'https://images.unsplash.com/photo-1522204523234-8729aa607dc7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+  { name: 'Library View', url: 'https://tse2.mm.bing.net/th/id/OIF.un1zdfiYR1VlsqSkRnJ3lQ?pid=Api&P=0&h=180' },
   { name: 'Cozy Cafe', url: 'https://tse2.mm.bing.net/th/id/OIP.9gJhM-SjMV1Br2QhqpLM3AHaEo?pid=Api&P=0&h=180' },
   { name: 'Mountain View', url: 'https://tse2.mm.bing.net/th/id/OIP._PWT_U9pKLrJuamO2WeLqgHaEo?pid=Api&P=0&h=180' },
-  { name: 'Forest Path', url: 'https://tse4.mm.bing.net/th/id/OIP.DZe4t3g9XPLF9L5Bk6cpygHaEK?pid=Api&P=0&h=180' },
+  { name: 'Forest Path', url: 'https://tse4.mm.bing.net/th/id/OIP.DZe4t3g9PPLF9L5Bk6cpygHaEK?pid=Api&P=0&h=180' },
   { name: 'Abstract Art', url: 'https://tse4.mm.bing.net/th/id/OIP.Y-KLVE4OMHZDsVw4Kj22XwHaEo?pid=Api&P=0&h=180' },
 ];
 
@@ -41,12 +37,14 @@ function VideoCall() {
   const [joinRequests, setJoinRequests] = useState([]); // Kept for persistence, not rendered
   const [selectedBackground, setSelectedBackground] = useState(BACKGROUND_IMAGES[0].url); // Default background
 
-  // New state for toggling visibility of overlay panels
+  // State for toggling visibility of sidebar panels
   const [showNotesPanel, setShowNotesPanel] = useState(true);
   const [showTimerPanel, setShowTimerPanel] = useState(true);
   const [showMusicPlayer, setShowMusicPlayer] = useState(true);
 
-  const localVideoRef = useRef(null); // For local camera/screen share in grid/main view
+  // Dedicated refs for local video elements
+  const localCameraVideoRef = useRef(null); // For local camera in left sidebar
+  const localScreenShareVideoRef = useRef(null); // For local screen share in main view
   const socketRef = useRef(null);
   const peerConnectionsRef = useRef({}); // userId -> RTCPeerConnection
 
@@ -146,7 +144,7 @@ function VideoCall() {
     };
   }, [localStream]);
 
-  // --- Get Local Media Stream ---
+  // --- Get Local Media Stream (Initial Camera) ---
   useEffect(() => {
     if (!localUsername || showUsernameModal) return;
 
@@ -154,9 +152,7 @@ function VideoCall() {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         setLocalStream(stream);
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = stream;
-        }
+        // srcObject assignment is now handled by the dedicated useEffect below
       } catch (err) {
         console.error('Error accessing media devices.', err);
         alert('Could not access camera/microphone. Please ensure permissions are granted.');
@@ -171,6 +167,26 @@ function VideoCall() {
       }
     };
   }, [localUsername, showUsernameModal]);
+
+  // --- Dedicated useEffect to assign localStream to the correct video element ---
+  useEffect(() => {
+    if (localStream) {
+      if (isScreenSharing && localScreenShareVideoRef.current) {
+        localScreenShareVideoRef.current.srcObject = localStream;
+      } else if (!isScreenSharing && localCameraVideoRef.current) {
+        localCameraVideoRef.current.srcObject = localStream;
+      }
+    } else {
+      // If localStream becomes null, clear srcObject from both refs
+      if (localScreenShareVideoRef.current) {
+        localScreenShareVideoRef.current.srcObject = null;
+      }
+      if (localCameraVideoRef.current) {
+        localCameraVideoRef.current.srcObject = null;
+      }
+    }
+  }, [localStream, isScreenSharing]); // Depend on localStream and isScreenSharing
+
 
   // --- Socket Setup and Listeners ---
   useEffect(() => {
@@ -264,20 +280,38 @@ function VideoCall() {
 
   // --- Update Peer Connection Tracks when localStream changes (e.g., screen share) ---
   useEffect(() => {
-    if (localStream) {
-      Object.values(peerConnectionsRef.current).forEach(pc => {
-        pc.getSenders().forEach(sender => {
-          if (sender.track) {
-            const newTrack = localStream.getTracks().find(track => track.kind === sender.track.kind);
-            if (newTrack) {
-              sender.replaceTrack(newTrack);
-            } else {
-              sender.replaceTrack(null);
-            }
+    if (!localStream) return;
+
+    Object.values(peerConnectionsRef.current).forEach(pc => {
+      const videoTrack = localStream.getVideoTracks()[0];
+      const audioTrack = localStream.getAudioTracks()[0];
+
+      // Get current senders for video and audio
+      const videoSender = pc.getSenders().find(sender => sender.track && sender.track.kind === 'video');
+      const audioSender = pc.getSenders().find(sender => sender.track && sender.track.kind === 'audio');
+
+      // Replace video track
+      if (videoSender) {
+          if (videoTrack && videoSender.track !== videoTrack) {
+              videoSender.replaceTrack(videoTrack);
+          } else if (!videoTrack && videoSender.track) { // If no new video track but old one exists
+              videoSender.replaceTrack(null);
           }
-        });
-      });
-    }
+      } else if (videoTrack) { // If no sender but new video track exists, add it
+          pc.addTrack(videoTrack, localStream);
+      }
+
+      // Replace audio track
+      if (audioSender) {
+          if (audioTrack && audioSender.track !== audioTrack) {
+              audioSender.replaceTrack(audioTrack);
+          } else if (!audioTrack && audioSender.track) { // If no new audio track but old one exists
+              audioSender.replaceTrack(null);
+          }
+      } else if (audioTrack) { // If no sender but new audio track exists, add it
+          pc.addTrack(audioTrack, localStream);
+      }
+    });
   }, [localStream]);
 
 
@@ -291,12 +325,26 @@ function VideoCall() {
     }
   };
 
-  const toggleCamera = () => {
+  const toggleCamera = async () => {
     if (localStream) {
-      localStream.getVideoTracks().forEach(track => {
-        track.enabled = !track.enabled;
-      });
-      setIsCameraOff(!isCameraOff);
+      const videoTracks = localStream.getVideoTracks();
+      if (videoTracks.length > 0) {
+        videoTracks.forEach(track => {
+          track.enabled = !track.enabled;
+        });
+        setIsCameraOff(!isCameraOff);
+      } else {
+        // If camera was off and no tracks, try to get media again
+        try {
+          const newStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+          setLocalStream(newStream);
+          // srcObject assignment is now handled by the dedicated useEffect
+          setIsCameraOff(false);
+        } catch (err) {
+          console.error('Error re-enabling camera:', err);
+          alert('Could not access camera. Please ensure permissions are granted.');
+        }
+      }
     }
   };
 
@@ -307,12 +355,9 @@ function VideoCall() {
         localStream.getTracks().forEach(track => track.stop());
       }
       try {
-        const newStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-        setLocalStream(newStream);
-        // Local camera goes into the grid
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = newStream;
-        }
+        const newCameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        setLocalStream(newCameraStream);
+        // srcObject assignment is now handled by the dedicated useEffect
         setIsScreenSharing(false);
       } catch (err) {
         console.error('Error switching back to camera:', err);
@@ -325,10 +370,7 @@ function VideoCall() {
       try {
         const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
         setLocalStream(screenStream);
-        // Screen share goes to the main video ref
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = screenStream;
-        }
+        // srcObject assignment is now handled by the dedicated useEffect
         setIsScreenSharing(true);
         screenStream.getVideoTracks()[0].onended = () => {
           toggleScreenShare(); // Automatically stop screen sharing if user stops it from browser UI
@@ -401,87 +443,100 @@ function VideoCall() {
     );
   }
 
-  // Combine local and remote participants for the grid
-  const allVideoParticipants = [
-    ...(localUserId && localStream && !isScreenSharing ? [{ id: localUserId, name: localUsername, stream: localStream, isLocal: true }] : []),
-    ...participants.filter(p => p.id !== localUserId).map(p => ({ ...p, stream: remoteStreams[p.id], isLocal: false }))
-  ];
-
   return (
     <div className="video-call">
+      {/* Left Sidebar for Participants */}
+      <div className="left-sidebar">
+        <h3>Participants</h3>
+        <div className="participant-list-vertical">
+          {/* Local User's Camera Feed (if not screen sharing) */}
+          {localUserId && localStream && !isScreenSharing && (
+            <div className="video-wrapper local-video-sidebar">
+              <video ref={localCameraVideoRef} autoPlay playsInline muted={true} />
+              <div className="video-label">{getUserDisplayName(localUserId)}</div>
+            </div>
+          )}
+
+          {/* Remote Participants */}
+          {participants.filter(p => p.id !== localUserId).map(p => (
+            <div key={p.id} className="video-wrapper">
+              {remoteStreams[p.id] ? (
+                <video autoPlay playsInline srcObject={remoteStreams[p.id]} />
+              ) : (
+                <div className="video-wrapper placeholder">
+                  <div className="video-label">{getUserDisplayName(p.id)} (Connecting...)</div>
+                </div>
+              )}
+              <div className="video-label">{getUserDisplayName(p.id)}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Study Area (Background / Screen Share) */}
       <div
-        className="top-study-area"
-        style={{ backgroundImage: selectedBackground ? `url(${selectedBackground})` : 'none' }}
+        className="main-study-area"
+        style={{
+          backgroundImage: isScreenSharing ? 'none' : (selectedBackground ? `url(${selectedBackground})` : 'none'),
+          backgroundColor: isScreenSharing ? 'var(--text-color)' : 'rgba(var(--text-color-rgb), 0.1)'
+        }}
       >
         {isScreenSharing && localStream ? (
           <div className="main-screen-share-wrapper">
-            <video ref={localVideoRef} autoPlay playsInline muted={true} />
+            <video ref={localScreenShareVideoRef} autoPlay playsInline muted={true} />
             <div className="video-label">{getUserDisplayName(localUserId)} (Screen Share)</div>
           </div>
         ) : (
           <div className="main-background-placeholder">
-            <p>Welcome to your study session!</p>
+          
           </div>
         )}
 
-        {/* Overlay Widgets */}
-        <div className="overlay-widgets">
-          {showMusicPlayer && (
-            <div className="music-player-overlay">
-              <MusicPlayer />
-            </div>
-          )}
-          {showTimerPanel && (
-            <div className="timer-overlay">
-              <Timer timer={timer} onTimerChange={handleTimerChange} />
-            </div>
-          )}
-          {showNotesPanel && (
-            <div className="notes-overlay">
-              <Notes notes={notes} onNotesChange={handleNotesChange} />
-            </div>
-          )}
-        </div>
+        {/* Floating Toolbar at the bottom of the main area */}
+        <FloatingToolbar
+          isMuted={isMuted}
+          isCameraOff={isCameraOff}
+          isScreenSharing={isScreenSharing}
+          onToggleMute={toggleMute}
+          onToggleCamera={toggleCamera}
+          onToggleScreenShare={toggleScreenShare}
+          backgroundImages={BACKGROUND_IMAGES}
+          selectedBackground={selectedBackground}
+          onSelectBackground={handleBackgroundChange}
+          onToggleNotes={() => setShowNotesPanel(prev => !prev)}
+          onToggleTimer={() => setShowTimerPanel(prev => !prev)}
+          onToggleMusicPlayer={() => setShowMusicPlayer(prev => !prev)}
+        />
       </div>
 
-      <div className="participant-video-grid">
-        {/* Local User's Camera Feed (if not screen sharing) */}
-        {localUserId && localStream && !isScreenSharing && (
-          <div className="video-wrapper local-video-grid-item">
-            <video ref={localVideoRef} autoPlay playsInline muted={true} />
-            <div className="video-label">{getUserDisplayName(localUserId)}</div>
-          </div>
-        )}
-
-        {/* Remote Participants */}
-        {participants.filter(p => p.id !== localUserId).map(p => (
-          <div key={p.id} className="video-wrapper">
-            {remoteStreams[p.id] ? (
-              <video autoPlay playsInline srcObject={remoteStreams[p.id]} />
-            ) : (
-              <div className="video-wrapper placeholder">
-                <div className="video-label">{getUserDisplayName(p.id)} (Connecting...)</div>
+      {/* Right Sidebar for Tools */}
+      <div className="right-sidebar">
+        <h3>Tools</h3>
+        {!isScreenSharing && ( // Conditionally render tools when not screen sharing
+          <div className="tools-panel-stack">
+            {showNotesPanel && (
+              <div className="notes-panel">
+                <Notes notes={notes} onNotesChange={handleNotesChange} />
               </div>
             )}
-            <div className="video-label">{getUserDisplayName(p.id)}</div>
+            {showTimerPanel && (
+              <div className="timer-panel">
+                <Timer timer={timer} onTimerChange={handleTimerChange} />
+              </div>
+            )}
+            {showMusicPlayer && (
+              <div className="music-player-panel">
+                <MusicPlayer />
+              </div>
+            )}
           </div>
-        ))}
+        )}
+        {isScreenSharing && (
+          <div className="tools-placeholder">
+            <p>Tools hidden during screen share.</p>
+          </div>
+        )}
       </div>
-
-      <FloatingToolbar
-        isMuted={isMuted}
-        isCameraOff={isCameraOff}
-        isScreenSharing={isScreenSharing}
-        onToggleMute={toggleMute}
-        onToggleCamera={toggleCamera}
-        onToggleScreenShare={toggleScreenShare}
-        backgroundImages={BACKGROUND_IMAGES}
-        selectedBackground={selectedBackground}
-        onSelectBackground={handleBackgroundChange}
-        onToggleNotes={() => setShowNotesPanel(prev => !prev)}
-        onToggleTimer={() => setShowTimerPanel(prev => !prev)}
-        onToggleMusicPlayer={() => setShowMusicPlayer(prev => !prev)}
-      />
     </div>
   );
 }
