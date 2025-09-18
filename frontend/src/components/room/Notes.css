@@ -1,0 +1,69 @@
+.notes {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.notes:hover {
+  transform: scale(1.02);
+}
+
+.notes h3 {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.notes textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 10px;
+  border-radius: 8px;
+  resize: vertical;
+  font-size: 1rem;
+  line-height: 1.5;
+  transition: box-shadow 0.2s ease;
+}
+
+.notes textarea:focus {
+  outline: none;
+  box-shadow: 0 0 6px rgba(0,0,0,0.2);
+}
+
+.notes-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.notes-footer span {
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.notes-footer button {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #0077b6; /* keeps your existing palette */
+  color: white;
+  font-size: 0.9rem;
+  transition: background 0.3s ease;
+}
+
+.notes-footer button:hover {
+  background: #0096c7;
+}
+
+.saved-msg {
+  margin-top: 6px;
+  font-size: 0.9rem;
+  color: green;
+  text-align: center;
+}
