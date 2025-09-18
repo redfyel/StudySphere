@@ -1,0 +1,541 @@
+/* VideoCall - Room Page Layout */
+.video-call {
+  display: flex;
+  flex-grow: 1;
+  position: relative;
+  overflow: hidden;
+  /* Background image for the entire video call area */
+  /* You can replace this URL with your preferred image for learning/study! */
+  background-image: url('https://images.unsplash.com/photo-1522204523234-8729aa607dc7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); /* Placeholder image */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white; /* Ensure text is visible on dark background */
+}
+
+.video-main-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Push videos to bottom, main content to top */
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.15); /* Reduced opacity for background image to show more */
+  position: relative; /* For toolbar positioning */
+}
+
+.main-video-area {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px; /* Space between main video and strip */
+}
+
+.local-video-wrapper.main-view {
+  width: 100%;
+  max-width: 900px; /* Max width for the main video */
+  height: 100%;
+  max-height: 600px; /* Max height for the main video */
+  aspect-ratio: 16/9; /* Maintain aspect ratio */
+  background-color: #333; /* Fallback/background for video element */
+  border-radius: 12px;
+  overflow: hidden;
+  border: 3px solid var(--cards-highlights);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.local-video-wrapper.main-view video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.video-strip {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  overflow-x: auto; /* Enable horizontal scrolling */
+  flex-shrink: 0; /* Prevent shrinking */
+  justify-content: center; /* Center videos if few */
+  background-color: rgba(0, 0, 0, 0.2); /* Slightly transparent background for the strip */
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.video-strip .video-wrapper {
+  position: relative;
+  width: 160px; /* Fixed width for small videos */
+  height: 90px; /* Fixed height for small videos (16:9 aspect) */
+  background-color: #333;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid var(--border-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0; /* Prevent videos from shrinking */
+}
+
+.video-strip .video-wrapper video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.video-label {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  z-index: 10;
+}
+
+.video-strip .video-wrapper.placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #ccc;
+  font-style: italic;
+  font-size: 0.9rem;
+  text-align: center;
+  background-color: #444;
+}
+
+.sidebar {
+  width: 350px;
+  min-width: 280px;
+  background-color: var(--secondary-bg-panels);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-left: 1px solid var(--border-color);
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+/* Common Panel Styles for Sidebar Components */
+.notes,
+.timer,
+.study-targets,
+.participant-list,
+.join-requests,
+.music-player { /* Added music-player */
+  background-color: var(--notes-timers-ui);
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-color);
+}
+
+.notes h3,
+.timer h3,
+.study-targets h3,
+.participant-list h3,
+.join-requests h3,
+.music-player h3 { /* Added music-player */
+  color: var(--text-color);
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+/* Notes Component */
+.notes textarea {
+  width: 100%; /* Make it truly 100% of parent, padding handled by parent */
+  box-sizing: border-box; /* Include padding in width calculation */
+  min-height: 150px;
+  padding: 12px; /* Slightly more padding */
+  border: 1px solid var(--border-color);
+  border-radius: 8px; /* Slightly more rounded corners */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Consistent font */
+  font-size: 1rem; /* Slightly larger font */
+  resize: vertical;
+  background-color: white;
+  color: var(--text-color);
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.notes textarea:focus {
+  outline: none;
+  border-color: var(--button-bg); /* Highlight border on focus */
+  box-shadow: 0 0 0 3px rgba(106, 138, 150, 0.2); /* Subtle glow on focus */
+}
+
+/* Timer Component */
+.timer-display {
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--button-bg);
+}
+
+.timer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.timer-controls button {
+  flex: 1;
+  max-width: 120px;
+}
+
+/* StudyTargets Component */
+.target-input {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.target-input input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  font-size: 0.95rem;
+  background-color: white;
+}
+
+.target-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.target-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border-color);
+  font-size: 0.95rem;
+}
+
+.target-list li:last-child {
+  border-bottom: none;
+}
+
+.target-list li button {
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  background-color: var(--danger-color); /* Red for remove */
+}
+
+.target-list li button:hover {
+  background-color: var(--danger-hover-color);
+}
+
+/* ParticipantList Component */
+.participant-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.participant-list li {
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--border-color);
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.participant-list li:last-child {
+  border-bottom: none;
+}
+
+/* JoinRequests Component */
+.join-requests ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.join-requests li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.join-requests li:last-child {
+  border-bottom: none;
+}
+
+.join-requests .request-actions button {
+  margin-left: 8px;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.join-requests .request-actions button:first-child {
+  background-color: var(--success-color); /* Green for approve */
+}
+
+.join-requests .request-actions button:first-child:hover {
+  background-color: var(--success-hover-color);
+}
+
+.join-requests .request-actions button:last-child {
+  background-color: var(--danger-color); /* Red for reject */
+}
+
+.join-requests .request-actions button:last-child:hover {
+  background-color: var(--danger-hover-color);
+}
+
+.join-requests p {
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+/* MusicPlayer Component */
+.music-player .player-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.music-player .player-controls button {
+  flex-shrink: 0;
+  width: 80px;
+}
+
+.music-player .player-controls select {
+  flex-grow: 1;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  background-color: white;
+  font-size: 0.95rem;
+}
+
+.music-player .volume-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.music-player .volume-control span {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.music-player .volume-control input[type="range"] {
+  flex-grow: 1;
+  -webkit-appearance: none; /* Override default look */
+  appearance: none;
+  height: 8px;
+  background: var(--border-color);
+  border-radius: 5px;
+  outline: none;
+  opacity: 0.7;
+  transition: opacity .2s;
+}
+
+.music-player .volume-control input[type="range"]:hover {
+  opacity: 1;
+}
+
+.music-player .volume-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--button-bg);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.music-player .volume-control input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--button-bg);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+
+/* Floating Toolbar */
+.floating-toolbar {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(var(--cards-highlights), 0.95);
+  padding: 15px 25px;
+  border-radius: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  display: flex;
+  gap: 15px;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  border: 1px solid var(--border-color);
+}
+
+.floating-toolbar button {
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+/* Modal Styles (for Username Modal within VideoCall) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal-content {
+  background-color: var(--notes-timers-ui);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 500px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: var(--text-color);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.modal-content .form-group {
+  margin-bottom: 15px;
+}
+
+.modal-content label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #555;
+}
+
+.modal-content input[type="text"] {
+  width: calc(100% - 22px);
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  font-size: 1rem;
+  background-color: white;
+}
+
+.modal-content .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 25px;
+}
+
+.modal-content .modal-actions button {
+  padding: 10px 20px;
+}
+
+.modal-content .modal-actions button.cancel {
+  background-color: #6c757d;
+}
+
+.modal-content .modal-actions button.cancel:hover {
+  background-color: #5a6268;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .video-call {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    max-height: 50vh; /* Allow sidebar to scroll if content is long */
+    border-left: none;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .video-main-content {
+    max-height: 50vh; /* Adjust video container height */
+    padding-bottom: 80px; /* Make space for floating toolbar */
+  }
+
+  .main-video-area {
+    margin-bottom: 10px;
+  }
+
+  .video-strip {
+    padding: 5px 0;
+  }
+
+  .video-strip .video-wrapper {
+    width: 120px;
+    height: 67.5px; /* 16:9 aspect ratio */
+  }
+
+  .floating-toolbar {
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    max-width: 90%;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 10px 15px;
+  }
+
+  .floating-toolbar button {
+    padding: 8px 15px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .video-main-content {
+    padding: 15px;
+  }
+
+  .sidebar {
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .notes h3,
+  .timer h3,
+  .study-targets h3,
+  .participant-list h3,
+  .join-requests h3,
+  .music-player h3 {
+    font-size: 1.2rem;
+  }
+
+  .timer-display {
+    font-size: 2rem;
+  }
+}

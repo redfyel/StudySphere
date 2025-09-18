@@ -7,12 +7,15 @@ import Timer from './Timer';
 import StudyTargets from './StudyTargets';
 import ParticipantList from './ParticipantList';
 import JoinRequests from './JoinRequests';
+import MusicPlayer from './MusicPlayer'; // New: Import MusicPlayer
+import './VideoCall.css'; // New: Import component-specific CSS
 
 // --- VideoCall Component ---
 function VideoCall() {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const [localUserId, setLocalUserId] = useState(null);
+  const latestLocalUserId = useRef(localUserId); // Ref to keep localUserId current in closures
   const [localUsername, setLocalUsername] = useState(localStorage.getItem('studyRoomUsername') || '');
   const [showUsernameModal, setShowUsernameModal] = useState(!localUsername);
 
@@ -34,12 +37,17 @@ function VideoCall() {
   const createPeerConnectionRef = useRef();
   const handleSignalRef = useRef();
 
+  // Update latestLocalUserId ref whenever localUserId state changes
+  useEffect(() => {
+    latestLocalUserId.current = localUserId;
+  }, [localUserId]);
+
   // Helper to get a user-friendly name
   const getUserDisplayName = useCallback((userId) => {
-    if (userId === localUserId) return `${localUsername} (You)`;
+    if (userId === latestLocalUserId.current) return `${localUsername} (You)`; // Use ref here
     const participant = participants.find(p => p.id === userId);
     return participant ? participant.name : `Guest ${userId ? userId.slice(-4) : 'Unknown'}`;
-  }, [localUserId, localUsername, participants]);
+  }, [localUsername, participants]); // Removed localUserId from dependencies
 
   // --- WebRTC Setup: Define createPeerConnection and update its ref ---
   useEffect(() => {
@@ -196,7 +204,7 @@ function VideoCall() {
         return prev;
       });
       // Initiate WebRTC connection for new user
-      if (userId !== localUserId) { // localUserId is stable here
+      if (userId !== latestLocalUserId.current) { // Use ref here
         // Use the ref to call the latest createPeerConnection function
         createPeerConnectionRef.current(userId);
       }
@@ -391,31 +399,44 @@ function VideoCall() {
   // Determine if the current user is the "moderator" (first participant in the list)
   const isModerator = localUserId && participants.length > 0 && participants[0].id === localUserId;
 
+  // Filter participants to display in the video strip (all except the main view)
+  const participantsInStrip = participants.filter(p => p.id !== localUserId);
+
+  // Determine which participant (local or remote) should be in the main view
+  const mainViewParticipantId = localUserId; // Default to local user in main view
+
   return (
     <div className="video-call">
-      <div className="video-container">
-        {localStream && (
-          <div className="local-video-wrapper">
-            <video ref={localVideoRef} autoPlay playsInline muted={true} />
-            <div className="video-label">{getUserDisplayName(localUserId)}</div>
-          </div>
-        )}
-        {Object.entries(remoteStreams).map(([userId, stream]) => (
-          <div key={userId} className="remote-video-wrapper">
-            <video autoPlay playsInline srcObject={stream} />
-            <div className="video-label">{getUserDisplayName(userId)}</div>
-          </div>
-        ))}
-        {/* Placeholder for participants without video streams yet */}
-        {participants
-          .filter(p => p.id !== localUserId && !remoteStreams[p.id])
-          .map(p => (
-            <div key={p.id} className="remote-video-wrapper placeholder">
-              <div className="video-label">{getUserDisplayName(p.id)} (Connecting...)</div>
+      <div className="video-main-content">
+        <div className="main-video-area">
+          {localStream && mainViewParticipantId === localUserId && (
+            <div className="local-video-wrapper main-view">
+              <video ref={localVideoRef} autoPlay playsInline muted={true} />
+              <div className="video-label">{getUserDisplayName(localUserId)}</div>
+            </div>
+          )}
+          {/* If a remote user were to be in main view, render them here */}
+        </div>
+
+        <div className="video-strip">
+          {/* Remote participants in the strip */}
+          {participantsInStrip.map(p => (
+            <div key={p.id} className="video-wrapper">
+              {remoteStreams[p.id] ? (
+                <video autoPlay playsInline srcObject={remoteStreams[p.id]} />
+              ) : (
+                <div className="video-wrapper placeholder">
+                  <div className="video-label">{getUserDisplayName(p.id)} (Connecting...)</div>
+                </div>
+              )}
+              <div className="video-label">{getUserDisplayName(p.id)}</div>
             </div>
           ))}
+        </div>
       </div>
+
       <div className="sidebar">
+        <MusicPlayer /> {/* New: Music Player */}
         <Notes notes={notes} onNotesChange={handleNotesChange} />
         <Timer timer={timer} onTimerChange={handleTimerChange} />
         <StudyTargets targets={targets} onTargetsChange={handleTargetsChange} />
