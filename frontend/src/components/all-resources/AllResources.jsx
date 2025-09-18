@@ -2,12 +2,10 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "./AllResources.css";
 import { BiLike } from "react-icons/bi";
-import { IoSaveOutline } from "react-icons/io5";
+import { IoSaveOutline, IoDocumentsOutline, IoCloudUploadOutline, IoBookmarkOutline, IoPeopleOutline, IoStatsChartOutline } from "react-icons/io5";
 import { FaRegComments } from "react-icons/fa6";
 import { GrAttachment } from "react-icons/gr";
 import Sidebar from "../sidebar/Sidebar";
-import {  IoDocumentsOutline, IoCloudUploadOutline, IoBookmarkOutline, IoPeopleOutline, IoStatsChartOutline } from "react-icons/io5";
-
 
 // Import your PDF files directly from the src/assets/pdfs directory
 import mathNotes from "../../assets/pdfs/mathNotes.pdf";
@@ -17,10 +15,10 @@ import mathNotes from "../../assets/pdfs/mathNotes.pdf";
 
 export default function ResourcesPage() {
   const [search, setSearch] = useState("");
-  const [showFilterModal, setShowFilterModal] = useState(false);
   const [subject, setSubject] = useState("");
   const [type, setType] = useState("");
   const [sort, setSort] = useState("recent");
+
   // ✅ Sidebar items
   const navItems = [
     { name: "All Resources", path: "/resources", icon: <IoDocumentsOutline /> },
@@ -138,103 +136,68 @@ export default function ResourcesPage() {
     <div className="resources-page-layout">
       {/* ✅ Sidebar */}
       <Sidebar
-  sectionName="Resources"
-  isCollapsed={isCollapsed}
-  toggleSidebar={toggleSidebar}
-  items={navItems}
-/>
-   <div className={`resources-page-content ${isCollapsed ? "collapsed" : ""}`}>
-      {/* Search + Filter Button */}
-      <div className="search-row">
-        <input
-          type="text"
-          placeholder="Search resources..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="search-bar"
-        />
-        <button className="filter-btn" onClick={() => setShowFilterModal(true)}>
-          Filters
-        </button>
-      </div>
-
-      {/* Filter Modal */}
-      {showFilterModal && (
-        <div className="modal-overlay" onClick={() => setShowFilterModal(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h3 className="modal-title">Filters</h3>
-            <div className="filter-group">
-              <label className="filter-label">Subject</label>
-              <select value={subject} onChange={(e) => setSubject(e.target.value)} className="filter-select">
-                <option value="">All Subjects</option>
-                <option value="Math">Math</option>
-                <option value="Physics">Physics</option>
-                <option value="Chemistry">Chemistry</option>
-                <option value="Biology">Biology</option>
-              </select>
-            </div>
-            <div className="filter-group">
-              <label className="filter-label">Type</label>
-              <select value={type} onChange={(e) => setType(e.target.value)} className="filter-select">
-                <option value="">All Types</option>
-                <option value="pdf">PDF</option>
-                <option value="video">Video</option>
-              </select>
-            </div>
-            <div className="filter-group">
-              <label className="filter-label">Sort By</label>
-              <select value={sort} onChange={(e) => setSort(e.target.value)} className="filter-select">
-                <option value="recent">Recently Uploaded</option>
-                <option value="popular">Popular</option>
-              </select>
-            </div>
-            <div className="modal-actions">
-              <button className="button save" onClick={() => setShowFilterModal(false)}>Apply</button>
-              <button className="button comment" onClick={() => setShowFilterModal(false)}>Cancel</button>
-            </div>
-          </div>
+        sectionName="Resources"
+        isCollapsed={isCollapsed}
+        toggleSidebar={toggleSidebar}
+        items={navItems}
+      />
+      {/* ✅ Main Content */}
+      <div className={`resources-page-content ${isCollapsed ? "collapsed" : ""}`}>
+        {/* Search + Filters Button */}
+        <div className="search-row">
+          <input
+            type="text"
+            placeholder="Search resources..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="search-bar"
+          />
+          <select value={subject} onChange={(e) => setSubject(e.target.value)} className="filter-select">
+            <option value="">All Subjects</option>
+            <option value="Math">Math</option>
+            <option value="Physics">Physics</option>
+            <option value="Chemistry">Chemistry</option>
+            <option value="Biology">Biology</option>
+          </select>
+          <select value={type} onChange={(e) => setType(e.target.value)} className="filter-select">
+            <option value="">All Types</option>
+            <option value="pdf">PDF</option>
+            <option value="video">Video</option>
+          </select>
+          <select value={sort} onChange={(e) => setSort(e.target.value)} className="filter-select">
+            <option value="recent">Recently Uploaded</option>
+            <option value="popular">Popular</option>
+          </select>
         </div>
-      )}
-
-      {/* Resource Cards */}
-      <div className="resource-grid">
-        {filtered.map((r) => (
-          <Link to={`/resources/pdf/${r.id}`} key={r.id} className="resource-card-link">
-            <div className="resource-card">
-              {/* Preview */}
-              <div className="preview-box">
-                {r.type === "pdf" && <img src={r.thumbnail} alt="PDF Preview" />}
-                {r.type === "video" && (
-                  <video controls>
-                    <source src={r.url} type="video/mp4" />
-                  </video>
-                )}
+        {/* Resource Cards */}
+        <div className="resource-grid">
+          {filtered.map((r) => (
+            <Link to={`/resources/pdf/${r.id}`} key={r.id} className="resource-card-link">
+              <div className="resource-card">
+                {/* Preview */}
+                <div className="preview-box">
+                  {r.type === "pdf" && <img src={r.thumbnail} alt="PDF Preview" />}
+                  {r.type === "video" && (
+                    <video controls>
+                      <source src={r.url} type="video/mp4" />
+                    </video>
+                  )}
+                </div>
+                {/* Details */}
+                <h3>{r.title}</h3>
+                <p className="author">By {r.author}</p>
+                {/* Actions */}
+                <div className="card-actions">
+                  <button className="icon-btn" onClick={(e) => e.preventDefault()}><BiLike /></button>
+                  <button className="icon-btn" onClick={(e) => e.preventDefault()}><IoSaveOutline /></button>
+                  <button className="icon-btn" onClick={(e) => e.preventDefault()}><FaRegComments /></button>
+                  <button className="icon-btn" onClick={(e) => e.preventDefault()}><GrAttachment /></button>
+                </div>
               </div>
-              {/* Details */}
-              <h3>{r.title}</h3>
-              <p className="author">By {r.author}</p>
-              {/* Actions */}
-              <div className="card-actions">
-                <button className="icon-btn" onClick={(e) => e.preventDefault()}><BiLike /></button>
-                <button className="icon-btn" onClick={(e) => e.preventDefault()}><IoSaveOutline /></button>
-                <button className="icon-btn" onClick={(e) => e.preventDefault()}><FaRegComments /></button>
-                <button className="icon-btn" onClick={(e) => e.preventDefault()}><GrAttachment /></button>
-              </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          ))}
+        </div>
       </div>
-    </div>
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
