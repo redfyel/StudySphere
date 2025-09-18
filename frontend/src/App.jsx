@@ -1,12 +1,11 @@
 import "./App.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
+import Home from "./components/home/Home";
 import MoodTracker from "./components/mood-tracker/MoodTracker";
 import RootLayout from "./RootLayout";
 import AIGenerationScreen from "./components/study-enhance/AIGenerationScreen";
-import FlashcardsView from "./components/study-enhance/FlashCardsView";
 import MindMapView from "./components/study-enhance/MindMapView";
-import Sidebar from "./components/sidebar/Sidebar";
 import FlashcardsLayout from "./components/study-enhance/FlashcardsLayout";
 
 function App() {
@@ -14,24 +13,55 @@ function App() {
     {
       path: "/",
       element: <RootLayout />,
+
       children: [
+        { index: true, element: <Home /> },
         { path: "/mood-tracker", element: <MoodTracker /> },
         {
           path: "/study-enhance",
           children: [
-            { index: true, element: <AIGenerationScreen /> },
-            { path: "flashcards", element: <FlashcardsLayout /> },
-            { path: "mindmap", element: <MindMapView /> }
+            {
+              index: true,
+              element: <AIGenerationScreen />,
+            },
+            {
+              path: "flashcards",
+              element: <FlashcardsLayout />,
+            },
+            {
+              path: "mindmap",
+              element: <MindMapView />,
+            },
           ],
         },
         {
           path: "/rooms",
-          element: <div style={{ padding: "2em", fontSize: "1.5em", color: "var(--color-text-light)" }}>Rooms Coming Soon!</div>
+          element: (
+            <div
+              style={{
+                padding: "2em",
+                fontSize: "1.5em",
+                color: "var(--color-text-light)",
+              }}
+            >
+              Rooms Coming Soon!
+            </div>
+          ),
         },
         {
           path: "/resource-hub",
-          element: <div style={{ padding: "2em", fontSize: "1.5em", color: "var(--color-text-light)" }}>Resource Hub Coming Soon!</div>
-        }
+          element: (
+            <div
+              style={{
+                padding: "2em",
+                fontSize: "1.5em",
+                color: "var(--color-text-light)",
+              }}
+            >
+              Resource Hub Coming Soon!
+            </div>
+          ),
+        },
       ],
     },
   ]);

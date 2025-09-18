@@ -324,10 +324,6 @@ const MoodTracker = () => {
           </button>
         </ChartCard>
       </div>
-
-      <footer style={styles.footer}>
-        <p>&copy; StudySphere. Visualize Your Journey.</p>
-      </footer>
     </div>
   );
 };
