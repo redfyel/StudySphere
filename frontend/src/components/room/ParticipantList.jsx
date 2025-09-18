@@ -1,4 +1,5 @@
 import React from 'react';
+import './ParticipantList.css';
 
 function ParticipantList({ participants, localUserId }) {
   return (

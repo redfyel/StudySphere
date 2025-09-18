@@ -1,33 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import RoomCard from './RoomCard';
 import CreateRoomModal from './createRoomModal';
+import './RoomList.css';
 
-// Helper to manage rooms in localStorage
+// Helper to manage rooms in memory (removed localStorage usage)
 const getStoredRooms = () => {
-  try {
-    const storedRooms = localStorage.getItem('studyRoomConnectRooms');
-    return storedRooms ? JSON.parse(storedRooms) : [
-      { id: 'room-1', name: 'Math Study Group', topic: 'Algebra', participants: 0 },
-      { id: 'room-2', name: 'Science Lab', topic: 'Physics', participants: 0 },
-      { id: 'room-3', name: 'History Buffs', topic: 'World History', participants: 0 },
-    ];
-  } catch (error) {
-    console.error("Failed to parse rooms from localStorage", error);
-    return [];
-  }
-};
-
-const saveRooms = (rooms) => {
-  localStorage.setItem('studyRoomConnectRooms', JSON.stringify(rooms));
+  return [
+    { id: 'room-1', name: 'Math Study Group', topic: 'Algebra', participants: 0 },
+    { id: 'room-2', name: 'Science Lab', topic: 'Physics', participants: 0 },
+    { id: 'room-3', name: 'History Buffs', topic: 'World History', participants: 0 },
+  ];
 };
 
 function RoomList() {
   const [rooms, setRooms] = useState(getStoredRooms);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-
-  useEffect(() => {
-    saveRooms(rooms);
-  }, [rooms]);
 
   const handleCreateRoom = ({ name, topic }) => {
     const newRoom = {
