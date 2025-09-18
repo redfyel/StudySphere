@@ -1,18 +1,20 @@
 import "./App.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+import Home from "./components/home/Home";
 import MoodTracker from "./components/mood-tracker/MoodTracker";
 import RootLayout from "./RootLayout";
 import AIGenerationScreen from "./components/study-enhance/AIGenerationScreen";
 import FlashcardsLayout from "./components/study-enhance/FlashcardsLayout";
 import MindMapView from "./components/study-enhance/MindMapView";
-import RoomList from './components/room/RoomList';
-import VideoCall from './components/room/VideoCall';
+import RoomList from "./components/room/RoomList";
+import VideoCall from "./components/room/VideoCall";
 
-// Import your Resource Hub components
-import AllResources from './components/all-resources/AllResources';
-import PdfReader from './components/pdf-reader/PdfReader';
-import UploadPage from './components/upload-page/UploadPage';
-import MyLibrary from './components/myLibrary/MyLibrary';
+// Resource Hub components
+import AllResources from "./components/all-resources/AllResources";
+import PdfReader from "./components/pdf-reader/PdfReader";
+import UploadPage from "./components/upload-page/UploadPage";
+import MyLibrary from "./components/myLibrary/MyLibrary";
 import GroupResources from "./components/group-resources/GroupResources";
 import TrendingPage from "./components/trending-page/TrendingPage";
 
@@ -22,32 +24,33 @@ function App() {
       path: "/",
       element: <RootLayout />,
       children: [
-        
-        { path: "/mood-tracker", element: <MoodTracker /> },
+        // Landing page
+        { index: true, element: <Home /> },
+
+        // Mood Tracker
+        { path: "mood-tracker", element: <MoodTracker /> },
+
+        // Study Enhance section
         {
-          path: "/study-enhance",
+          path: "study-enhance",
           children: [
             { index: true, element: <AIGenerationScreen /> },
             { path: "flashcards", element: <FlashcardsLayout /> },
-            { path: "mindmap", element: <MindMapView /> }
+            { path: "mindmap", element: <MindMapView /> },
           ],
         },
-        {
-          path: "/rooms",
-          element: <div style={{ padding: "2em", fontSize: "1.5em", color: "var(--color-text-light)" }}><RoomList /></div>
-        },
-        {
-          path: "/room/:roomId",
-          element: <VideoCall />
-        },
-        // All your Resource Hub routes
-        
-        { path: "/resources", element: <AllResources /> },
-        { path: "/resources/pdf/:id", element: <PdfReader /> },
-        { path: "/upload", element: <UploadPage /> },
-        { path: "/my-library", element: <MyLibrary /> },
-        { path: "/groups", element: <GroupResources /> },
-        { path: "/trending", element: <TrendingPage /> },
+
+        // Rooms
+        { path: "rooms", element: <RoomList /> },
+        { path: "room/:roomId", element: <VideoCall /> },
+
+        // Resource Hub
+        { path: "resources", element: <AllResources /> },
+        { path: "resources/pdf/:id", element: <PdfReader /> },
+        { path: "upload", element: <UploadPage /> },
+        { path: "my-library", element: <MyLibrary /> },
+        { path: "groups", element: <GroupResources /> },
+        { path: "trending", element: <TrendingPage /> },
       ],
     },
   ]);
