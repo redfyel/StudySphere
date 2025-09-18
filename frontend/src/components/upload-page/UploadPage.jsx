@@ -54,7 +54,7 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="upload-page-container">
+    <div className="resources-page-layout">
         <Sidebar
         sectionName="Resources"
         isCollapsed={isCollapsed}
@@ -62,7 +62,8 @@ export default function UploadPage() {
         items={navItems}
       />
       
-      <div className="upload-form-card">
+      {/* <div className="upload-form-card"> */}
+      <div className={`resources-page-content ${isCollapsed ? "collapsed" : ""}`}>
         <h2>Upload a New Resource</h2>
         <form onSubmit={handleSubmit} className="upload-form">
           <div className="form-group">

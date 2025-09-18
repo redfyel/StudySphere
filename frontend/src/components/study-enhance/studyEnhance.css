@@ -452,13 +452,20 @@ body {
 /* --- Flashcards View (Single Card) --- */
 .flashcards-view-container {
     width: 100%;
-    max-width: 900px; /* Constrain max width for better readability */
+    max-width: 975px; /* Constrain max width for better readability */
     background-color: var(--color-white);
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     padding: 30px 40px;
     box-sizing: border-box;
+    margin-left:240px;
 }
+
+.sidebar-page-content.collapsed .flashcards-view-container{
+    width:100%;
+    max-width: 1145px;
+    margin-left:70px;
+} 
 
 .flashcards-header {
     display: flex;

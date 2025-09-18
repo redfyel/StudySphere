@@ -100,7 +100,7 @@ export default function TrendingPage() {
         toggleSidebar={toggleSidebar}
         items={navItems}
       />
-      
+      <div className={`resources-page-content ${isCollapsed ? "collapsed" : ""}`}>
       <h2 className="page-title">Trending Resources 🔥</h2>
       <p className="page-description">The most popular resources, updated daily.</p>
       
@@ -120,6 +120,7 @@ export default function TrendingPage() {
           ))}
         </ul>
       </div>
+    </div>
     </div>
   );
 }

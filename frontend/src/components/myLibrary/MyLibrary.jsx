@@ -52,14 +52,14 @@ export default function MyLibraryPage() {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
   return (
-    <div className="my-library-page-content">
+    <div className="resources-page-layout">
         <Sidebar
         sectionName="Resources"
         isCollapsed={isCollapsed}
         toggleSidebar={toggleSidebar}
         items={navItems}
       />
-      
+      <div className={`resources-page-content ${isCollapsed ? "collapsed" : ""}`}>
       <h2 className="page-title">My Library</h2>
       <p className="page-description">Your saved resources for quick access.</p>
       
@@ -94,6 +94,7 @@ export default function MyLibraryPage() {
       ) : (
         <p className="no-resources-message">You have no saved resources yet.</p>
       )}
+    </div>
     </div>
   );
 }

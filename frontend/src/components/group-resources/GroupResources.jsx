@@ -104,7 +104,7 @@ export default function GroupResources() {
         toggleSidebar={toggleSidebar}
         items={navItems}
       />
-      
+      <div className={`resources-page-content ${isCollapsed ? "collapsed" : ""}`}>
       <h2 className="group-title">Group Name's Resources</h2>
       <p className="group-description">This is the shared space for our group.</p>
 
@@ -145,6 +145,7 @@ export default function GroupResources() {
           <button type="submit" className="comment-btn">Post</button>
         </form>
       </div>
+    </div>
     </div>
   );
 }
