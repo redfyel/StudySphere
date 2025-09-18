@@ -37,7 +37,7 @@ const Header = () => {
         </NavLink>
 
         <NavLink 
-          to="/resource-hub" 
+          to="/resources" 
           className={({isActive}) => isActive ? "nav-link active" : "nav-link"} 
           end
         >

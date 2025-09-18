@@ -1,0 +1,202 @@
+/* AllResources.css */
+
+/* Add this new rule */
+.resources-page-content {
+  width: 100%; /* Ensure it takes up the full width available from the main content area */
+  /* If you want internal padding for this specific page, you can add it here */
+  /* padding: 1rem 0; /* Example: add some top/bottom padding */
+}
+
+
+/* Search Row */
+.search-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  width: 100%; /* Ensure search row spans full width */
+}
+
+.search-bar {
+  flex: 3; /* 75% */
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--color-secondary);
+  border-radius: 8px;
+  background: white;
+  transition: all 0.3s ease-in-out;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 5px var(--color-secondary);
+}
+
+.filter-btn {
+  flex: 1; /* 25% */
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.filter-btn:hover {
+  background: #6e8e9c; /* a slightly darker shade */
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 350px;
+  max-width: 90%;
+  z-index: 1001;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+}
+
+.modal h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.modal label {
+  display: block;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.modal select {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--color-secondary);
+  border-radius: 6px;
+  margin-top: 0.25rem;
+  background: #f9f9f9;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end; /* Align buttons to the right */
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.button {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.2s ease-in-out;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+}
+
+.button.save {
+  background: var(--color-primary);
+  color: white;
+}
+
+.button.comment {
+  background: var(--color-secondary);
+  color: #333;
+}
+
+/* Cards */
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  width: 100%; /* Ensure grid spans full width */
+}
+
+.resource-card {
+  background: var(--color-accent);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.resource-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.resource-card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.preview-box {
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  height: 180px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.preview-box img,
+.preview-box video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px; /* Match parent */
+}
+
+.resource-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.author {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+/* Actions */
+.card-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.icon-btn:hover {
+  color: #6e8e9c;
+  transform: scale(1.1);
+}

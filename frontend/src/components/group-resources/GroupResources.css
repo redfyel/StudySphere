@@ -1,0 +1,168 @@
+/* Reusing grid and card styles for consistency */
+.resource-grid, .pinboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  margin-bottom: 2.5rem;
+}
+
+.resource-card {
+  background: var(--color-accent);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.resource-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.resource-card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.preview-box {
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  height: 180px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.preview-box img,
+.preview-box video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.link-preview {
+  font-size: 1.2rem;
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+.resource-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.author {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 1rem;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.icon-btn:hover {
+  color: #6e8e9c;
+  transform: scale(1.1);
+}
+
+/* Page-specific styles for Group Resources */
+.group-resources-page {
+  width: 100%;
+  padding-bottom: 2rem;
+}
+
+.group-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.group-description {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 2.5rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-secondary);
+  padding-bottom: 0.5rem;
+  margin-bottom: 2rem;
+  margin-top: 2rem;
+}
+
+.pinboard-grid .resource-card {
+  border: 2px solid gold;
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+}
+
+/* Comment System */
+.comment-section {
+  background: var(--color-accent);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-top: 3rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.comment {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--color-primary);
+}
+
+.comment-form {
+  display: flex;
+  gap: 1rem;
+}
+
+.comment-input {
+  flex-grow: 1;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--color-secondary);
+  border-radius: 8px;
+  background: white;
+}
+
+.comment-btn {
+  padding: 0.8rem 1.5rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.comment-btn:hover {
+  background: #6e8e9c;
+}

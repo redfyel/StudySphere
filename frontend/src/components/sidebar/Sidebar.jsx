@@ -1,44 +1,56 @@
-import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
-import '../study-enhance/studyEnhance.css';
+import React from "react";
+import { NavLink } from "react-router-dom";
+import {
+  IoDocumentsOutline,
+  IoCloudUploadOutline,
+  IoBookmarkOutline,
+  IoPeopleOutline,
+  IoStatsChartOutline,
+  IoMenuOutline,
+} from "react-icons/io5";
+import "./Sidebar.css";
+import { CgProfile } from "react-icons/cg";
+import { BsFillSunFill } from "react-icons/bs";
 
-const Sidebar = ({ logoText = "StudySphere", menuItems = [] }) => {
-  const [activeView, setActiveView] = useState(menuItems[0]?.key || "");
+export default function Sidebar({ isCollapsed, toggleSidebar }) {
+  const resnavItems = [
+    { name: "All Resources", path: "/resources", icon: <IoDocumentsOutline /> },
+    { name: "Upload Resource", path: "/upload", icon: <IoCloudUploadOutline /> },
+    { name: "My Library", path: "/my-library", icon: <IoBookmarkOutline /> },
+    { name: "Group Resources", path: "/groups", icon: <IoPeopleOutline /> },
+    { name: "Trending", path: "/trending", icon: <IoStatsChartOutline /> },
+  ];
 
   return (
-    <div className="app-container">
-      {/* Sidebar */}
-      <div className="sidebar">
-        <div className="sidebar-logo">
-          {menuItems.find(item => item.key === activeView)?.icon} {logoText}
-        </div>
-        <nav className="sidebar-nav">
-          <ul>
-            {menuItems.map(item => (
-              <li key={item.key}>
-                <a
-                  href="#"
-                  className={activeView === item.key ? 'active' : ''}
-                  onClick={() => setActiveView(item.key)}
-                >
-                  {item.icon} {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
+    <div className={`resource-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+      <div className="resource-sidebar-header"> {/* Corrected class name */}
+        <div className="logo">StudySphere</div>
+        <button className="toggle-btn" onClick={toggleSidebar}>
+          <IoMenuOutline />
+        </button>
       </div>
-
-      {/* Main content */}
-      <div className="main-content">
-        {/* Render the component tied to the activeView */}
-        {menuItems.find(item => item.key === activeView)?.component}
-
-        {/* Extra nested routes */}
-        <Outlet />
+      <nav className="res-nav-menu">
+        {resnavItems.map((item) => (
+          <NavLink
+            key={item.name}
+            to={item.path}
+            className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
+          >
+            <span className="res-nav-icon">{item.icon}</span>
+            <span className="res-nav-name">{!isCollapsed && item.name}</span>
+          </NavLink>
+        ))}
+      </nav>
+      <div className="resource-sidebar-footer"> {/* Corrected class name */}
+        <div className="res-footer-item">
+          <CgProfile />
+          {!isCollapsed && "Profile"}
+        </div>
+        <div className="res-footer-item">
+          <BsFillSunFill />
+          {!isCollapsed && "Light Mode"}
+        </div>
       </div>
     </div>
   );
-};
-
-export default Sidebar;
+}
