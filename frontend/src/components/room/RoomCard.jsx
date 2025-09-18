@@ -1,13 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './RoomCard.css';
 
 function RoomCard({ room }) {
   return (
     <div className="room-card">
       <h3>{room.name}</h3>
       <p>Topic: {room.topic}</p>
-      <p>Participants: {room.participants}</p>
-      <Link to={`/room/${room.id}`}>
+      <p> {room.participants}</p>
+      <Link to={`/rooms/${room.id}`}>
         <button>Join Room</button>
       </Link>
     </div>

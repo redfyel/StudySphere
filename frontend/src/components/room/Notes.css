@@ -1,69 +1,171 @@
+/* Color Palette */
+:root {
+  --notes-text-color: #1F2937;
+  --notes-placeholder-color: #89A8B2;
+  --notes-border-color: #B3C8CF;
+  --notes-hover-color:#89A8B2;
+  --notes-background:#89A8B2;
+  --notes-focus-color: #89A8B2;
+  --notes-stats-color: #6B7280;
+  --notes-saved-color: #89A8B2;
+}
+
 .notes {
-  max-width: 500px;
-  margin: 20px auto;
-  padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  transition: transform 0.2s ease;
-}
-
-.notes:hover {
-  transform: scale(1.02);
-}
-
-.notes h3 {
-  font-size: 1.4rem;
-  margin-bottom: 10px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.notes textarea {
   width: 100%;
-  min-height: 120px;
-  padding: 10px;
-  border-radius: 8px;
-  resize: vertical;
-  font-size: 1rem;
-  line-height: 1.5;
-  transition: box-shadow 0.2s ease;
+  max-width: 600px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: all 0.3s ease;
+  color: var(--notes-text-color);
 }
 
-.notes textarea:focus {
-  outline: none;
-  box-shadow: 0 0 6px rgba(0,0,0,0.2);
+.notes-expanded {
+  max-width: 90vw;
+  width: 90vw;
 }
 
-.notes-footer {
+.notes-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--notes-border-color);
+}
+
+.notes h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  /* font-weight: 600; */
+  color: var(--notes-focus-color);
+}
+
+.notes-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  padding: 6px 10px;
+  /* border: 1px solid var(--notes-border-color); */
+  border-radius: 6px;
+  background: var(--notes-background);
+  color: var(--notes-text-color);
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  min-width: 32px;
+}
+
+.action-btn:hover:not(:disabled) {
+  background: var(--notes-hover-color);
+  transform: translateY(-1px);
+ 
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.expand-btn {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.textarea-container {
+  position: relative;
+  color:#5e8694;
+}
+
+.notes-textarea {
+  width: 100%;
+  min-height: 120px;
+  max-height: 400px;
+  padding: 16px;
+  /* border: 2px solid var(--notes-border-color); */
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+  resize: vertical;
+  background: var(--notes-background);
+  color: #020b0e;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.notes-textarea:focus {
+  outline: none;
+  border-color: var(--notes-focus-color);
+  /* box-shadow: 0 0 0 3px rgba(137, 168, 178, 0.5); */
+}
+
+.notes-textarea::placeholder {
+ color: var(--notes-stats-color);
+  line-height: 1.4;
+}
+
+.notes-expanded .notes-textarea {
+  min-height: 300px;
+  max-height: 600px;
+}
+
+.notes-footer {
   margin-top: 8px;
 }
 
-.notes-footer span {
-  font-size: 0.9rem;
-  color: #444;
+.notes-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--notes-stats-color);
 }
 
-.notes-footer button {
-  padding: 6px 14px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  background: #0077b6; /* keeps your existing palette */
-  color: white;
-  font-size: 0.9rem;
-  transition: background 0.3s ease;
+.stat {
+  margin-right: 16px;
 }
 
-.notes-footer button:hover {
-  background: #0096c7;
+.last-saved {
+  font-style: italic;
+  color: var(--notes-saved-color);
 }
 
-.saved-msg {
-  margin-top: 6px;
-  font-size: 0.9rem;
-  color: green;
-  text-align: center;
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .notes {
+    max-width: 100%;
+    padding: 0 8px;
+  }
+  .notes-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .notes-actions {
+    align-self: flex-end;
+  }
+  .action-btn {
+    padding: 8px 12px;
+    min-width: 36px;
+  }
+  .notes-textarea {
+    font-size: 16px;
+  }
+  .notes-stats {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+/* Smooth animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.last-saved {
+  animation: fadeIn 0.3s ease;
 }

@@ -1,0 +1,193 @@
+.room-list {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #F1F0E8 0%, #E5E1DA 30%, #B3C8CF 70%, #89A8B2 100%);
+  padding: 2.5rem;
+  position: relative;
+}
+
+.room-list::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(137, 168, 178, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(179, 200, 207, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 60%, rgba(229, 225, 218, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.room-list h1 {
+  text-align: center;
+  font-size: 3.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #89A8B2 0%, #B3C8CF 50%, #89A8B2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  position: relative;
+  text-shadow: 0 4px 8px rgba(137, 168, 178, 0.1);
+  animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+  from {
+    filter: drop-shadow(0 0 10px rgba(137, 168, 178, 0.3));
+  }
+  to {
+    filter: drop-shadow(0 0 20px rgba(137, 168, 178, 0.5));
+  }
+}
+
+.room-list h1::before {
+  content: "🎓";
+  font-size: 2.5rem;
+  margin-right: 1rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+.room-list h1::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #89A8B2, #B3C8CF, #89A8B2, transparent);
+  border-radius: 2px;
+}
+
+.create-room-section {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.create-room-section button {
+  padding: 1.25rem 2.5rem;
+  background: linear-gradient(135deg, #89A8B2 0%, #B3C8CF 100%);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 6px 20px rgba(137, 168, 178, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.create-room-section button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.6s;
+}
+
+.create-room-section button:hover::before {
+  left: 100%;
+}
+
+.create-room-section button:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 35px rgba(137, 168, 178, 0.4);
+  background: linear-gradient(135deg, #7A9AA5 0%, #A4BCC8 100%);
+}
+
+.create-room-section button::after {
+  content: "✨";
+  font-size: 1rem;
+  margin-left: 0.75rem;
+  transition: transform 0.3s ease;
+}
+
+.create-room-section button:hover::after {
+  transform: rotate(180deg) scale(1.2);
+}
+
+.room-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Staggered animation for room cards */
+.room-grid > *:nth-child(1) { animation-delay: 0.1s; }
+.room-grid > *:nth-child(2) { animation-delay: 0.2s; }
+.room-grid > *:nth-child(3) { animation-delay: 0.3s; }
+.room-grid > *:nth-child(4) { animation-delay: 0.4s; }
+.room-grid > *:nth-child(n+5) { animation-delay: 0.5s; }
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .room-list {
+    padding: 2rem;
+  }
+  
+  .room-grid {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .room-list {
+    padding: 1.5rem;
+  }
+  
+  .room-list h1 {
+    font-size: 2.5rem;
+  }
+  
+  .room-list h1::before {
+    font-size: 2rem;
+  }
+  
+  .create-room-section button {
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+  }
+  
+  .room-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .room-list {
+    padding: 1rem;
+  }
+  
+  .room-list h1 {
+    font-size: 2rem;
+  }
+  
+  .create-room-section button {
+    padding: 0.875rem 1.75rem;
+    font-size: 1rem;
+  }
+}
