@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Line, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Tooltip, Legend, Filler } from 'chart.js';
 
-import ViewSwitcher from './ViewSwitcher';
+import ViewSwitcher from './ViewSwitcher'; // This will become our "timeframe pill menu" for charts
 import StudyVibeLogger from './StudyVibeLogger';
 import DailyMoodLogger from './DailyMoodLogger';
 import ChartCard from './ChartCard';
@@ -20,310 +20,192 @@ ChartJS.register(
 );
 
 const MoodTracker = () => {
-  // --- State Management ---
-  const [selectedView, setSelectedView] = useState('week'); // 'day', 'week', 'month'
+  // New state for primary navigation: 'logging' or 'analytics'
+  const [currentSection, setCurrentSection] = useState('logging');
 
-  // --- Chart Data States (These would be populated from actual user data) ---
-  const [weeklyStudyTrendsData, setWeeklyStudyTrendsData] = useState({
-    labels: [],
-    datasets: [],
-  });
-  const [moodMeterData, setMoodMeterData] = useState({
-    labels: [],
-    datasets: [],
-  });
-  const [currentInsight, setCurrentInsight] = useState("Insight: Log your moods to see trends!");
+  // State for chart timeframes (used within 'analytics' section)
+  const [selectedView, setSelectedView] = useState('week'); // 'day', 'week', 'month', 'year'
 
-  // --- Effects for Data Loading/Updating ---
+  const [weeklyStudyTrendsData, setWeeklyStudyTrendsData] = useState({ labels: [], datasets: [] });
+  const [moodMeterData, setMoodMeterData] = useState({ labels: [], datasets: [] });
+  const [currentInsight, setCurrentInsight] = useState("Log your moods and study vibes to uncover powerful insights!");
+
   useEffect(() => {
-    // In a real app, you'd fetch data here based on `selectedView`
-    // and process it for your charts.
-    // For now, we'll use dummy chart data placeholders.
-    const generateDummyChartData = () => {
-      // Dummy data for Weekly Study Vibe Trends
-      const labels = Array.from({ length: 7 }, (_, i) => `Day ${i + 1}`); // Example for a week
-      setWeeklyStudyTrendsData({
-        labels,
-        datasets: [
-          {
-            label: 'Focused',
-            data: labels.map(() => Math.floor(Math.random() * 60)), // Dummy percentage
-            borderColor: '#60a5fa', // Blue
-            backgroundColor: 'rgba(96, 165, 250, 0.2)',
-            tension: 0.4,
-            fill: true,
-          },
-          {
-            label: 'Accomplished',
-            data: labels.map(() => Math.floor(Math.random() * 50)), // Dummy percentage
-            borderColor: '#34d399', // Green
-            backgroundColor: 'rgba(52, 211, 153, 0.2)',
-            tension: 0.4,
-            fill: true,
-          },
-          {
-            label: 'Burnt Out',
-            data: labels.map(() => Math.floor(Math.random() * 40)), // Dummy percentage
-            borderColor: '#ef4444', // Red
-            backgroundColor: 'rgba(239, 68, 68, 0.2)',
-            tension: 0.4,
-            fill: true,
-          },
-        ],
-      });
+    // Only generate chart data if we are in the analytics section or about to switch to it
+    if (currentSection === 'analytics') {
+      const generateDummyChartData = () => {
+        let labels = [];
+        let dataPointsCount = 0;
 
-      // Dummy data for Mood Meter (Overall Daily Vibe)
-      setMoodMeterData({
-        labels: ['Happy', 'Balanced', 'Neutral', 'Stressed'],
-        datasets: [{
-          data: [30, 25, 20, 25], // Dummy percentages
-          backgroundColor: ['#fde047', '#34d399', '#94a3b8', '#f87171'],
-          hoverBackgroundColor: ['#facc15', '#10b981', '#64748b', '#ef4444'],
-        }]
-      });
+        switch (selectedView) {
+          case 'day':
+            labels = ['Morning', 'Afternoon', 'Evening', 'Night'];
+            dataPointsCount = 4;
+            break;
+          case 'week':
+            labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            dataPointsCount = 7;
+            break;
+          case 'month':
+            labels = Array.from({ length: 4 }, (_, i) => `Week ${i + 1}`);
+            dataPointsCount = 4;
+            break;
+          case 'year':
+            labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            dataPointsCount = 12;
+            break;
+          default:
+            labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            dataPointsCount = 7;
+        }
 
-      // Update dummy insight
-      if (selectedView === 'week') {
-        setCurrentInsight("Insight: You were most focused on Tuesday afternoons. Try scheduling deep work then!");
-      } else if (selectedView === 'day') {
-        setCurrentInsight("Insight: Reflect on your highs and lows today!");
-      } else {
-        setCurrentInsight("Insight: Consistent positive moods this month! Keep up the good habits!");
-      }
+        setWeeklyStudyTrendsData({
+          labels,
+          datasets: [
+            {
+              label: 'Focused',
+              data: Array.from({ length: dataPointsCount }, () => Math.floor(Math.random() * 60) + 20),
+              borderColor: '#51A8FF',
+              backgroundColor: 'rgba(81, 168, 255, 0.2)',
+              tension: 0.4,
+              fill: true,
+              pointBackgroundColor: '#51A8FF',
+              pointBorderColor: '#fff',
+              pointHoverBackgroundColor: '#fff',
+              pointHoverBorderColor: '#51A8FF',
+            },
+            {
+              label: 'Accomplished',
+              data: Array.from({ length: dataPointsCount }, () => Math.floor(Math.random() * 50) + 10),
+              borderColor: '#34D399',
+              backgroundColor: 'rgba(52, 211, 153, 0.2)',
+              tension: 0.4,
+              fill: true,
+              pointBackgroundColor: '#34D399',
+              pointBorderColor: '#fff',
+              pointHoverBackgroundColor: '#fff',
+              pointHoverBorderColor: '#34D399',
+            },
+            {
+              label: 'Burnt Out',
+              data: Array.from({ length: dataPointsCount }, () => Math.floor(Math.random() * 30) + 5),
+              borderColor: '#FF7A7A',
+              backgroundColor: 'rgba(255, 122, 122, 0.2)',
+              tension: 0.4,
+              fill: true,
+              pointBackgroundColor: '#FF7A7A',
+              pointBorderColor: '#fff',
+              pointHoverBackgroundColor: '#fff',
+              pointHoverBorderColor: '#FF7A7A',
+            },
+          ],
+        });
 
-    };
+        setMoodMeterData({
+          labels: ['Happy', 'Content', 'Neutral', 'Stressed', 'Sad'],
+          datasets: [{
+            data: [25, 20, 15, 25, 15].map(val => val * (Math.random() * 0.5 + 0.75)),
+            backgroundColor: ['#FACC15', '#34D399', '#94A3B8', '#FF7A7A', '#60A5FA'],
+            hoverOffset: 8,
+            borderWidth: 1,
+            borderColor: '#fff',
+          }]
+        });
 
-    generateDummyChartData();
-  }, [selectedView]); // Recalculate if the view changes
+        if (selectedView === 'week') {
+          setCurrentInsight("Insight: This week shows a strong 'Focused' trend on mid-week days. Leverage these peak times!");
+        } else if (selectedView === 'day') {
+          setCurrentInsight("Insight: Your mood was highest in the morning today. Start your key tasks early!");
+        } else if (selectedView === 'month') {
+          setCurrentInsight("Insight: Overall positive mood consistency this month. Keep reinforcing those good habits!");
+        } else if (selectedView === 'year') {
+          setCurrentInsight("Insight: A generally productive year with peak performance in Q3. Time to set new goals!");
+        }
+      };
 
-  // --- Handlers ---
-  const handleLogStudyVibe = ({ vibe, subject }) => {
-    // In a real app:
-    // 1. Send selectedStudyVibe, studySubject, and timestamp to your backend/local storage.
-    console.log('Logging Study Vibe:', {
-      vibe,
-      subject,
-      timestamp: new Date().toISOString(),
-    });
-    // 2. Potentially reset form fields and update charts.
-    alert('Study Vibe Logged!'); // Placeholder for a nice toast notification
-  };
-
-  const handleLogOverallMood = ({ mood, notes }) => {
-    // In a real app:
-    // 1. Send selectedOverallMood, overallMoodNotes, and timestamp to your backend/local storage.
-    console.log('Logging Overall Mood:', {
-      mood,
-      notes,
-      timestamp: new Date().toISOString(),
-    });
-    // 2. Potentially reset form fields and update charts.
-    alert('Daily Mood Logged!'); // Placeholder
-  };
-
-  // --- Inline Styles (for demonstration, extract to CSS Modules or Tailwind) ---
-  const styles = {
-    pageContainer: {
-      fontFamily: "'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-      background: 'linear-gradient(135deg, #FAF9EE, #CBDCEB)', // Soft gradient background
-      minHeight: '100vh',
-      padding: '40px',
-      color: '#333',
-    },
-    viewSwitcher: {
-      display: 'flex',
-      justifyContent: 'center',
-      gap: '10px',
-      marginBottom: '40px',
-    },
-    viewButton: {
-      padding: '10px 20px',
-      borderRadius: '20px',
-      border: 'none',
-      cursor: 'pointer',
-      fontSize: '1em',
-      backgroundColor: '#f0f0f0',
-      color: '#555',
-      transition: 'all 0.3s ease',
-    },
-    viewButtonActive: {
-      backgroundColor: '#6D94C5', // A vibrant purple for active
-      color: 'white',
-      boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-    },
-    gridContainer: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-      gap: '30px',
-      maxWidth: '1200px',
-      margin: '0 auto',
-    },
-    card: {
-      background: 'white',
-      borderRadius: '20px',
-      padding: '30px',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-    },
-    cardTitle: {
-      fontSize: '1.4em',
-      fontWeight: '600',
-      marginBottom: '20px',
-      color: '#333',
-    },
-    studyVibeGrid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-      gap: '15px',
-      marginBottom: '20px',
-    },
-    studyVibeCard: {
-      background: '#f0f4f8',
-      borderRadius: '15px',
-      padding: '15px',
-      textAlign: 'center',
-      cursor: 'pointer',
-      transition: 'all 0.2s ease',
-      border: '2px solid transparent',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '100px',
-    },
-    studyVibeCardSelected: {
-      borderColor: '#8a2be2',
-      boxShadow: '0 4px 12px rgba(138, 43, 226, 0.2)',
-      transform: 'scale(1.03)',
-    },
-    studyVibeIcon: {
-      fontSize: '2em',
-      marginBottom: '5px',
-    },
-    studyVibeLabel: {
-      fontWeight: 'bold',
-      fontSize: '0.9em',
-      marginBottom: '3px',
-    },
-    studyVibeDesc: {
-      fontSize: '0.75em',
-      color: '#666',
-    },
-    inputField: {
-      width: '100%',
-      padding: '12px',
-      borderRadius: '10px',
-      border: '1px solid #ddd',
-      fontSize: '1em',
-      marginBottom: '15px',
-      boxSizing: 'border-box',
-    },
-    textArea: {
-      width: '100%',
-      padding: '12px',
-      borderRadius: '10px',
-      border: '1px solid #ddd',
-      fontSize: '1em',
-      minHeight: '80px',
-      marginBottom: '15px',
-      boxSizing: 'border-box',
-      resize: 'vertical',
-    },
-    logButton: {
-      padding: '12px 25px',
-      borderRadius: '10px',
-      border: 'none',
-      backgroundColor: '#8a2be2',
-      color: 'white',
-      fontSize: '1em',
-      fontWeight: 'bold',
-      cursor: 'pointer',
-      transition: 'background-color 0.3s ease',
-      alignSelf: 'flex-end',
-    },
-    logButtonHover: {
-      backgroundColor: '#7a1ad1',
-    },
-    overallMoodSliderContainer: {
-      marginBottom: '20px',
-    },
-    overallMoodDisplay: {
-      textAlign: 'center',
-      fontSize: '2.5em',
-      marginBottom: '15px',
-    },
-    overallMoodLabel: {
-      fontSize: '1.2em',
-      fontWeight: '600',
-      color: '#555',
-    },
-    chartContainer: {
-      background: 'white',
-      borderRadius: '20px',
-      padding: '30px',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-    },
-    chartPlaceholder: {
-      height: '300px', // Placeholder height for charts
-      backgroundColor: '#f9f9f9',
-      borderRadius: '10px',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      color: '#999',
-      fontSize: '1.2em',
-      border: '1px dashed #e0e0e0',
-    },
-    insightBox: {
-      backgroundColor: '#e6f4f1',
-      borderRadius: '10px',
-      padding: '15px',
-      marginTop: '20px',
-      fontSize: '0.95em',
-      color: '#2d6a5d', 
-      borderLeft: '5px solid #38b2ac', 
-    },
-    footer: {
-      textAlign: 'center',
-      marginTop: '50px',
-      fontSize: '0.9em',
-      color: '#666',
+      generateDummyChartData();
     }
+  }, [selectedView, currentSection]); // Re-run effect when selectedView OR currentSection changes
+
+  const handleLogStudyVibe = (data) => {
+    console.log('Logging Study Vibe:', data);
+    alert('Study Vibe Logged! 🚀');
+    // In a real app, you would dispatch this data to your global state/backend
+    // and then potentially refetch analytics if the user switches to 'analytics'
   };
 
+  const handleLogOverallMood = (data) => {
+    console.log('Logging Overall Mood:', data);
+    alert('Daily Mood Logged! 😊');
+    // In a real app, you would dispatch this data to your global state/backend
+  };
 
   return (
-    <div style={styles.pageContainer}>
-      <ViewSwitcher selectedView={selectedView} setSelectedView={setSelectedView} styles={styles} />
-
-      <div style={styles.gridContainer}>
-        <StudyVibeLogger onLog={handleLogStudyVibe} styles={styles} />
-
-        <DailyMoodLogger onLog={handleLogOverallMood} styles={styles} />
-
-        <ChartCard
-          title="Weekly Study Vibe Trends"
-          chartComponent={<Line data={weeklyStudyTrendsData} options={{ maintainAspectRatio: false }} />}
-          insight={currentInsight}
-          styles={styles}
-          gridColumn="span 2"
-        />
-
-        <ChartCard
-          title="Your Mood Meter"
-          chartComponent={<Pie data={moodMeterData} options={{ maintainAspectRatio: false }} />}
-          styles={styles}
-        >
+    <div className="mood-tracker-container">
+      <header className="mood-tracker-header">
+        <h1>How are you feeling today?</h1>
+        {/* Primary navigation: Logging vs. Analytics */}
+        <div className="primary-nav-menu">
           <button
-            onClick={() => alert("Navigate to Full Analytics Page!")}
-            style={{ ...styles.logButton, marginTop: '20px', alignSelf: 'center', backgroundColor: '#6b7280' }} // Grey button for analytics
+            className={`primary-nav-button ${currentSection === 'logging' ? 'active' : ''}`}
+            onClick={() => setCurrentSection('logging')}
           >
-            View Full Analytics
+            Log Your Vibe
           </button>
-        </ChartCard>
-      </div>
+          <button
+            className={`primary-nav-button ${currentSection === 'analytics' ? 'active' : ''}`}
+            onClick={() => setCurrentSection('analytics')}
+          >
+            Analytics
+          </button>
+        </div>
+      </header>
+
+      <main className="moodashboard-content"> 
+        {/* Changed from dashboard-grid */}
+        {currentSection === 'logging' && (
+          <section className=" logger-section card-group"> {/* New section for logging content */}
+            <h2 className="section-title">Current State Loggers</h2>
+            
+            {/* Two-column layout for loggers */}
+            <StudyVibeLogger onLog={handleLogStudyVibe} />
+            <DailyMoodLogger onLog={handleLogOverallMood} />
+          </section>
+        )}
+
+        {currentSection === 'analytics' && (
+          <section className="charts-analytics-section"> {/* New section for analytics content */}
+            <h2 className="section-title">Your Vibe Analytics</h2>
+            {/* Pill menu (ViewSwitcher) for chart timeframes */}
+            <ViewSwitcher
+              selectedView={selectedView}
+              setSelectedView={setSelectedView}
+              views={['day', 'week', 'month', 'year']}
+            />
+            <div className="analytics-charts-grid"> {/* Grid for charts within analytics */}
+              <ChartCard
+                title={`Study Vibe Trends (${selectedView.charAt(0).toUpperCase() + selectedView.slice(1)})`}
+                chartComponent={<Line data={weeklyStudyTrendsData} options={{ maintainAspectRatio: false, responsive: true }} />}
+                insight={currentInsight}
+                className="chart-card-large"
+              />
+
+              <ChartCard
+                title={`Overall Mood Distribution (${selectedView.charAt(0).toUpperCase() + selectedView.slice(1)})`}
+                chartComponent={<Pie data={moodMeterData} options={{ maintainAspectRatio: false, responsive: true }} />}
+                insight="Understand the breakdown of your emotions over this period."
+              >
+                <button
+                  onClick={() => alert("Navigating to detailed analytics...")}
+                  className="view-analytics-button"
+                >
+                  View Full Analytics
+                </button>
+              </ChartCard>
+            </div>
+          </section>
+        )}
+      </main>
     </div>
   );
 };

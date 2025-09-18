@@ -1,16 +1,22 @@
 import "./App.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
+import RootLayout from "./RootLayout";
+
+// Core pages
 import Home from "./components/home/Home";
 import MoodTracker from "./components/mood-tracker/MoodTracker";
-import RootLayout from "./RootLayout";
+
+// Study Enhance
 import AIGenerationScreen from "./components/study-enhance/AIGenerationScreen";
 import FlashcardsLayout from "./components/study-enhance/FlashcardsLayout";
 import MindMapView from "./components/study-enhance/MindMapView";
+
+// Rooms
 import RoomList from "./components/room/RoomList";
 import VideoCall from "./components/room/VideoCall";
 
-// Resource Hub components
+// Resource Hub
 import AllResources from "./components/all-resources/AllResources";
 import PdfReader from "./components/pdf-reader/PdfReader";
 import UploadPage from "./components/upload-page/UploadPage";
@@ -24,13 +30,13 @@ function App() {
       path: "/",
       element: <RootLayout />,
       children: [
-        // Landing page
+        // 🏠 Landing Page
         { index: true, element: <Home /> },
 
-        // Mood Tracker
+        // 📊 Mood Tracker
         { path: "mood-tracker", element: <MoodTracker /> },
 
-        // Study Enhance section
+        // 🎓 Study Enhance
         {
           path: "study-enhance",
           children: [
@@ -40,17 +46,27 @@ function App() {
           ],
         },
 
-        // Rooms
-        { path: "rooms", element: <RoomList /> },
-        { path: "room/:roomId", element: <VideoCall /> },
+        // 🗣️ Rooms
+        {
+          path: "rooms",
+          children: [
+            { index: true, element: <RoomList /> },
+            { path: ":roomId", element: <VideoCall /> },
+          ],
+        },
 
-        // Resource Hub
-        { path: "resources", element: <AllResources /> },
-        { path: "resources/pdf/:id", element: <PdfReader /> },
-        { path: "upload", element: <UploadPage /> },
-        { path: "my-library", element: <MyLibrary /> },
-        { path: "groups", element: <GroupResources /> },
-        { path: "trending", element: <TrendingPage /> },
+        // 📚 Resource Hub
+        {
+          path: "resources",
+          children: [
+            { index: true, element: <AllResources /> }, // /resources
+            { path: "upload", element: <UploadPage /> }, // /resources/upload
+            { path: "library", element: <MyLibrary /> }, // /resources/library
+            { path: "groups", element: <GroupResources /> }, // /resources/groups
+            { path: "trending", element: <TrendingPage /> }, // /resources/trending
+            { path: "pdf/:id", element: <PdfReader /> }, // /resources/pdf/123
+          ],
+        },
       ],
     },
   ]);

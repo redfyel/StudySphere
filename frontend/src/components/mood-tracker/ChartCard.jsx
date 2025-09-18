@@ -1,13 +1,14 @@
+import React from 'react';
 
-const ChartCard = ({ title, chartComponent, insight, children, styles, gridColumn }) => {
+const ChartCard = ({ title, chartComponent, insight, children, className }) => { // Removed 'styles', 'gridColumn'
   return (
-    <div style={{ ...styles.chartContainer, gridColumn: gridColumn || 'span 1' }}>
-      <h2 style={styles.cardTitle}>{title}</h2>
-      <div style={styles.chartPlaceholder}>
+    <div className={`card ${className || ''}`}> {/* Use className="card" and merge with passed className */}
+      <h2 className="card-title">{title}</h2> {/* Use className="card-title" */}
+      <div className="chart-content-area"> {/* A new class for the chart wrapper, can be 'chart-placeholder' if you prefer */}
         {chartComponent}
       </div>
       {insight && (
-        <div style={styles.insightBox}>
+        <div className="insight-box"> {/* Use className="insight-box" */}
           {insight}
         </div>
       )}

@@ -19,6 +19,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  text-decoration: none;
 }
 
 .logo-icon {
@@ -37,20 +38,18 @@
 
 
 /* Center: Nav Pills */
-.nav-container {
+.header-nav-container {
   display: flex;
   background: #e7ecef;   /* ONLY pill has background */
   border-radius: 30px;
   justify-content: center;
   margin-top: 8px;
-  padding-top: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
-  gap: 4px;
+  padding: 8px;
+  gap: 7px;
 }
 
-.nav-link {
-  font-size: 1rem;
+.header-nav-link {
+  font-size: 1.2rem;
   color: #2a3d66;
   text-decoration: none;
   padding: 6px;
@@ -58,13 +57,13 @@
   transition: all 0.2s ease;
 }
 
-.nav-link:hover {
+.header-nav-link:hover {
   border-radius: 40px;
   background: #d8e2e8;
   color: #2a3d66;
 }
 
-.nav-link.active {
+.header-nav-link.active {
   background: #89a8b2;
   color: #fff;
   font-weight: 600;
@@ -82,7 +81,7 @@
   border: none;
   padding: 6px 16px;
   border-radius: 20px;
-  font-size: 1rem;
+  font-size: 1.1rem;
   cursor: pointer;
   color: #2a3d66;
   transition: background 0.2s ease;

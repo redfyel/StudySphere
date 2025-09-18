@@ -1,11 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { BiLike } from "react-icons/bi";
 import { IoSaveOutline } from "react-icons/io5";
 import { FaRegComments } from "react-icons/fa6";
 import { GrAttachment } from "react-icons/gr";
 import { FaTrophy } from "react-icons/fa";
+import {IoDocumentsOutline, IoCloudUploadOutline, IoBookmarkOutline, IoPeopleOutline, IoStatsChartOutline } from "react-icons/io5";
 import "./TrendingPage.css";
+import Sidebar from '../sidebar/Sidebar'
+// ✅ Sidebar items (Resource Hub)
+const navItems = [
+  { name: "All Resources", path: "/resources", icon: <IoDocumentsOutline /> },
+  { name: "Upload Resource", path: "/resources/upload", icon: <IoCloudUploadOutline /> },
+  { name: "My Library", path: "/resources/library", icon: <IoBookmarkOutline /> },
+  { name: "Group Resources", path: "/resources/groups", icon: <IoPeopleOutline /> },
+  { name: "Trending", path: "/resources/trending", icon: <IoStatsChartOutline /> },
+];
 
 // Sample data for trending resources (sorted by likes/saves)
 const trendingResources = [
@@ -61,6 +71,8 @@ const leaderboard = [
 ];
 
 export default function TrendingPage() {
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const toggleSidebar = () => setIsCollapsed(!isCollapsed);
   const renderResourceCard = (r) => (
     <Link to={`/resources/pdf/${r.id}`} key={r.id} className="resource-card-link">
       <div className="resource-card">
@@ -82,6 +94,13 @@ export default function TrendingPage() {
 
   return (
     <div className="trending-page-container">
+        <Sidebar
+        sectionName="Resources"
+        isCollapsed={isCollapsed}
+        toggleSidebar={toggleSidebar}
+        items={navItems}
+      />
+      <div className={`resources-page-content ${isCollapsed ? "collapsed" : ""}`}>
       <h2 className="page-title">Trending Resources 🔥</h2>
       <p className="page-description">The most popular resources, updated daily.</p>
       
@@ -101,6 +120,7 @@ export default function TrendingPage() {
           ))}
         </ul>
       </div>
+    </div>
     </div>
   );
 }

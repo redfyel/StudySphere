@@ -9,7 +9,7 @@
 }
 
 .resource-card {
-  background: var(--color-accent);
+  background: var (--color-accent);
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
@@ -101,4 +101,20 @@
   color: #999;
   text-align: center;
   margin-top: 5rem;
+}
+.resources-page-layout {
+  display: flex;
+  min-height: 100vh;
+}
+/* Main Content */
+.resources-page-content {
+  flex: 1;
+  padding: 20px;
+  margin-left: 240px;/* matches expanded sidebar width */
+  transition: margin-left 0.3s ease;
+}
+
+/* When sidebar is collapsed */
+.resources-page-content.collapsed {
+  margin-left: 70px; /* matches collapsed sidebar width */
 }

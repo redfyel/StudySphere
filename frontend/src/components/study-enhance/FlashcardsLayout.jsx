@@ -33,7 +33,11 @@ const FlashcardsLayout = () => {
     },
   ];
 
-  return <Sidebar logoText="StudyApp" menuItems={menuItems} />;
+  return (
+    <>
+      <FlashcardsView/>
+    </>
+  );
 };
 
 export default FlashcardsLayout;

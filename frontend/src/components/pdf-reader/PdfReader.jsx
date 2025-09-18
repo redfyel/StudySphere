@@ -1,43 +1,51 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Document, Page, pdfjs } from "react-pdf";
 import { useParams, Link } from "react-router-dom";
 import { MdClose } from "react-icons/md";
-import 'react-pdf/dist/Page/AnnotationLayer.css';
-import 'react-pdf/dist/Page/TextLayer.css';
 import "./PdfReader.css";
 
-// Configure react-pdf worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+// Import your PDF files directly from the src/assets/pdfs directory
+import mathNotes from "../../assets/pdfs/mathNotes.pdf";
+// Assuming you have these files, update the paths accordingly
+// import chemistryGuide from "../../assets/pdfs/chemistryGuide.pdf";
+// import algebraSheet from "../../assets/pdfs/algebraSheet.pdf";
 
 export default function PdfReader() {
   const { id } = useParams();
-  const [numPages, setNumPages] = useState(null);
-  const [pageNumber, setPageNumber] = useState(1);
+
   const [timer, setTimer] = useState(0);
+  const [isActive, setIsActive] = useState(false);
   const timerIntervalRef = useRef(null);
 
-  // Sample data to simulate fetching a single resource by ID
-  const resources = {
-    1: { id: 1, url: "https://www.pvpsiddhartha.ac.in/syllabus_23/cse/21/23BS1305.pdf", title: "Math Notes" },
-    3: { id: 3, url: "https://www.adobe.com/support/products/enterprise/acs/pdfs/acs_ecomm_wp.pdf", title: "Chemistry Guide" },
-    5: { id: 5, url: "https://arxiv.org/pdf/quant-ph/0410100.pdf", title: "Algebra Cheat Sheet" },
-  };
+  // Hardcoded average time for UI demonstration purposes
+  const avgTime = "00:05:30";
 
+  // This object holds all PDF URLs and their associated titles
+  const resources = {
+    1: { id: 1, url: mathNotes, title: "Math Notes" },
+    3: { id: 3, url: mathNotes, title: "Chemistry Guide" },
+    5: { id: 5, url: mathNotes, title: "Algebra Cheat Sheet" },
+  };
   const currentResource = resources[id];
 
   useEffect(() => {
-    // Start the timer when the component mounts
-    timerIntervalRef.current = setInterval(() => {
-      setTimer(prevTimer => prevTimer + 1);
-    }, 1000);
-
-    // Cleanup interval on component unmount
+    if (isActive) {
+      timerIntervalRef.current = setInterval(() => {
+        setTimer(prevTimer => prevTimer + 1);
+      }, 1000);
+    } else if (!isActive && timer !== 0) {
+      clearInterval(timerIntervalRef.current);
+    }
     return () => clearInterval(timerIntervalRef.current);
-  }, []);
+  }, [isActive, timer]);
 
-  function onDocumentLoadSuccess({ numPages }) {
-    setNumPages(numPages);
-  }
+  const toggleTimer = () => {
+    setIsActive(!isActive);
+  };
+
+  const resetTimer = () => {
+    setIsActive(false);
+    setTimer(0);
+  };
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600);
@@ -54,52 +62,42 @@ export default function PdfReader() {
     <div className="pdf-reader-container">
       <div className="reader-header">
         <Link to="/resources" className="back-btn">← Back to Resources</Link>
-        <div className="pdf-title-and-timer">
-          <h2 className="pdf-title">{currentResource.title}</h2>
-          <div className="pdf-timer">
-            Reading Time: <span>{formatTime(timer)}</span>
-          </div>
-        </div>
+        <div className="pdf-header-placeholder"></div> {/* Empty div to occupy space */}
         <button onClick={() => window.history.back()} className="close-btn">
           <MdClose size={24} />
         </button>
       </div>
-
-      <div className="pdf-document-container">
-        <Document
-          file={currentResource.url}
-          onLoadSuccess={onDocumentLoadSuccess}
-          className="pdf-document"
-        >
-          <Page
-            pageNumber={pageNumber}
-            renderTextLayer={false}
-            renderAnnotationLayer={false}
-          />
-        </Document>
-      </div>
-
-      {numPages && (
-        <div className="pdf-navigation">
-          <button
-            onClick={() => setPageNumber(prev => Math.max(1, prev - 1))}
-            disabled={pageNumber <= 1}
-            className="pdf-nav-btn"
+      <div className="pdf-and-timer-container">
+        <div className="pdf-document-container">
+          <iframe
+            src={currentResource.url}
+            title={currentResource.title}
+            width="100%"
+            height="100%"
+            style={{ border: "none" }}
           >
-            Previous
-          </button>
-          <span>
-            Page {pageNumber} of {numPages}
-          </span>
-          <button
-            onClick={() => setPageNumber(prev => Math.min(numPages, prev + 1))}
-            disabled={pageNumber >= numPages}
-            className="pdf-nav-btn"
-          >
-            Next
-          </button>
+            This browser does not support PDFs.
+          </iframe>
         </div>
-      )}
+        <div className="side-panel-container"> {/* New container for right-side content */}
+          <div className="pdf-title-card"> {/* New card for title and avg time */}
+            <h2 className="pdf-title">{currentResource.title}</h2>
+            <div className="avg-time">
+              Avg. reading time: <span>{avgTime}</span>
+            </div>
+          </div>
+          <div className="timer-card">
+            <div className="timer-header">Study Timer</div>
+            <div className="timer-display">{formatTime(timer)}</div>
+            <div className="timer-actions">
+              <button className="timer-btn" onClick={toggleTimer}>
+                {isActive ? 'Stop' : 'Start'}
+              </button>
+              <button className="timer-btn" onClick={resetTimer}>Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
