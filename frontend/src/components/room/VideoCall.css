@@ -1,59 +1,151 @@
-/* VideoCall - Room Page Layout (Improved with New Color Palette) */
+/* Enhanced VideoCall - Glass Morphism Design with Video Background */
 .video-call {
-  display: grid;
-  grid-template-columns: 220px 1fr 280px; /* Left sidebar, main content, right sidebar */
-  height: calc(100vh - var(--navbar-height)); /* Fill remaining viewport height */
-  overflow: hidden; /* Prevent overall scroll */
-  background-color: var(--primary-bg); /* Use palette primary background */
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
   color: var(--text-color);
+}
+
+/* Background Video - Full screen behind everything */
+.background-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+  filter: brightness(0.7) blur(1px);
+}
+
+/* Content Container - Overlay with improved glass effect */
+.content-container {
+  position: relative;
+  display: grid;
+  grid-template-columns: 220px 1fr 400px;
+  min-height: 100vh;
+  padding: 1.5rem;
+  box-sizing: border-box;
+  gap: 20px;
+  z-index: 1;
+}
+
+/* Enhanced Glass Panel Base */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.4) 50%, 
+    transparent 100%);
+}
+
+.glass-panel:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 /* Left Sidebar for Participants */
 .left-sidebar {
-  background-color: var(--secondary-bg-panels); /* Light panel background */
-  padding: 15px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  border-right: 2px solid var(--border-color);
-  overflow-y: auto; /* Scroll for many participants */
-  box-shadow: 2px 0 8px rgba(var(--text-color-rgb), 0.1);
+  gap: 16px;
+  overflow-y: auto;
+  max-height: calc(100vh - 3rem);
+}
+
+.left-sidebar.glass-panel {
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .left-sidebar h3 {
-  color: var(--text-color);
+  color: rgba(255, 255, 255, 0.95);
   margin-top: 0;
-  margin-bottom: 10px;
-  font-size: 1.2rem;
+  margin-bottom: 16px;
+  font-size: 1.1rem;
   text-align: center;
-  border-bottom: 2px solid var(--border-color);
-  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 12px;
   font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .participant-list-vertical {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
+/* Enhanced Video Wrapper with Glass Effect */
 .video-wrapper {
   position: relative;
   width: 100%;
-  padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
-  height: 0; /* Important for aspect ratio padding trick */
-  background-color: var(--cards-highlights);
+  padding-bottom: 56.25%;
+  height: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
   border-radius: 12px;
   overflow: hidden;
-  border: 3px solid var(--border-color);
-  box-shadow: 0 4px 12px rgba(var(--text-color-rgb), 0.15);
-  flex-shrink: 0; /* Prevent shrinking in flex container */
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.video-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    transparent 50%);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .video-wrapper:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(var(--text-color-rgb), 0.2);
+  transform: translateY(-3px) scale(1.02);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.video-wrapper.active-main-view {
+  border-color: rgba(59, 130, 246, 0.8);
+  box-shadow: 
+    0 0 0 2px rgba(59, 130, 246, 0.5),
+    0 8px 25px rgba(0, 0, 0, 0.4);
 }
 
 .video-wrapper video {
@@ -64,88 +156,98 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  z-index: 0;
 }
 
 .video-label {
   position: absolute;
   bottom: 8px;
   left: 8px;
-  background-color: rgba(var(--text-color-rgb), 0.85);
-  color: white;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 0.8rem;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  color: rgba(255, 255, 255, 0.95);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
   font-weight: 500;
   z-index: 10;
-  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .video-wrapper.placeholder {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: var(--text-color-light);
+  color: rgba(255, 255, 255, 0.7);
   font-style: italic;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   text-align: center;
-  background-color: var(--notes-timers-ui);
-  position: absolute; /* For placeholder to fill wrapper */
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  border: 2px dashed var(--border-color);
+  backdrop-filter: blur(5px);
 }
 
 /* Main Study Area (Center) */
 .main-study-area {
   position: relative;
   display: flex;
-  flex-direction: column; /* Stack content and toolbar vertically */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  transition: background-image 0.3s ease-in-out;
-  padding: 20px; /* Padding around content */
-  background-color: var(--primary-bg);
+  padding: 24px;
+  border-radius: 20px;
+  overflow: hidden;
 }
 
+
+
 .main-background-placeholder {
-  position: absolute;
-  /* top: 0;
-  left: 0; */
-  width: 100%;
-  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--text-color);
-  text-shadow: 0 2px 8px rgba(255,255,255,0.8);
+  font-size: 2.2rem;
+  font-weight: 300;
+  
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   pointer-events: none;
   text-align: center;
-  padding: 20px;
-  box-sizing: border-box;
-  background: linear-gradient(135deg, rgba(var(--text-color-rgb), 0.05), rgba(var(--text-color-rgb), 0.1));
-  border-radius: 20px;
-  margin: 20px;
+  padding: 80px 20px;
+  min-height: 200px;
+  width: 100%;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.05) 0%, 
+    rgba(255, 255, 255, 0.02) 100%);
+  border-radius: 16px;
+  backdrop-filter: blur(5px);
 }
 
 .main-screen-share-wrapper {
   width: 100%;
-  height: 100%;
-  max-width: 1200px; /* Max width for main screen share */
-  max-height: 100px; /* Max height for main screen share */
   aspect-ratio: 16/9;
-  background-color: var(--cards-highlights);
+  
+  backdrop-filter: blur(20px);
   border-radius: 16px;
   overflow: hidden;
-  border: 4px solid var(--button-bg);
-  /* box-shadow: 0 12px 32px rgba(var(--text-color-rgb), 0.2); */
+  border: 1px solid rgba(59, 130, 246, 0.6);
+  
   position: relative;
+}
+
+.main-screen-share-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+ 
+  pointer-events: none;
   z-index: 1;
 }
 
@@ -158,428 +260,558 @@
 
 /* Right Sidebar for Tools */
 .right-sidebar {
-  background-color: var(--secondary-bg-panels); /* Light panel background */
-  padding: 15px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  border-left: 2px solid var(--border-color);
-  overflow-y: auto; /* Scroll if tools exceed height */
-  box-shadow: -2px 0 8px rgba(var(--text-color-rgb), 0.1);
+  gap: 16px;
+  overflow-y: auto;
+  max-height: calc(100vh - 3rem);
 }
 
+
+
 .right-sidebar h3 {
-  color: var(--text-color);
+  color: rgba(255, 255, 255, 0.95);
   margin-top: 0;
-  margin-bottom: 10px;
-  font-size: 1.2rem;
+  margin-bottom: 16px;
+  font-size: 1.1rem;
   text-align: center;
-  border-bottom: 2px solid var(--border-color);
-  padding-bottom: 50px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 12px;
   font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 .tools-panel-stack {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 16px;
 }
 
-.notes-panel
- {
-  background-color: var(--notes-timers-ui);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 4px 12px rgba(var(--text-color-rgb), 0.1);
-  border: 2px solid var(--border-color);
-  color: var(--text-color);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* Enhanced Tool Panels with Glass Morphism */
+.notes-panel,
+.timer-panel,
+.music-player-panel {
+  background: #E5E1DA; /* Use a solid palette color */
+  backdrop-filter: none; /* Remove blur */
+  -webkit-backdrop-filter: none; /* Remove blur for WebKit browsers */
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.2); /* Keep a subtle shadow for depth */
+  border: 1px solid #B3C8CF; /* Use a lighter color from the palette */
+  color: #1F2937; /* Use a darker text color for readability */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.notes-panel::before,
+.timer-panel::before,
+.music-player-panel::before {
+  /* Remove the shimmer effect as it's part of the glass design */
+  content: none;
 }
 
 .notes-panel:hover,
 .timer-panel:hover,
 .music-player-panel:hover {
+  background: #F1F0E8; /* Use a lighter color on hover */
+  border-color: #89A8B2; /* Use the main accent color on hover */
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(var(--text-color-rgb), 0.15);
+  box-shadow: 
+    0 12px 35px rgba(0, 0, 0, 0.3); /* Adjust shadow for the hover effect */
 }
 
+.tools-placeholder {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced Panel Titles */
 .notes-panel h3,
 .timer-panel h3,
 .music-player-panel h3 {
-  font-size: 1.1rem;
+  font-size: 1rem;
   margin-top: 0;
-  margin-bottom: 12px;
-  border-bottom: 2px solid var(--border-color);
-  padding-bottom: 8px;
-  color: var(--text-color);
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 10px;
+  color: rgba(255, 255, 255, 0.95);
   font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* Adjustments for MusicPlayer within panel */
-.music-player-panel .player-controls {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-.music-player-panel .player-controls button {
-  flex-shrink: 0;
-  width: 80px;
-  background-color: var(--button-bg);
-  border-radius: 8px;
-}
-.music-player-panel .player-controls button:hover {
-  background-color: var(--button-hover-bg);
-}
-.music-player-panel .player-controls select {
-  flex-grow: 1;
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 2px solid var(--border-color);
-  background-color: white;
-  font-size: 0.95rem;
-  color: var(--text-color);
-  transition: border-color 0.2s ease;
-}
-.music-player-panel .player-controls select:focus {
-  outline: none;
-  border-color: var(--button-bg);
-}
-.music-player-panel .volume-control {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 8px;
-}
-.music-player-panel .volume-control span {
-  font-size: 0.95rem;
-  color: var(--text-color-light);
-  font-weight: 500;
-}
-.music-player-panel .volume-control input[type="range"] {
-  flex-grow: 1;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 8px;
-  background: var(--border-color);
-  border-radius: 5px;
-  outline: none;
-  opacity: 0.8;
-  transition: opacity .2s;
-}
-.music-player-panel .volume-control input[type="range"]:hover {
-  opacity: 1;
-}
-.music-player-panel .volume-control input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--button-bg);
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(var(--text-color-rgb), 0.2);
-}
-.music-player-panel .volume-control input[type="range"]::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--button-bg);
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(var(--text-color-rgb), 0.2);
-  border: none;
-}
-
-/* Adjustments for Timer within panel */
-.timer-panel .timer-display {
-  font-size: 2rem;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 15px;
-  color: var(--button-bg);
-  background: linear-gradient(135deg, var(--cards-highlights), var(--secondary-bg-panels));
-  padding: 12px;
-  border-radius: 10px;
-  border: 2px solid var(--border-color);
-}
-.timer-panel .timer-controls {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-.timer-panel .timer-controls button {
-  padding: 10px 16px;
-  font-size: 0.9rem;
-  flex: 1;
-  max-width: 100px;
-  border-radius: 8px;
-  font-weight: 500;
-}
-
-/* Adjustments for Notes within panel */
+/* Enhanced Notes Panel */
 .notes-panel textarea {
   width: 100%;
   box-sizing: border-box;
   min-height: 120px;
-  padding: 12px;
-  border: 2px solid var(--border-color);
-  border-radius: 10px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   resize: vertical;
-  background-color: white;
-  color: var(--text-color);
-  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  color: rgba(255, 255, 255, 0.95);
+  transition: all 0.2s ease;
+}
+
+.notes-panel textarea::placeholder {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .notes-panel textarea:focus {
   outline: none;
-  border-color: var(--button-bg);
-  box-shadow: 0 0 0 4px rgba(var(--text-color-rgb), 0.1);
+  border-color: rgba(59, 130, 246, 0.6);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 0 0 2px rgba(59, 130, 246, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-/* Floating Toolbar (at the bottom of the main-study-area) */
+/* Enhanced Timer Panel */
+.timer-panel .timer-display {
+  font-size: 1.8rem;
+  font-weight: 300;
+  text-align: center;
+  margin-bottom: 16px;
+  color: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  font-family: 'SF Mono', 'Monaco', monospace;
+}
 
-/* Modal Styles (for Username Modal within VideoCall) */
+.timer-panel .timer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.timer-panel .timer-controls button {
+  padding: 12px 18px;
+  font-size: 0.85rem;
+  flex: 1;
+  max-width: 100px;
+  border-radius: 10px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.95);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.timer-panel .timer-controls button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+
+/* Enhanced Music Player Panel */
+.music-player-panel .music-player {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  color: inherit;
+}
+
+/* Enhanced Floating Toolbar */
+.floating-toolbar {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 12px 40px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+.floating-toolbar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.4) 50%, 
+    transparent 100%);
+}
+
+/* Enhanced Modal Styles */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(var(--text-color-rgb), 0.6);
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 2000;
-  backdrop-filter: blur(5px);
 }
 
 .modal-content {
-  background: linear-gradient(135deg, var(--notes-timers-ui), var(--secondary-bg-panels));
-  padding: 32px;
-  border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(var(--text-color-rgb), 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  padding: 36px;
+  border-radius: 20px;
+  box-shadow: 
+    0 25px 70px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
   width: 90%;
   max-width: 500px;
-  animation: fadeIn 0.3s ease-out;
-  border: 3px solid var(--border-color);
+  animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.95);
+  position: relative;
+  overflow: hidden;
+}
+
+.modal-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.5) 50%, 
+    transparent 100%);
 }
 
 .modal-content h2 {
   margin-top: 0;
-  color: var(--text-color);
-  border-bottom: 2px solid var(--border-color);
+  color: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   padding-bottom: 16px;
   margin-bottom: 24px;
   font-weight: 600;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .modal-content .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .modal-content label {
   display: block;
-  margin-bottom: 10px;
-  font-weight: 600;
-  color: var(--text-color);
-  font-size: 1.1rem;
+  margin-bottom: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 1rem;
 }
 
 .modal-content input[type="text"] {
-  width: calc(100% - 28px);
-  padding: 12px 14px;
-  border: 2px solid var(--border-color);
-  border-radius: 10px;
+  width: calc(100% - 32px);
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
   font-size: 1rem;
-  background-color: white;
-  color: var(--text-color);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+  color: rgba(255, 255, 255, 0.95);
+  transition: all 0.2s ease;
+}
+
+.modal-content input[type="text"]::placeholder {
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .modal-content input[type="text"]:focus {
   outline: none;
-  border-color: var(--button-bg);
-  box-shadow: 0 0 0 4px rgba(var(--text-color-rgb), 0.1);
+  border-color: rgba(59, 130, 246, 0.6);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 0 0 2px rgba(59, 130, 246, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .modal-content .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 28px;
+  margin-top: 32px;
 }
 
 .modal-content .modal-actions button {
   padding: 12px 24px;
-  border-radius: 10px;
-  font-weight: 600;
+  border-radius: 12px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.95);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.modal-content .modal-actions button.cancel {
-  background-color: var(--text-color-light);
+.modal-content .modal-actions button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
 }
 
-.modal-content .modal-actions button.cancel:hover {
-  background-color: var(--text-color);
+.modal-content .modal-actions button.primary {
+  background: rgba(59, 130, 246, 0.8);
+  border-color: rgba(59, 130, 246, 0.6);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-20px) scale(0.95); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+.modal-content .modal-actions button.primary:hover {
+  background: rgba(59, 130, 246, 0.9);
+  border-color: rgba(59, 130, 246, 0.8);
+}
+
+@keyframes modalSlideIn {
+  from { 
+    opacity: 0; 
+    transform: translateY(-30px) scale(0.9); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+  }
+}
+
+/* Enhanced Scrollbars */
+.left-sidebar::-webkit-scrollbar,
+.right-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.left-sidebar::-webkit-scrollbar-track,
+.right-sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.left-sidebar::-webkit-scrollbar-thumb,
+.right-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.left-sidebar::-webkit-scrollbar-thumb:hover,
+.right-sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-  .video-call {
-    grid-template-columns: 180px 1fr 250px; /* Adjust sidebar widths */
+  .content-container {
+    grid-template-columns: 200px 1fr 320px;
+    padding: 1.2rem;
+    gap: 16px;
   }
   .left-sidebar, .right-sidebar {
-    padding: 12px;
+    padding: 16px;
     gap: 12px;
   }
-  .left-sidebar h3, .right-sidebar h3 {
-    font-size: 1.1rem;
-    margin-bottom: 8px;
-    padding-bottom: 50px;
-  }
-  .notes-panel, .timer-panel, .music-player-panel {
-    padding: 12px;
-  }
-  .notes-panel textarea {
-    min-height: 100px;
+}
+
+@media (max-width: 992px) {
+  .content-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: 160px 1fr auto;
+    padding: 1rem;
+    gap: 12px;
   }
   
-@media (max-width: 992px) {
-  .video-call {
-    grid-template-columns: 1fr; /* Stack vertically */
-    grid-template-rows: 150px 1fr auto 200px; /* Left sidebar (top), main, toolbar, right sidebar (bottom) */
-  }
-
   .left-sidebar {
-    flex-direction: row; /* Horizontal scroll for participants */
+    flex-direction: row;
     overflow-x: auto;
     overflow-y: hidden;
-    border-right: none;
-    border-bottom: 2px solid var(--border-color);
-    max-height: 150px;
-    background-color: var(--secondary-bg-panels);
+    max-height: 160px;
+    padding: 16px;
   }
+  
   .left-sidebar h3 {
-    display: none; /* Hide title to save space */
+    display: none;
   }
+  
   .participant-list-vertical {
     flex-direction: row;
-    padding: 0 10px;
+    padding: 0;
+    gap: 12px;
   }
-  .video-wrapper {
-    width: 160px; /* Fixed width for horizontal strip */
-    height: 90px; /* 16:9 aspect ratio */
-    padding-bottom: 0; /* Reset padding-bottom trick */
-  }
-  .video-wrapper video {
-    position: static; /* Reset absolute positioning */
-  }
-
-  .main-study-area {
-    padding: 15px;
-    min-height: 300px;
-    max-height: 12000px;
-  }
-
   
-
+  .video-wrapper {
+    width: 180px;
+    height: 101px;
+    padding-bottom: 0;
+    flex-shrink: 0;
+  }
+  
+  .video-wrapper video {
+    position: static;
+  }
+  
+  .main-study-area {
+    padding: 20px;
+    min-height: 320px;
+  }
+  
   .right-sidebar {
-    border-left: none;
-    border-top: 2px solid var(--border-color);
-    max-height: 200px; /* Limit height when at bottom */
+    max-height: 220px;
     overflow-y: auto;
-    flex-direction: row; /* Arrange tools horizontally if space allows */
+    flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
     align-items: flex-start;
-    background-color: var(--secondary-bg-panels);
+    gap: 12px;
   }
+  
   .right-sidebar h3 {
-    width: 100%; /* Take full width */
+    width: 100%;
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
   }
+  
   .notes-panel, .timer-panel, .music-player-panel {
-    flex-basis: calc(50% - 15px); /* Two columns for tools */
-    max-width: calc(50% - 15px);
+    flex-basis: calc(50% - 8px);
+    max-width: calc(50% - 8px);
     box-sizing: border-box;
+    padding: 16px;
   }
+  
   .notes-panel textarea {
     min-height: 80px;
   }
 }
 
 @media (max-width: 768px) {
-  .video-call {
-    grid-template-rows: 120px 1fr auto auto; /* Smaller sidebar, main, toolbar, tools */
-  }
-  .left-sidebar {
-    max-height: 120px;
-  }
-  .video-wrapper {
-    width: 120px;
-    height: 67.5px; /* 16:9 */
-  }
-  .main-study-area {
-    padding: 10px;
-    min-height: 250px;
-  }
-  .main-background-placeholder {
-    font-size: 1.5rem;
+  .content-container {
+    grid-template-rows: 140px 1fr auto;
+    padding: 0.8rem;
   }
   
+  .left-sidebar {
+    max-height: 140px;
+    padding: 12px;
+  }
+  
+  .video-wrapper {
+    width: 140px;
+    height: 78px;
+  }
+  
+  .main-study-area {
+    padding: 16px;
+    min-height: 280px;
+  }
+  
+  .main-background-placeholder {
+    font-size: 1.8rem;
+    padding: 60px 16px;
+  }
   
   .right-sidebar {
-    max-height: 180px;
+    max-height: 200px;
+    padding: 12px;
   }
+  
   .notes-panel, .timer-panel, .music-player-panel {
-    flex-basis: 100%; /* Stack tools vertically again if very tight */
+    flex-basis: 100%;
     max-width: 100%;
-  }
-  .notes-panel h3, .timer-panel h3, .music-player-panel h3 {
-    font-size: 1rem;
-  }
-  .timer-panel .timer-display {
-    font-size: 1.4rem;
+    padding: 14px;
   }
 }
 
 @media (max-width: 480px) {
-  .video-call {
-    grid-template-rows: 100px 1fr auto auto;
+  .content-container {
+    grid-template-rows: 120px 1fr auto;
+    padding: 0.5rem;
   }
-  .left-sidebar {
-    max-height: 100px;
-  }
-  .video-wrapper {
-    width: 100px;
-    height: 56.25px; /* 16:9 */
-  }
-  .main-study-area {
-    min-height: 200px;
-  }
-  .main-background-placeholder {
-    font-size: 1.1rem;
-  }
- 
   
+  .left-sidebar {
+    max-height: 120px;
+    padding: 10px;
+  }
+  
+  .video-wrapper {
+    width: 120px;
+    height: 67px;
+  }
+  
+  .main-study-area {
+    min-height: 240px;
+    padding: 12px;
+  }
+  
+  .main-background-placeholder {
+    font-size: 1.4rem;
+    padding: 40px 12px;
+  }
   
   .right-sidebar {
-    max-height: 150px;
+    max-height: 180px;
     padding: 10px;
   }
+  
   .notes-panel, .timer-panel, .music-player-panel {
-    padding: 10px;
+    padding: 12px;
   }
+  
   .notes-panel textarea {
     min-height: 60px;
+    font-size: 14px;
   }
 }
+
+/* Ensure proper z-index layering */
+button, input, select, textarea {
+  position: relative;
+  z-index: 2;
+}
+
+/* Loading animation for glass panels */
+@keyframes glassShimmer {
+  0% { 
+    background-position: -200% 0; 
+  }
+  100% { 
+    background-position: 200% 0; 
+  }
+}
+
+.glass-panel.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1), 
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: glassShimmer 2s infinite;
 }
