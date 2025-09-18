@@ -22,7 +22,7 @@ import { Outlet } from "react-router-dom";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import Sidebar from "./components/sidebar/Sidebar";
-import "./RootLayout.css"; // Ensure this CSS file exists
+// import "./RootLayout.css"; // Ensure this CSS file exists
 
 function RootLayout() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -33,7 +33,7 @@ function RootLayout() {
 
   return (
     <div className="app-container">
-      <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} />
+      {/* <Sidebar isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} /> */}
       <div className={`main-content ${isCollapsed ? 'collapsed' : ''}`}>
         <Header />
         <main>

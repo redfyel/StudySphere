@@ -371,12 +371,12 @@ body {
     background-color: #f0f2f5; /* A neutral background for the overall app wrapper */
 }
 
-/* --- App Layout --- */
+/* --- App Layout ---
 .app-container {
     display: flex;
     min-height: 100vh;
-    background-color: var(--color-extra-light); /* Main app background */
-}
+    background-color: var(--color-extra-light);
+} */
 
 /* --- Sidebar --- */
 .sidebar {
@@ -440,14 +440,14 @@ body {
 }
 
 /* --- Main Content Area --- */
-.main-content {
+/* .main-content {
     flex-grow: 1;
     padding: 40px;
     background-color: var(--color-extra-light);
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center content horizontally */
-}
+    align-items: center; 
+} */
 
 /* --- Flashcards View (Single Card) --- */
 .flashcards-view-container {
