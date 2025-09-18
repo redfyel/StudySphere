@@ -111,10 +111,10 @@
   margin-top: 2rem;
 }
 
-.pinboard-grid .resource-card {
-  border: 2px solid gold;
-  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
-}
+/* .pinboard-grid .resource-card {
+  border: 2px solid var(--color-primary);
+  /* box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4); 
+} */
 
 /* Comment System */
 .comment-section {

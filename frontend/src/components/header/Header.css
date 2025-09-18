@@ -1,120 +1,102 @@
-/* Global Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Poppins', sans-serif;
-  background-color: #F1F0E8; /* Soft, light background */
-  color: #2A3D66;  /* Darker text for readability */
-  line-height: 1.6;
-  margin: 0;
-}
-
-/* Header Styling */
-header {
+/* Header container */
+.header {
   position: fixed;
   top: 0;
-  left: 50%;
-  transform: translateX(-50%);  /* Center the header */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: rgba(255, 255, 255, 0.7);  /* Translucent background */
-  backdrop-filter: blur(10px);  /* Soft blur effect */
-  width: 90%;
-  margin: 10px;
-  max-width: 1200px;
-  padding: 20px;
-  border-radius: 20px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  z-index: 10;  /* Ensure header is on top */
-  transition: all 0.3s ease;
-  transform-origin: center; /* Origin of transformation */
-}
-
-/* Adding scroll effects (parallax-style) */
-header.scrolled {
-  transform: translateX(-50%) translateY(-10px); /* Slightly lift on scroll */
-  opacity: 0.95; /* Fade a bit on scroll */
-}
-
-/* Logo Container */
-.logo-container {
+  left: 0;
+  width: 100%;
+  height: 60px;
   display: flex;
   align-items: center;
+  justify-content: space-between; /* logo left, nav center, buttons right */
+  padding: 0 20px;
+  background: transparent;       /* no color at all */
+  box-shadow: none;              /* remove shadow if you want it floating clean */
+  z-index: 1000;
+}
+
+/* Left: Logo + Name */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .logo-icon {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  margin-right: 15px;
-  /* border-radius: 50%; */
-  transition: transform 0.3s ease;
+  width: 40px;
 }
 
-.logo-title-link {
-  text-decoration: none;
-}
-
-.logo-title {
-  font-size: 2rem;
+.logo-text {
+  font-size: 1.8rem;
   font-weight: 600;
-  color: #89A8B2;  /* Soft muted blue-gray */
-  letter-spacing: 1px;
-  transition: transform 0.3s ease;
+  color: var(--color-deep-teal);
 }
 
-.logo-title-link:hover .logo-title {
-  transform: translateX(5px);  /* Slight movement on hover */
-  color: #B3C8CF;  /* Lighter blue hover */
+.logo-text span {
+  color: var(--color-text-dark);
 }
 
-/* Navigation Styling */
-.main-nav {
+
+/* Center: Nav Pills */
+.nav-container {
   display: flex;
-  gap: 30px;
+  background: #e7ecef;   /* ONLY pill has background */
+  border-radius: 30px;
+  justify-content: center;
+  margin-top: 8px;
+  padding-top: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  gap: 4px;
 }
 
 .nav-link {
+  font-size: 1rem;
+  color: #2a3d66;
   text-decoration: none;
-  font-size: 1.2rem;
-  font-weight: 500;
-  color: #89A8B2;  /* Soft muted blue-gray */
-  padding: 10px 20px;
-  border-radius: 30px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  padding: 6px;
+  border-radius: 25px;
+  transition: all 0.2s ease;
 }
 
 .nav-link:hover {
-  background-color: #B3C8CF;  /* Lighter blue-gray hover */
-  color: #F1F0E8;  /* Almost white text on hover */
-  transform: translateY(-3px);  /* Subtle lift effect */
+  border-radius: 40px;
+  background: #d8e2e8;
+  color: #2a3d66;
 }
 
 .nav-link.active {
-  background-color: #E5E1DA;  /* Subtle beige for active state */
-  color: #2A3D66;
-  box-shadow: 0 5px 15px rgba(242, 209, 46, 0.2);
+  background: #89a8b2;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 40px;
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-  header {
-    flex-direction: column;
-    text-align: center;
-  }
+/* Right: Buttons */
+.header-buttons {
+  display: flex;
+  gap: 8px;
+}
 
-  .logo-title {
-    font-size: 1.8rem;
-  }
+.rbtn {
+  background: #e7ecef;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #2a3d66;
+  transition: background 0.2s ease;
+}
 
-  .main-nav {
-    margin-top: 20px;
-    flex-direction: column;
-    gap: 15px;
-  }
+.rbtn:hover {
+  background: #d8e2e8;
+}
+
+.rbtn.join {
+  background: #89a8b2;
+  color: #fff;
+}
+
+.rbtn.join:hover {
+  background: #6f8f97;
 }

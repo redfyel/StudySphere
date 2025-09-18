@@ -24,7 +24,7 @@ export default function Sidebar({ isCollapsed, toggleSidebar }) {
   return (
     <div className={`resource-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <div className="resource-sidebar-header"> {/* Corrected class name */}
-        <div className="logo">StudySphere</div>
+        <div className="res-logo">ResourceHub</div>
         <button className="toggle-btn" onClick={toggleSidebar}>
           <IoMenuOutline />
         </button>

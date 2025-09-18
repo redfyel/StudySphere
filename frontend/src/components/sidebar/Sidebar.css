@@ -1,7 +1,7 @@
 /* resource-sidebar Container */
 
 .resource-sidebar {
-  width: 250px;
+  width: 225px;
   background: white;
   padding: 2rem 1.5rem;
   display: flex;
@@ -18,7 +18,7 @@
 
 /* Collapsed state */
 .resource-sidebar.collapsed {
-  width: 70px;
+  width: 50px;
   padding: 2rem 0.5rem;
   align-items: center;
 }
@@ -37,14 +37,16 @@
 }
 
 /* Logo */
-.logo {
-  font-size: 1.5rem;
+.res-logo {
+  font-size: 1.2rem;
   font-weight: bold;
   color: var(--color-primary);
   transition: opacity 0.3s ease;
+  margin-top:50px;
+  margin-left:20px;
 }
 
-.resource-sidebar.collapsed .logo {
+.resource-sidebar.collapsed .res-logo {
   opacity: 0;
   pointer-events: none;
   width: 0;
@@ -55,14 +57,16 @@
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: #777;
+  color:var(--color-primary);/* #777;*/
   cursor: pointer;
   padding: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0;
+  margin-top:50px;
 }
+
 
 /* Navigation Menu */
 .res-nav-menu {
@@ -94,6 +98,17 @@
   font-weight: 600;
 }
 
+.nav-link.active {
+  background: var(--color-primary);
+  color: white; /* Applies to the text directly inside the NavLink */
+  font-weight: 600;
+}
+
+/* New rule to specifically target the icon inside an active link */
+.nav-link.active .res-nav-icon {
+  color: white;
+}
+
 .resource-sidebar.collapsed .nav-link {
   justify-content: center;
   padding: 0.8rem;
@@ -108,6 +123,7 @@
 
 .resource-sidebar.collapsed .res-nav-icon {
   margin-right: 0;
+  margin-left:0;
 }
 
 /* Navigation Names */

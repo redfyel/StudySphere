@@ -1,65 +1,34 @@
-import { useState, useEffect } from 'react';
+import React from "react";
 import { NavLink } from "react-router-dom";
-import logo from '/logo.png';
-import './Header.css';
+import "./Header.css";
+import logo from "/logo.png";
 
-const Header = () => {
-  const [scrolled, setScrolled] = useState(false);
-
-  const handleScroll = () => {
-    if (window.scrollY > 50) {  // Adjust this value for how much scrolling triggers the effect
-      setScrolled(true);
-    } else {
-      setScrolled(false);
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
+function Header() {
   return (
-    <header className={scrolled ? "header-container scrolled" : "header-container"}>
-      <div className="logo-container">
-        <img src={logo} alt="StudySphere Logo" className="logo-icon" />
-        <NavLink to="/" className="logo-title-link">
-          <h1 className="logo-title">StudySphere</h1>
-        </NavLink>
+    <header className="header">
+      {/* Left: Logo + Name */}
+      <div className="logo">
+        <img src={logo} alt="logo" className="logo-icon" />
+        <div className="logo-text">
+          Study<span>Sphere</span>
+        </div>
       </div>
-      <nav className="main-nav">
-        <NavLink 
-          to="/rooms" 
-          className={({isActive}) => isActive ? "nav-link active" : "nav-link"} 
-          end
-        >
-          Rooms
-        </NavLink>
 
-        <NavLink 
-          to="/resources" 
-          className={({isActive}) => isActive ? "nav-link active" : "nav-link"} 
-          end
-        >
-          Resource Hub
-        </NavLink>
-
-        <NavLink 
-          to="/mood-tracker" 
-          className={({isActive}) => isActive ? "nav-link active" : "nav-link"} 
-          end
-        >
-          Mood
-        </NavLink>
-        <NavLink 
-          to="/study-enhance" 
-          className={({isActive}) => isActive ? "nav-link active" : "nav-link"}
-        >
-          Study Enhancement
-        </NavLink>
+      {/* Center: Nav Pills */}
+      <nav className="nav-container">
+        <NavLink to="/rooms" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Rooms</NavLink>
+        <NavLink to="/resources" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Resource Hub</NavLink>
+        <NavLink to="/mood-tracker" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Mood</NavLink>
+        <NavLink to="/study-enhance" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Enhance</NavLink>
       </nav>
+
+      {/* Right: Buttons */}
+      <div className="header-buttons">
+        <button className="rbtn">Dashboard</button>
+        <button className="rbtn join">Join Now</button>
+      </div>
     </header>
   );
-};
+}
 
 export default Header;

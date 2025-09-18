@@ -62,12 +62,7 @@ export default function PdfReader() {
     <div className="pdf-reader-container">
       <div className="reader-header">
         <Link to="/resources" className="back-btn">← Back to Resources</Link>
-        <div className="pdf-title-and-timer">
-          <h2 className="pdf-title">{currentResource.title}</h2>
-          <div className="avg-time">
-            Avg. reading time: <span>{avgTime}</span>
-          </div>
-        </div>
+        <div className="pdf-header-placeholder"></div> {/* Empty div to occupy space */}
         <button onClick={() => window.history.back()} className="close-btn">
           <MdClose size={24} />
         </button>
@@ -84,14 +79,22 @@ export default function PdfReader() {
             This browser does not support PDFs.
           </iframe>
         </div>
-        <div className="timer-card">
-          <div className="timer-header">Study Timer</div>
-          <div className="timer-display">{formatTime(timer)}</div>
-          <div className="timer-actions">
-            <button className="timer-btn" onClick={toggleTimer}>
-              {isActive ? 'Stop' : 'Start'}
-            </button>
-            <button className="timer-btn" onClick={resetTimer}>Reset</button>
+        <div className="side-panel-container"> {/* New container for right-side content */}
+          <div className="pdf-title-card"> {/* New card for title and avg time */}
+            <h2 className="pdf-title">{currentResource.title}</h2>
+            <div className="avg-time">
+              Avg. reading time: <span>{avgTime}</span>
+            </div>
+          </div>
+          <div className="timer-card">
+            <div className="timer-header">Study Timer</div>
+            <div className="timer-display">{formatTime(timer)}</div>
+            <div className="timer-actions">
+              <button className="timer-btn" onClick={toggleTimer}>
+                {isActive ? 'Stop' : 'Start'}
+              </button>
+              <button className="timer-btn" onClick={resetTimer}>Reset</button>
+            </div>
           </div>
         </div>
       </div>
