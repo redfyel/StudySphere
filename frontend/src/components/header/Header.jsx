@@ -15,11 +15,11 @@ function Header() {
       </div>
 
       {/* Center: Nav Pills */}
-      <nav className="nav-container">
-        <NavLink to="/rooms" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Rooms</NavLink>
-        <NavLink to="/resources" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Resource Hub</NavLink>
-        <NavLink to="/mood-tracker" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Mood</NavLink>
-        <NavLink to="/study-enhance" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>Enhance</NavLink>
+      <nav className="header-nav-container">
+        <NavLink to="/rooms" className={({ isActive }) => isActive ? "header-nav-link active" : "header-nav-link"}>Rooms</NavLink>
+        <NavLink to="/resources" className={({ isActive }) => isActive ? "header-nav-link active" : "header-nav-link"}>Resource Hub</NavLink>
+        <NavLink to="/mood-tracker" className={({ isActive }) => isActive ? "header-nav-link active" : "header-nav-link"}>Mood</NavLink>
+        <NavLink to="/study-enhance" className={({ isActive }) => isActive ? "header-nav-link active" : "header-nav-link"}>Enhance</NavLink>
       </nav>
 
       {/* Right: Buttons */}

@@ -1,8 +1,23 @@
 import React, { useState } from "react";
 import "./UploadPage.css";
 import { IoCloudUploadOutline } from "react-icons/io5";
+import Sidebar from '../sidebar/Sidebar'
+import { IoSaveOutline, IoDocumentsOutline, IoBookmarkOutline, IoPeopleOutline, IoStatsChartOutline } from "react-icons/io5";
+import { FaRegComments } from "react-icons/fa6";
+import { GrAttachment } from "react-icons/gr";
 
+ // ✅ Sidebar items
+  const navItems = [
+    { name: "All Resources", path: "/resources", icon: <IoDocumentsOutline /> },
+    { name: "Upload Resource", path: "/upload", icon: <IoCloudUploadOutline /> },
+    { name: "My Library", path: "/my-library", icon: <IoBookmarkOutline /> },
+    { name: "Group Resources", path: "/groups", icon: <IoPeopleOutline /> },
+    { name: "Trending", path: "/trending", icon: <IoStatsChartOutline /> },
+  ];
+  
 export default function UploadPage() {
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const toggleSidebar = () => setIsCollapsed(!isCollapsed);
   const [title, setTitle] = useState("");
   const [resourceType, setResourceType] = useState("file"); // 'file' or 'link'
   const [file, setFile] = useState(null);
@@ -39,6 +54,13 @@ export default function UploadPage() {
 
   return (
     <div className="upload-page-container">
+        <Sidebar
+        sectionName="Resources"
+        isCollapsed={isCollapsed}
+        toggleSidebar={toggleSidebar}
+        items={navItems}
+      />
+      
       <div className="upload-form-card">
         <h2>Upload a New Resource</h2>
         <form onSubmit={handleSubmit} className="upload-form">

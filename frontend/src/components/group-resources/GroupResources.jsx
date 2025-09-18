@@ -1,10 +1,20 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { BiLike } from "react-icons/bi";
-import { IoSaveOutline } from "react-icons/io5";
+import { IoSaveOutline, IoDocumentsOutline, IoCloudUploadOutline, IoBookmarkOutline, IoPeopleOutline, IoStatsChartOutline } from "react-icons/io5";
 import { FaRegComments } from "react-icons/fa6";
 import { GrAttachment } from "react-icons/gr";
 import "./GroupResources.css";
+import Sidebar from '../sidebar/Sidebar'
+
+ // ✅ Sidebar items
+  const navItems = [
+    { name: "All Resources", path: "/resources", icon: <IoDocumentsOutline /> },
+    { name: "Upload Resource", path: "/upload", icon: <IoCloudUploadOutline /> },
+    { name: "My Library", path: "/my-library", icon: <IoBookmarkOutline /> },
+    { name: "Group Resources", path: "/groups", icon: <IoPeopleOutline /> },
+    { name: "Trending", path: "/trending", icon: <IoStatsChartOutline /> },
+  ];
 
 // Sample data for a group's resources and pinned items
 const groupResources = [
@@ -54,6 +64,8 @@ const otherResources = groupResources.filter(r => !r.isPinned);
 export default function GroupResources() {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
   const handleCommentSubmit = (e) => {
     e.preventDefault();
@@ -85,6 +97,13 @@ export default function GroupResources() {
 
   return (
     <div className="group-resources-page">
+        <Sidebar
+        sectionName="Resources"
+        isCollapsed={isCollapsed}
+        toggleSidebar={toggleSidebar}
+        items={navItems}
+      />
+      
       <h2 className="group-title">Group Name's Resources</h2>
       <p className="group-description">This is the shared space for our group.</p>
 
