@@ -1,4 +1,7 @@
-/* PdfReaderPage.css */
+/* PdfReader.css */
+
+/* ... (existing styles for pdf-reader-container, reader-header, etc.) ... */
+
 .pdf-reader-container {
   display: flex;
   flex-direction: column;
@@ -13,7 +16,7 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  max-width: 800px;
+  max-width: 1200px;
   margin-bottom: 2rem;
   background: white;
   padding: 1rem 1.5rem;
@@ -21,13 +24,45 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
-.pdf-title-and-timer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex-grow: 1;
+.pdf-header-placeholder {
+  flex-grow: 1; /* This will push the back and close buttons to the edges */
 }
 
+/* New styles for PDF and Timer layout */
+.pdf-and-timer-container {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  align-items: stretch;
+}
+
+.pdf-document-container {
+  width: 70%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+  border: 1px solid #ddd;
+  min-height: 80vh;
+}
+
+/* New side panel container */
+.side-panel-container {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* New title card styles */
+.pdf-title-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
 .pdf-title {
   font-size: 1.5rem;
   font-weight: bold;
@@ -35,67 +70,51 @@
   margin: 0;
 }
 
-.pdf-timer {
+.avg-time {
   font-size: 1rem;
   color: #666;
-  font-family: monospace;
+  font-family: 'Inter', sans-serif;
   margin-top: 0.5rem;
 }
 
-.back-btn,
-.close-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--color-primary);
-  font-size: 1rem;
-  font-weight: 500;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.close-btn svg {
-  color: #c44;
-}
-
-.back-btn:hover {
-  color: #6e8e9c;
-}
-
-.close-btn:hover svg {
-  color: #a33;
-}
-
-.pdf-document-container {
-  width: 100%;
-  max-width: 800px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  overflow: hidden;
+/* Timer card styles */
+.timer-card {
+  flex: 1; /* This ensures the timer card fills the remaining vertical space */
   background: white;
-  border: 1px solid #ddd;
-}
-
-.pdf-document {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-}
-
-.pdf-navigation {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1.5rem;
-  margin-top: 2rem;
-  padding: 1rem 2rem;
-  background: white;
+  padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 }
 
-.pdf-nav-btn {
+.timer-header {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--color-primary);
+  border-bottom: 2px solid var(--color-secondary);
+  width: 100%;
+  text-align: center;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.timer-display {
+  font-size: 3rem;
+  font-family: monospace;
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+.timer-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.timer-btn {
   padding: 0.8rem 1.5rem;
   background: var(--color-primary);
   color: white;
@@ -106,11 +125,6 @@
   transition: background 0.3s ease;
 }
 
-.pdf-nav-btn:hover {
+.timer-btn:hover {
   background: #6e8e9c;
-}
-
-.pdf-nav-btn:disabled {
-  background: #ccc;
-  cursor: not-allowed;
 }

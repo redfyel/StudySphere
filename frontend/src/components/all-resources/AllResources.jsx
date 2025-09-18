@@ -5,7 +5,12 @@ import { BiLike } from "react-icons/bi";
 import { IoSaveOutline, IoDocumentsOutline, IoCloudUploadOutline, IoBookmarkOutline, IoPeopleOutline, IoStatsChartOutline } from "react-icons/io5";
 import { FaRegComments } from "react-icons/fa6";
 import { GrAttachment } from "react-icons/gr";
-import Sidebar from '../sidebar/Sidebar'
+
+// Import your PDF files directly from the src/assets/pdfs directory
+import mathNotes from "../../assets/pdfs/mathNotes.pdf";
+// Assuming you have these files, update the paths accordingly
+// import chemistryGuidePdf from "../../assets/pdfs/acs_ecomm_wp.pdf";
+// import algebraSheetPdf from "../../assets/pdfs/0410100.pdf";
 
 export default function ResourcesPage() {
   const [search, setSearch] = useState("");
@@ -41,7 +46,12 @@ export default function ResourcesPage() {
       (subject === "" || r.subject === subject) &&
       (type === "" || r.type === type)
     )
-    .sort((a, b) => (sort === "popular" ? b.id - a.id : 0));
+    .sort((a, b) => {
+      if (sort === "popular") {
+        return b.id - a.id;
+      }
+      return 0;
+    });
 
   return (
     <div className="resources-page-layout">

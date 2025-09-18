@@ -1,17 +1,31 @@
 /* Color Palette */
 :root {
-  --primary-bg: #89a8b2; /* Primary Background */
-  --cards-highlights: #b3c8cf; /* Cards & Highlights */
-  --secondary-bg-panels: #e5e1da; /* Secondary Background/Panels */
-  --notes-timers-ui: #f1f0e8; /* Notes/Timers/Other UI Areas */
-  --text-color: #333;
-  --button-bg: #6a8a96;
-  --button-hover-bg: #5a7a86;
-  --border-color: #a0b5bd;
+  --primary-bg: #89A8B2; /* Primary Background */
+  --cards-highlights: #B3C8CF; /* Cards & Highlights */
+  --secondary-bg-panels: #E5E1DA; /* Secondary Background/Panels */
+  --notes-timers-ui: #F1F0E8; /* Notes/Timers/Other UI Areas */
+
+  /* Custom colors derived from palette for better contrast/functionality */
+  --text-color: #2C3E50; /* Dark blue-grey for main text */
+  --text-color-light: #4A6572; /* Slightly lighter dark blue-grey for secondary text */
+  --text-color-rgb: 44, 62, 80; /* RGB for --text-color for rgba() usage */
+
+  --button-bg: #5F7C8A; /* Custom blue-grey, darker than primary */
+  --button-hover-bg: #4F6C7A; /* Darker hover for buttons */
+  --border-color: #7A9AA6; /* Custom blue-grey, darker than primary */
+
+  /* RGB versions for rgba() usage in CSS */
+  --cards-highlights-rgb: 179, 200, 207; /* RGB for #B3C8CF */
+  --button-bg-rgb: 95, 124, 138; /* RGB for #5F7C8A */
+  --notes-timers-ui-rgb: 241, 240, 232; /* RGB for #F1F0E8 */
+
+
+  /* Functional colors (kept as standard for clarity) */
   --danger-color: #dc3545;
   --danger-hover-color: #c82333;
   --success-color: #28a745;
   --success-hover-color: #218838;
+
   --navbar-height: 60px;
 }
 
@@ -83,7 +97,7 @@ button:active {
   background-color: var(--cards-highlights);
   border-radius: 12px;
   padding: 25px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(var(--text-color-rgb), 0.1);
   text-align: left;
   transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
   display: flex;
@@ -94,7 +108,7 @@ button:active {
 
 .room-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 25px rgba(var(--text-color-rgb), 0.15);
 }
 
 .room-card h3 {
@@ -105,7 +119,7 @@ button:active {
 }
 
 .room-card p {
-  color: #555;
+  color: var(--text-color-light); /* Use lighter text color */
   margin-bottom: 8px;
   font-size: 0.95rem;
 }
