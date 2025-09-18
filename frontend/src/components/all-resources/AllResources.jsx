@@ -24,10 +24,10 @@ export default function ResourcesPage() {
   // ✅ Sidebar items
   const navItems = [
     { name: "All Resources", path: "/resources", icon: <IoDocumentsOutline /> },
-    { name: "Upload Resource", path: "/upload", icon: <IoCloudUploadOutline /> },
-    { name: "My Library", path: "/my-library", icon: <IoBookmarkOutline /> },
-    { name: "Group Resources", path: "/groups", icon: <IoPeopleOutline /> },
-    { name: "Trending", path: "/trending", icon: <IoStatsChartOutline /> },
+    { name: "Upload Resource", path: "/resources/upload", icon: <IoCloudUploadOutline /> },
+    { name: "My Library", path: "/resources/my-library", icon: <IoBookmarkOutline /> },
+    { name: "Group Resources", path: "/resources/groups", icon: <IoPeopleOutline /> },
+    { name: "Trending", path: "/resources/trending", icon: <IoStatsChartOutline /> },
   ];
 
   const [isCollapsed, setIsCollapsed] = useState(false);

@@ -7,14 +7,15 @@ import { GrAttachment } from "react-icons/gr";
 import "./GroupResources.css";
 import Sidebar from '../sidebar/Sidebar'
 
- // ✅ Sidebar items
-  const navItems = [
-    { name: "All Resources", path: "/resources", icon: <IoDocumentsOutline /> },
-    { name: "Upload Resource", path: "/upload", icon: <IoCloudUploadOutline /> },
-    { name: "My Library", path: "/my-library", icon: <IoBookmarkOutline /> },
-    { name: "Group Resources", path: "/groups", icon: <IoPeopleOutline /> },
-    { name: "Trending", path: "/trending", icon: <IoStatsChartOutline /> },
-  ];
+// ✅ Sidebar items (Resource Hub)
+const navItems = [
+  { name: "All Resources", path: "/resources", icon: <IoDocumentsOutline /> },
+  { name: "Upload Resource", path: "/resources/upload", icon: <IoCloudUploadOutline /> },
+  { name: "My Library", path: "/resources/library", icon: <IoBookmarkOutline /> },
+  { name: "Group Resources", path: "/resources/groups", icon: <IoPeopleOutline /> },
+  { name: "Trending", path: "/resources/trending", icon: <IoStatsChartOutline /> },
+];
+
 
 // Sample data for a group's resources and pinned items
 const groupResources = [
@@ -103,7 +104,7 @@ export default function GroupResources() {
         toggleSidebar={toggleSidebar}
         items={navItems}
       />
-      
+      <div className={`resources-page-content ${isCollapsed ? "collapsed" : ""}`}>
       <h2 className="group-title">Group Name's Resources</h2>
       <p className="group-description">This is the shared space for our group.</p>
 
@@ -144,6 +145,7 @@ export default function GroupResources() {
           <button type="submit" className="comment-btn">Post</button>
         </form>
       </div>
+    </div>
     </div>
   );
 }

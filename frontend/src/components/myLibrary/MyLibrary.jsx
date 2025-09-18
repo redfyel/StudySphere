@@ -7,14 +7,15 @@ import { FaRegComments } from "react-icons/fa6";
 import { GrAttachment } from "react-icons/gr";
 import { IoSaveOutline, IoDocumentsOutline, IoCloudUploadOutline, IoBookmarkOutline, IoPeopleOutline, IoStatsChartOutline } from "react-icons/io5";
 import Sidebar from '../sidebar/Sidebar'
- // ✅ Sidebar items
-  const navItems = [
-    { name: "All Resources", path: "/resources", icon: <IoDocumentsOutline /> },
-    { name: "Upload Resource", path: "/upload", icon: <IoCloudUploadOutline /> },
-    { name: "My Library", path: "/my-library", icon: <IoBookmarkOutline /> },
-    { name: "Group Resources", path: "/groups", icon: <IoPeopleOutline /> },
-    { name: "Trending", path: "/trending", icon: <IoStatsChartOutline /> },
-  ];
+// ✅ Sidebar items (Resource Hub)
+const navItems = [
+  { name: "All Resources", path: "/resources", icon: <IoDocumentsOutline /> },
+  { name: "Upload Resource", path: "/resources/upload", icon: <IoCloudUploadOutline /> },
+  { name: "My Library", path: "/resources/library", icon: <IoBookmarkOutline /> },
+  { name: "Group Resources", path: "/resources/groups", icon: <IoPeopleOutline /> },
+  { name: "Trending", path: "/resources/trending", icon: <IoStatsChartOutline /> },
+];
+
 
 // Sample data for saved resources
 const savedResources = [
@@ -51,14 +52,14 @@ export default function MyLibraryPage() {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const toggleSidebar = () => setIsCollapsed(!isCollapsed);
   return (
-    <div className="my-library-page-content">
+    <div className="resources-page-layout">
         <Sidebar
         sectionName="Resources"
         isCollapsed={isCollapsed}
         toggleSidebar={toggleSidebar}
         items={navItems}
       />
-      
+      <div className={`resources-page-content ${isCollapsed ? "collapsed" : ""}`}>
       <h2 className="page-title">My Library</h2>
       <p className="page-description">Your saved resources for quick access.</p>
       
@@ -93,6 +94,7 @@ export default function MyLibraryPage() {
       ) : (
         <p className="no-resources-message">You have no saved resources yet.</p>
       )}
+    </div>
     </div>
   );
 }

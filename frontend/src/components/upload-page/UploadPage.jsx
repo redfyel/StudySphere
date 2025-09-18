@@ -6,14 +6,15 @@ import { IoSaveOutline, IoDocumentsOutline, IoBookmarkOutline, IoPeopleOutline, 
 import { FaRegComments } from "react-icons/fa6";
 import { GrAttachment } from "react-icons/gr";
 
- // ✅ Sidebar items
-  const navItems = [
-    { name: "All Resources", path: "/resources", icon: <IoDocumentsOutline /> },
-    { name: "Upload Resource", path: "/upload", icon: <IoCloudUploadOutline /> },
-    { name: "My Library", path: "/my-library", icon: <IoBookmarkOutline /> },
-    { name: "Group Resources", path: "/groups", icon: <IoPeopleOutline /> },
-    { name: "Trending", path: "/trending", icon: <IoStatsChartOutline /> },
-  ];
+// ✅ Sidebar items (Resource Hub)
+const navItems = [
+  { name: "All Resources", path: "/resources", icon: <IoDocumentsOutline /> },
+  { name: "Upload Resource", path: "/resources/upload", icon: <IoCloudUploadOutline /> },
+  { name: "My Library", path: "/resources/library", icon: <IoBookmarkOutline /> },
+  { name: "Group Resources", path: "/resources/groups", icon: <IoPeopleOutline /> },
+  { name: "Trending", path: "/resources/trending", icon: <IoStatsChartOutline /> },
+];
+
   
 export default function UploadPage() {
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -53,7 +54,7 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="upload-page-container">
+    <div className="resources-page-layout">
         <Sidebar
         sectionName="Resources"
         isCollapsed={isCollapsed}
@@ -61,7 +62,8 @@ export default function UploadPage() {
         items={navItems}
       />
       
-      <div className="upload-form-card">
+      {/* <div className="upload-form-card"> */}
+      <div className={`resources-page-content ${isCollapsed ? "collapsed" : ""}`}>
         <h2>Upload a New Resource</h2>
         <form onSubmit={handleSubmit} className="upload-form">
           <div className="form-group">

@@ -8,15 +8,15 @@ import { FaTrophy } from "react-icons/fa";
 import {IoDocumentsOutline, IoCloudUploadOutline, IoBookmarkOutline, IoPeopleOutline, IoStatsChartOutline } from "react-icons/io5";
 import "./TrendingPage.css";
 import Sidebar from '../sidebar/Sidebar'
+// ✅ Sidebar items (Resource Hub)
+const navItems = [
+  { name: "All Resources", path: "/resources", icon: <IoDocumentsOutline /> },
+  { name: "Upload Resource", path: "/resources/upload", icon: <IoCloudUploadOutline /> },
+  { name: "My Library", path: "/resources/library", icon: <IoBookmarkOutline /> },
+  { name: "Group Resources", path: "/resources/groups", icon: <IoPeopleOutline /> },
+  { name: "Trending", path: "/resources/trending", icon: <IoStatsChartOutline /> },
+];
 
- // ✅ Sidebar items
-  const navItems = [
-    { name: "All Resources", path: "/resources", icon: <IoDocumentsOutline /> },
-    { name: "Upload Resource", path: "/upload", icon: <IoCloudUploadOutline /> },
-    { name: "My Library", path: "/my-library", icon: <IoBookmarkOutline /> },
-    { name: "Group Resources", path: "/groups", icon: <IoPeopleOutline /> },
-    { name: "Trending", path: "/trending", icon: <IoStatsChartOutline /> },
-  ];
 // Sample data for trending resources (sorted by likes/saves)
 const trendingResources = [
   {
@@ -100,7 +100,7 @@ export default function TrendingPage() {
         toggleSidebar={toggleSidebar}
         items={navItems}
       />
-      
+      <div className={`resources-page-content ${isCollapsed ? "collapsed" : ""}`}>
       <h2 className="page-title">Trending Resources 🔥</h2>
       <p className="page-description">The most popular resources, updated daily.</p>
       
@@ -120,6 +120,7 @@ export default function TrendingPage() {
           ))}
         </ul>
       </div>
+    </div>
     </div>
   );
 }
