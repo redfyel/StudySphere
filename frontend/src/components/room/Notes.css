@@ -75,7 +75,7 @@
 
 .textarea-container {
   position: relative;
-  color:#89A8B2;
+  color:#5e8694;
 }
 
 .notes-textarea {
@@ -90,7 +90,7 @@
   font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
   resize: vertical;
   background: var(--notes-background);
-  color: #89A8B2;
+  color: #020b0e;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   box-sizing: border-box;
 }
@@ -102,7 +102,7 @@
 }
 
 .notes-textarea::placeholder {
-  color: var(--notes-placeholder-color);
+ color: var(--notes-stats-color);
   line-height: 1.4;
 }
 

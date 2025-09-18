@@ -43,11 +43,7 @@ function Timer({ timer, onTimerChange }) {
       
       <div className="timer-display-container">
         <div className="timer-display">{displayTime}</div>
-        <div className="timer-labels">
-          <span>HH</span>
-          <span>MM</span>
-          <span>SS</span>
-        </div>
+        
       </div>
       
       <div className="timer-controls">
@@ -65,20 +61,7 @@ function Timer({ timer, onTimerChange }) {
         </button>
       </div>
 
-      <div className="timer-stats">
-        <div className="stat-item">
-          <span className="stat-label">Hours</span>
-          <span className="stat-value">{Math.floor(timer / 3600)}</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-label">Minutes</span>
-          <span className="stat-value">{Math.floor((timer % 3600) / 60)}</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-label">Sessions</span>
-          <span className="stat-value">{Math.floor(timer / 1800)}</span>
-        </div>
-      </div>
+      
 
       <style jsx>{`
         .timer {
@@ -86,7 +69,7 @@ function Timer({ timer, onTimerChange }) {
           max-width: 280px;
           margin: 0 auto;
           padding: 20px;
-          background: transparent;
+          // background: transparent;
           border: none;
           border-radius: 12px;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -111,11 +94,11 @@ function Timer({ timer, onTimerChange }) {
           font-size: 12px;
           padding: 4px 8px;
           border-radius: 6px;
-          background: ${isRunning ? 'rgba(34, 197, 94, 0.8)' : 'rgba(156, 163, 175, 0.8)'};
-          color: #89A8B2;
+          background: ${isRunning ? 'rgba(34, 197, 94, 0.8)' : 'rgba(174, 195, 231, 0.8)'};
+          color: #1b3c47ff;
           font-weight: 500;
           backdrop-filter: blur(4px);
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          // border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .timer-display-container {
@@ -131,11 +114,11 @@ function Timer({ timer, onTimerChange }) {
           letter-spacing: 0.05em;
           margin-bottom: 8px;
           padding: 16px;
-          background: rgba(0, 0, 0, 0.3);
+          // background: rgba(0, 0, 0, 0.3);
           backdrop-filter: blur(10px);
-          border: 2px solid rgba(255, 255, 255, 0.2);
+          // border: 2px solid rgba(255, 255, 255, 0.2);
           border-radius: 8px;
-          text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+          // text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         .timer-labels {
@@ -158,7 +141,7 @@ function Timer({ timer, onTimerChange }) {
         .timer-btn {
           flex: 1;
           padding: 12px;
-          border: 1px solid rgba(255, 255, 255, 0.2);
+          // border: 1px solid rgba(39, 34, 182, 0.2);
           border-radius: 6px;
           font-size: 14px;
           font-weight: 600;
@@ -169,13 +152,12 @@ function Timer({ timer, onTimerChange }) {
 
         .timer-btn.primary {
           background: rgba(34, 197, 94, 0.8);
-          color: rgba(255, 255, 255, 0.95);
+          color: rgba(246, 237, 237, 0.95);
         }
 
         .timer-btn.primary:hover {
           background: rgba(34, 197, 94, 0.9);
           transform: translateY(-1px);
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .timer-btn.primary.pause {
@@ -187,7 +169,7 @@ function Timer({ timer, onTimerChange }) {
         }
 
         .timer-btn.secondary {
-          background: rgba(255, 255, 255, 0.1);
+          background: rgba(144, 72, 72, 0.1);
           color: rgba(255, 255, 255, 0.9);
         }
 
