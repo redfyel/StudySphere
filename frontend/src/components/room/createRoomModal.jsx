@@ -1,18 +1,17 @@
+// CreateRoomModal.jsx
+
 import React, { useState } from 'react';
-import './CreateRoomModal.css';
+import './CreateRoomModal.css'; // Create this CSS file
 
 function CreateRoomModal({ isOpen, onClose, onCreateRoom }) {
-  const [roomName, setRoomName] = useState('');
-  const [roomTopic, setRoomTopic] = useState('');
+  const [name, setName] = useState('');
+  const [topic, setTopic] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (roomName.trim() && roomTopic.trim()) {
-      onCreateRoom({ name: roomName.trim(), topic: roomTopic.trim() });
-      setRoomName('');
-      setRoomTopic('');
-      onClose();
-    }
+    const ownerId = localStorage.getItem('studyRoomUserId') || Date.now().toString();
+    localStorage.setItem('studyRoomUserId', ownerId);
+    onCreateRoom({ name, topic, ownerId });
   };
 
   if (!isOpen) return null;
@@ -20,35 +19,29 @@ function CreateRoomModal({ isOpen, onClose, onCreateRoom }) {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h2>Create New Study Room</h2>
+        <h3>Create a New Room</h3>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="roomName">Room Name:</label>
+            <label>Room Name</label>
             <input
               type="text"
-              id="roomName"
-              value={roomName}
-              onChange={(e) => setRoomName(e.target.value)}
-              placeholder="e.g., Advanced Calculus Session"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               required
             />
           </div>
           <div className="form-group">
-            <label htmlFor="roomTopic">Topic:</label>
+            <label>Room Topic</label>
             <input
               type="text"
-              id="roomTopic"
-              value={roomTopic}
-              onChange={(e) => setRoomTopic(e.target.value)}
-              placeholder="e.g., Derivatives and Integrals"
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
               required
             />
           </div>
           <div className="modal-actions">
-            <button type="button" className="cancel" onClick={onClose}>
-              Cancel
-            </button>
-            <button type="submit">Create Room</button>
+            <button type="submit">Create</button>
+            <button type="button" onClick={onClose}>Cancel</button>
           </div>
         </form>
       </div>
