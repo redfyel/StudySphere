@@ -7,6 +7,8 @@ function RootLayout() {
 
   // Check if the current path is a video call (inside /rooms/:roomId)
   const isVideoCallPage = location.pathname.startsWith("/rooms/");
+  const isRoomsPage = location.pathname.startsWith("/rooms");
+
 
   return (
     <div className="app-container">

@@ -24,185 +24,47 @@ const io = socketIo(server, {
   }
 });
 
-// Import Spotify routes
-const spotifyRoutes = require('./routes/spotify');
+app.use(cors()); // Enable CORS for Express routes if you add any REST endpoints
 
-app.use(cors({
-  origin: [process.env.FRONTEND_URL || 'http://localhost:3000', 'http://localhost:5173'],
-  credentials: true
-}));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Session middleware (for Spotify auth state parameter validation)
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-session-secret-here',
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
-  }
-}));
+// --- Server State (In-memory, for transient participant data) ---
+const roomsParticipants = new Map(); // roomId -> { participants: Map<userId, { socketId, username }>, joinRequests }
+const sockets = new Map(); // socketId -> { userId, roomId, username }
 
-// MongoDB connection
-let db;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
-const client = new MongoClient(MONGODB_URI);
+let db; // MongoDB database instance
 
-async function connectToDatabase() {
-  try {
-    await client.connect();
-    db = client.db('studyverse');
-    console.log('✅ Connected to MongoDB Atlas');
-    
-    // Create indexes for better performance
-    await db.collection('rooms').createIndex({ roomId: 1 }, { unique: true });
-    await db.collection('rooms').createIndex({ createdAt: -1 });
-    await db.collection('rooms').createIndex({ roomType: 1 });
-    await db.collection('rooms').createIndex({ isActive: 1 });
-    await db.collection('users').createIndex({ socketId: 1 });
-  } catch (error) {
-    console.error('❌ MongoDB connection failed:', error);
-    process.exit(1);
-  }
-}
+// Initialize rooms from DB and populate if empty
+const initializeRooms = async () => {
+  db = await connectDB(); // Connect to MongoDB and get the db instance
+  const roomsCollection = db.collection('rooms');
 
-// Initialize database connection
-connectToDatabase();
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
-
-// Use Spotify routes
-app.use('/api/spotify', spotifyRoutes);
-
-// In-memory storage for active users and real-time data
-const activeUsers = new Map();
-const roomSessions = new Map(); // For real-time data like notes, timer, etc.
-
-// Room session data structure (for real-time collaboration)
-class RoomSession {
-  constructor(roomId, roomType = 'private') {
-    this.roomId = roomId;
-    this.roomType = roomType; // 'private' or 'public'
-    this.activeParticipants = new Map();
-    this.notes = '';
-    this.timer = 0;
-    this.targets = [];
-    this.joinRequests = []; // Only used for private rooms
+  const count = await roomsCollection.countDocuments();
+  if (count === 0) {
+    console.log('No rooms found in DB, seeding initial data...');
+    const initialRooms = [
+      { id: 'room-1', name: 'Math Study Group', topic: 'Algebra', notes: 'Welcome to Math Study Group notes!', timer: 0, targets: ['Review Algebra', 'Solve practice problems'] },
+      { id: 'room-2', name: 'Science Lab', topic: 'Physics', notes: 'Science Lab notes here.', timer: 0, targets: ['Experiment setup', 'Data analysis'] },
+      { id: 'room-3', name: 'History Buffs', topic: 'World History', notes: 'History Buffs notes.', timer: 0, targets: ['Read Chapter 5', 'Discuss historical events'] },
+    ];
+    await roomsCollection.insertMany(initialRooms);
+    console.log('Initial rooms seeded.');
+  } else {
+    console.log(`${count} rooms found in DB.`);
   }
 
-  addParticipant(userId, userInfo) {
-    this.activeParticipants.set(userId, {
-      ...userInfo,
-      joinedAt: new Date()
+  // Load all rooms from DB into our in-memory map for quick access to participant data
+  const allRooms = await roomsCollection.find({}).toArray();
+  allRooms.forEach(room => {
+    roomsParticipants.set(room.id, {
+      participants: new Map(),
+      joinRequests: [],
     });
-  }
+  });
+  console.log("Server initialized with rooms from DB:", allRooms.map(r => ({id: r.id, name: r.name})));
+};
 
-  removeParticipant(userId) {
-    this.activeParticipants.delete(userId);
-  }
-
-  getActiveParticipants() {
-    return Array.from(this.activeParticipants.entries()).map(([id, info]) => ({
-      id,
-      ...info
-    }));
-  }
-
-  addJoinRequest(userId, username) {
-    // Only add join requests for private rooms
-    if (this.roomType === 'private') {
-      // Check if request already exists
-      const existingRequest = this.joinRequests.find(req => req.userId === userId);
-      if (!existingRequest) {
-        this.joinRequests.push({
-          userId,
-          username,
-          requestedAt: new Date()
-        });
-      }
-    }
-  }
-
-  removeJoinRequest(userId) {
-    this.joinRequests = this.joinRequests.filter(req => req.userId !== userId);
-  }
-}
-
-// User data structure
-class User {
-  constructor(id, socketId) {
-    this.id = id;
-    this.socketId = socketId;
-    this.username = '';
-    this.roomId = null;
-    this.isConnected = true;
-    this.isMuted = false;
-    this.isCameraOff = false;
-    this.isScreenSharing = false;
-  }
-}
-
-// Helper function to get room session
-function getRoomSession(roomId, roomType = 'private') {
-  if (!roomSessions.has(roomId)) {
-    roomSessions.set(roomId, new RoomSession(roomId, roomType));
-  }
-  return roomSessions.get(roomId);
-}
-
-// Helper function to broadcast to room
-function broadcastToRoom(roomId, event, data, excludeSocketId = null) {
-  const session = roomSessions.get(roomId);
-  if (session) {
-    session.activeParticipants.forEach((participant, userId) => {
-      const user = activeUsers.get(userId);
-      if (user && user.socketId !== excludeSocketId) {
-        io.to(user.socketId).emit(event, data);
-      }
-    });
-  }
-}
-
-// Database helper functions
-async function createRoomInDB(roomData) {
-  try {
-    const room = {
-      ...roomData,
-      roomId: roomData.roomId || uuidv4(),
-      participants: [],
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      // Enhanced room properties
-      roomType: roomData.roomType || 'private', // 'private' or 'public'
-      requiresApproval: roomData.roomType === 'private', // Auto-set based on room type
-      currentParticipants: 0
-    };
-    
-    const result = await db.collection('rooms').insertOne(room);
-    return { ...room, _id: result.insertedId };
-  } catch (error) {
-    console.error('Error creating room in DB:', error);
-    throw error;
-  }
-}
-
-async function getRoomFromDB(roomId) {
-  try {
-    return await db.collection('rooms').findOne({ roomId });
-  } catch (error) {
-    console.error('Error getting room from DB:', error);
-    return null;
-  }
-}
-
-async function updateRoomInDB(roomId, updateData) {
+// Save room state to MongoDB
+const saveRoomState = async (roomId, updates) => {
   try {
     const result = await db.collection('rooms').updateOne(
       { roomId },
