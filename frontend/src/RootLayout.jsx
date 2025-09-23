@@ -4,16 +4,18 @@ import Footer from "./components/footer/Footer";
 
 function RootLayout() {
   const location = useLocation();
-  const isRoomsPage = location.pathname.startsWith("/rooms");
+
+  // Check if the current path is a video call (inside /rooms/:roomId)
+  const isVideoCallPage = location.pathname.startsWith("/rooms/");
 
   return (
     <div className="app-container">
       <div>
-        <Header />
+        {!isVideoCallPage && <Header />}
         <main>
           <Outlet />
         </main>
-        {!isRoomsPage && <Footer />}
+        {!isVideoCallPage && <Footer />}
       </div>
     </div>
   );

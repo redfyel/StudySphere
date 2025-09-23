@@ -2,7 +2,13 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
+const session = require('express-session');
+const dotenv = require('dotenv');
+const { MongoClient, ObjectId } = require('mongodb');
 const { v4: uuidv4 } = require('uuid');
+
+// Load environment variables
+dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
@@ -10,56 +16,115 @@ const server = http.createServer(app);
 // Configure CORS for Socket.IO
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
   }
 });
 
-app.use(cors());
+// Import Spotify routes
+const spotifyRoutes = require('./routes/spotify');
+
+app.use(cors({
+  origin: [process.env.FRONTEND_URL || 'http://localhost:3000', 'http://localhost:5173'],
+  credentials: true
+}));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Store room data and user information
-const rooms = new Map();
-const users = new Map();
+// Session middleware (for Spotify auth state parameter validation)
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-session-secret-here',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
 
-// Room data structure
-class Room {
-  constructor(id) {
-    this.id = id;
-    this.participants = new Map();
+// MongoDB connection
+let db;
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+const client = new MongoClient(MONGODB_URI);
+
+async function connectToDatabase() {
+  try {
+    await client.connect();
+    db = client.db('studyverse');
+    console.log('✅ Connected to MongoDB Atlas');
+    
+    // Create indexes for better performance
+    await db.collection('rooms').createIndex({ roomId: 1 }, { unique: true });
+    await db.collection('rooms').createIndex({ createdAt: -1 });
+    await db.collection('rooms').createIndex({ roomType: 1 });
+    await db.collection('rooms').createIndex({ isActive: 1 });
+    await db.collection('users').createIndex({ socketId: 1 });
+  } catch (error) {
+    console.error('❌ MongoDB connection failed:', error);
+    process.exit(1);
+  }
+}
+
+// Initialize database connection
+connectToDatabase();
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// Use Spotify routes
+app.use('/api/spotify', spotifyRoutes);
+
+// In-memory storage for active users and real-time data
+const activeUsers = new Map();
+const roomSessions = new Map(); // For real-time data like notes, timer, etc.
+
+// Room session data structure (for real-time collaboration)
+class RoomSession {
+  constructor(roomId, roomType = 'private') {
+    this.roomId = roomId;
+    this.roomType = roomType; // 'private' or 'public'
+    this.activeParticipants = new Map();
     this.notes = '';
     this.timer = 0;
     this.targets = [];
-    this.joinRequests = [];
-    this.createdAt = new Date();
-    this.isLocked = false;
+    this.joinRequests = []; // Only used for private rooms
   }
 
   addParticipant(userId, userInfo) {
-    this.participants.set(userId, {
+    this.activeParticipants.set(userId, {
       ...userInfo,
       joinedAt: new Date()
     });
   }
 
   removeParticipant(userId) {
-    this.participants.delete(userId);
+    this.activeParticipants.delete(userId);
   }
 
-  getParticipants() {
-    return Array.from(this.participants.entries()).map(([id, info]) => ({
+  getActiveParticipants() {
+    return Array.from(this.activeParticipants.entries()).map(([id, info]) => ({
       id,
       ...info
     }));
   }
 
   addJoinRequest(userId, username) {
-    this.joinRequests.push({
-      userId,
-      username,
-      requestedAt: new Date()
-    });
+    // Only add join requests for private rooms
+    if (this.roomType === 'private') {
+      // Check if request already exists
+      const existingRequest = this.joinRequests.find(req => req.userId === userId);
+      if (!existingRequest) {
+        this.joinRequests.push({
+          userId,
+          username,
+          requestedAt: new Date()
+        });
+      }
+    }
   }
 
   removeJoinRequest(userId) {
@@ -81,24 +146,109 @@ class User {
   }
 }
 
-// Helper function to get room safely
-function getRoom(roomId) {
-  if (!rooms.has(roomId)) {
-    rooms.set(roomId, new Room(roomId));
+// Helper function to get room session
+function getRoomSession(roomId, roomType = 'private') {
+  if (!roomSessions.has(roomId)) {
+    roomSessions.set(roomId, new RoomSession(roomId, roomType));
   }
-  return rooms.get(roomId);
+  return roomSessions.get(roomId);
 }
 
 // Helper function to broadcast to room
 function broadcastToRoom(roomId, event, data, excludeSocketId = null) {
-  const room = rooms.get(roomId);
-  if (room) {
-    room.participants.forEach((participant, userId) => {
-      const user = users.get(userId);
+  const session = roomSessions.get(roomId);
+  if (session) {
+    session.activeParticipants.forEach((participant, userId) => {
+      const user = activeUsers.get(userId);
       if (user && user.socketId !== excludeSocketId) {
         io.to(user.socketId).emit(event, data);
       }
     });
+  }
+}
+
+// Database helper functions
+async function createRoomInDB(roomData) {
+  try {
+    const room = {
+      ...roomData,
+      roomId: roomData.roomId || uuidv4(),
+      participants: [],
+      isActive: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      // Enhanced room properties
+      roomType: roomData.roomType || 'private', // 'private' or 'public'
+      requiresApproval: roomData.roomType === 'private', // Auto-set based on room type
+      currentParticipants: 0
+    };
+    
+    const result = await db.collection('rooms').insertOne(room);
+    return { ...room, _id: result.insertedId };
+  } catch (error) {
+    console.error('Error creating room in DB:', error);
+    throw error;
+  }
+}
+
+async function getRoomFromDB(roomId) {
+  try {
+    return await db.collection('rooms').findOne({ roomId });
+  } catch (error) {
+    console.error('Error getting room from DB:', error);
+    return null;
+  }
+}
+
+async function updateRoomInDB(roomId, updateData) {
+  try {
+    const result = await db.collection('rooms').updateOne(
+      { roomId },
+      { 
+        $set: { 
+          ...updateData, 
+          updatedAt: new Date() 
+        } 
+      }
+    );
+    return result.modifiedCount > 0;
+  } catch (error) {
+    console.error('Error updating room in DB:', error);
+    return false;
+  }
+}
+
+async function addParticipantToDB(roomId, participantData) {
+  try {
+    const result = await db.collection('rooms').updateOne(
+      { roomId },
+      { 
+        $push: { participants: participantData },
+        $set: { updatedAt: new Date() },
+        $inc: { currentParticipants: 1 }
+      }
+    );
+    return result.modifiedCount > 0;
+  } catch (error) {
+    console.error('Error adding participant to DB:', error);
+    return false;
+  }
+}
+
+async function removeParticipantFromDB(roomId, userId) {
+  try {
+    const result = await db.collection('rooms').updateOne(
+      { roomId },
+      { 
+        $pull: { participants: { userId } },
+        $set: { updatedAt: new Date() },
+        $inc: { currentParticipants: -1 }
+      }
+    );
+    return result.modifiedCount > 0;
+  } catch (error) {
+    console.error('Error removing participant from DB:', error);
+    return false;
   }
 }
 
@@ -109,77 +259,249 @@ io.on('connection', (socket) => {
   // Generate unique user ID and store user
   const userId = uuidv4();
   const user = new User(userId, socket.id);
-  users.set(userId, user);
+  activeUsers.set(userId, user);
   
   // Send user ID to client
   socket.emit('user-id-assigned', userId);
 
   // Handle joining a room
-  socket.on('join-room', ({ roomId, username }) => {
+  socket.on('join-room', async ({ roomId, username }) => {
     try {
-      const room = getRoom(roomId);
-      user.username = username;
-      user.roomId = roomId;
-
-      // Check if room is locked (has existing participants)
-      if (room.participants.size > 0 && room.isLocked) {
-        // Add to join requests
-        room.addJoinRequest(userId, username);
-        
-        // Notify existing participants about join request
-        broadcastToRoom(roomId, 'new-join-request', {
-          userId,
-          username,
-          requestedAt: new Date()
-        });
-        
-        socket.emit('join-request-pending', { roomId });
+      console.log(`Join room request: ${roomId} from user: ${username} (${userId})`);
+      
+      // Get room from database
+      const roomFromDB = await getRoomFromDB(roomId);
+      if (!roomFromDB) {
+        console.log(`Room not found: ${roomId}`);
+        socket.emit('room-not-found');
         return;
       }
 
-      // Add user to room
-      room.addParticipant(userId, {
-        name: username,
-        socketId: socket.id,
-        isMuted: user.isMuted,
-        isCameraOff: user.isCameraOff,
-        isScreenSharing: user.isScreenSharing
-      });
+      const session = getRoomSession(roomId, roomFromDB.roomType);
+      user.username = username;
+      user.roomId = roomId;
 
-      // Join socket room for easy broadcasting
-      socket.join(roomId);
+      // Check if user is admin (room creator)
+      const isAdmin = roomFromDB.createdBy === userId || roomFromDB.adminId === userId;
+      const isCreator = roomFromDB.createdBy === userId;
 
-      // Send current room state to the new user
-      socket.emit('room-state', {
-        roomId,
-        notes: room.notes,
-        timer: room.timer,
-        targets: room.targets,
-        participants: room.getParticipants(),
-        joinRequests: room.joinRequests,
-        localUserId: userId
-      });
+      console.log(`Room type: ${roomFromDB.roomType}, Requires approval: ${roomFromDB.requiresApproval}, Is admin: ${isAdmin}`);
 
-      // Notify other participants about the new user
-      broadcastToRoom(roomId, 'user-connected', {
-        userId,
-        username,
-        isMuted: user.isMuted,
-        isCameraOff: user.isCameraOff,
-        isScreenSharing: user.isScreenSharing
-      }, socket.id);
+      // Handle room joining logic based on room type
+      if (roomFromDB.roomType === 'public' || isAdmin) {
+        // Public room or admin - join immediately
+        console.log(`Allowing immediate join - Public room or admin`);
+        await joinRoomImmediately();
+      } else if (roomFromDB.roomType === 'private' && !isAdmin) {
+        // Private room and not admin - check if approval is needed
+        if (session.activeParticipants.size > 0) {
+          // Room has active participants, need approval
+          console.log(`Private room with active participants - requesting approval`);
+          session.addJoinRequest(userId, username);
+          
+          // Notify existing participants about join request (admins only)
+          session.activeParticipants.forEach((participant, participantId) => {
+            if (participant.isAdmin) {
+              const adminUser = activeUsers.get(participantId);
+              if (adminUser) {
+                io.to(adminUser.socketId).emit('new-join-request', {
+                  userId,
+                  username,
+                  requestedAt: new Date()
+                });
+              }
+            }
+          });
+          
+          socket.emit('join-request-sent', roomId);
+          return;
+        } else {
+          // Private room but no active participants - join as first participant
+          console.log(`Private room with no active participants - allowing join`);
+          await joinRoomImmediately();
+        }
+      }
 
-      console.log(`User ${username} (${userId}) joined room ${roomId}`);
+      async function joinRoomImmediately() {
+        // Add user to active session
+        session.addParticipant(userId, {
+          userId,
+          id: userId,
+          name: username,
+          socketId: socket.id,
+          isMuted: user.isMuted,
+          isCameraOff: user.isCameraOff,
+          isScreenSharing: user.isScreenSharing,
+          isAdmin,
+          isCreator
+        });
+
+        // Add participant to database
+        await addParticipantToDB(roomId, {
+          userId,
+          username,
+          joinedAt: new Date(),
+          isActive: true
+        });
+
+        // Join socket room for easy broadcasting
+        socket.join(roomId);
+
+        // Send current room state to the new user
+        socket.emit('room-state', {
+          roomId,
+          roomInfo: roomFromDB,
+          notes: session.notes,
+          timer: session.timer,
+          targets: session.targets,
+          participants: session.getActiveParticipants(),
+          joinRequests: isAdmin ? session.joinRequests : [], // Only send join requests to admins
+          localUserId: userId,
+          isLocked: roomFromDB.requiresApproval,
+          roomType: roomFromDB.roomType,
+          creatorId: roomFromDB.createdBy,
+          isAdmin,
+          isCreator
+        });
+
+        // Notify other participants about the new user
+        broadcastToRoom(roomId, 'user-connected', {
+          userId,
+          username,
+          isMuted: user.isMuted,
+          isCameraOff: user.isCameraOff,
+          isScreenSharing: user.isScreenSharing,
+          isAdmin,
+          isCreator
+        }, socket.id);
+
+        console.log(`User ${username} (${userId}) joined room ${roomId} successfully`);
+      }
+
     } catch (error) {
       console.error('Error joining room:', error);
       socket.emit('error', { message: 'Failed to join room' });
     }
   });
 
+  // Handle join request responses (admin only)
+  socket.on('join-request-response', async ({ roomId, userId: requesterId, action }) => {
+    try {
+      console.log(`Join request response: ${action} for user ${requesterId} in room ${roomId}`);
+      
+      const roomFromDB = await getRoomFromDB(roomId);
+      const isAdmin = roomFromDB && (roomFromDB.createdBy === user.id || roomFromDB.adminId === user.id);
+      
+      if (!isAdmin) {
+        socket.emit('error', { message: 'Only admins can approve/reject join requests' });
+        return;
+      }
+
+      const session = roomSessions.get(roomId);
+      if (!session || user.roomId !== roomId) {
+        console.log(`Session not found or user not in room`);
+        return;
+      }
+
+      const requesterUser = activeUsers.get(requesterId);
+      if (!requesterUser) {
+        console.log(`Requester user not found: ${requesterId}`);
+        return;
+      }
+
+      // Remove the join request
+      session.removeJoinRequest(requesterId);
+
+      if (action === 'approve') {
+        console.log(`Approving join request for ${requesterId}`);
+        
+        // Add user to session
+        session.addParticipant(requesterId, {
+          userId: requesterId,
+          id: requesterId,
+          name: requesterUser.username,
+          socketId: requesterUser.socketId,
+          isMuted: requesterUser.isMuted,
+          isCameraOff: requesterUser.isCameraOff,
+          isScreenSharing: requesterUser.isScreenSharing,
+          isAdmin: false,
+          isCreator: false
+        });
+
+        // Add to database
+        await addParticipantToDB(roomId, {
+          userId: requesterId,
+          username: requesterUser.username,
+          joinedAt: new Date(),
+          isActive: true
+        });
+
+        // Update requester's room ID
+        requesterUser.roomId = roomId;
+
+        // Join socket room
+        const requesterSocket = io.sockets.sockets.get(requesterUser.socketId);
+        if (requesterSocket) {
+          requesterSocket.join(roomId);
+        }
+
+        // Notify approved user
+        io.to(requesterUser.socketId).emit('join-approved', roomId);
+        
+        // Send room state to approved user
+        io.to(requesterUser.socketId).emit('room-state', {
+          roomId,
+          roomInfo: roomFromDB,
+          notes: session.notes,
+          timer: session.timer,
+          targets: session.targets,
+          participants: session.getActiveParticipants(),
+          joinRequests: [], // Regular users don't see join requests
+          localUserId: requesterId,
+          isLocked: roomFromDB.requiresApproval,
+          roomType: roomFromDB.roomType,
+          creatorId: roomFromDB.createdBy,
+          isAdmin: false,
+          isCreator: false
+        });
+
+        // Notify all participants about new user
+        broadcastToRoom(roomId, 'user-connected', {
+          userId: requesterId,
+          username: requesterUser.username,
+          isMuted: requesterUser.isMuted,
+          isCameraOff: requesterUser.isCameraOff,
+          isScreenSharing: requesterUser.isScreenSharing,
+          isAdmin: false,
+          isCreator: false
+        });
+        
+        console.log(`User ${requesterId} approved and joined room ${roomId}`);
+      } else {
+        console.log(`Rejecting join request for ${requesterId}`);
+        // Notify rejected user
+        io.to(requesterUser.socketId).emit('join-rejected', roomId);
+      }
+
+      // Update join requests for all admin participants
+      session.activeParticipants.forEach((participant, participantId) => {
+        if (participant.isAdmin) {
+          const adminUser = activeUsers.get(participantId);
+          if (adminUser) {
+            io.to(adminUser.socketId).emit('update-join-requests', session.joinRequests);
+          }
+        }
+      });
+      
+    } catch (error) {
+      console.error('Error handling join request response:', error);
+    }
+  });
+
   // Handle WebRTC signaling
   socket.on('signal', ({ targetUserId, signal }) => {
     try {
-      const targetUser = users.get(targetUserId);
+      const targetUser = activeUsers.get(targetUserId);
       if (targetUser && targetUser.socketId) {
         io.to(targetUser.socketId).emit('signal', {
           userId: user.id,
@@ -194,7 +516,7 @@ io.on('connection', (socket) => {
   // Handle ICE candidates
   socket.on('ice-candidate', ({ targetUserId, candidate }) => {
     try {
-      const targetUser = users.get(targetUserId);
+      const targetUser = activeUsers.get(targetUserId);
       if (targetUser && targetUser.socketId) {
         io.to(targetUser.socketId).emit('ice-candidate', {
           userId: user.id,
@@ -214,10 +536,10 @@ io.on('connection', (socket) => {
         user.isCameraOff = isCameraOff;
         user.isScreenSharing = isScreenSharing;
 
-        const room = rooms.get(user.roomId);
-        if (room && room.participants.has(user.id)) {
-          // Update participant info in room
-          const participant = room.participants.get(user.id);
+        const session = roomSessions.get(user.roomId);
+        if (session && session.activeParticipants.has(user.id)) {
+          // Update participant info in session
+          const participant = session.activeParticipants.get(user.id);
           participant.isMuted = isMuted;
           participant.isCameraOff = isCameraOff;
           participant.isScreenSharing = isScreenSharing;
@@ -236,12 +558,20 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle notes updates
-  socket.on('notes-update', ({ roomId, notes }) => {
+  // Handle notes updates (admin only)
+  socket.on('notes-update', async ({ roomId, notes }) => {
     try {
-      const room = rooms.get(roomId);
-      if (room && user.roomId === roomId) {
-        room.notes = notes;
+      const roomFromDB = await getRoomFromDB(roomId);
+      const isAdmin = roomFromDB && (roomFromDB.createdBy === user.id || roomFromDB.adminId === user.id);
+      
+      if (!isAdmin) {
+        socket.emit('error', { message: 'Only admins can update notes' });
+        return;
+      }
+
+      const session = roomSessions.get(roomId);
+      if (session && user.roomId === roomId) {
+        session.notes = notes;
         broadcastToRoom(roomId, 'notes-update', notes, socket.id);
       }
     } catch (error) {
@@ -249,12 +579,20 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle timer updates
-  socket.on('timer-update', ({ roomId, timer }) => {
+  // Handle timer updates (admin only)
+  socket.on('timer-update', async ({ roomId, timer }) => {
     try {
-      const room = rooms.get(roomId);
-      if (room && user.roomId === roomId) {
-        room.timer = timer;
+      const roomFromDB = await getRoomFromDB(roomId);
+      const isAdmin = roomFromDB && (roomFromDB.createdBy === user.id || roomFromDB.adminId === user.id);
+      
+      if (!isAdmin) {
+        socket.emit('error', { message: 'Only admins can update timer' });
+        return;
+      }
+
+      const session = roomSessions.get(roomId);
+      if (session && user.roomId === roomId) {
+        session.timer = timer;
         broadcastToRoom(roomId, 'timer-update', timer, socket.id);
       }
     } catch (error) {
@@ -262,12 +600,20 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle targets updates
-  socket.on('targets-update', ({ roomId, targets }) => {
+  // Handle targets updates (admin only)
+  socket.on('targets-update', async ({ roomId, targets }) => {
     try {
-      const room = rooms.get(roomId);
-      if (room && user.roomId === roomId) {
-        room.targets = targets;
+      const roomFromDB = await getRoomFromDB(roomId);
+      const isAdmin = roomFromDB && (roomFromDB.createdBy === user.id || roomFromDB.adminId === user.id);
+      
+      if (!isAdmin) {
+        socket.emit('error', { message: 'Only admins can update targets' });
+        return;
+      }
+
+      const session = roomSessions.get(roomId);
+      if (session && user.roomId === roomId) {
+        session.targets = targets;
         broadcastToRoom(roomId, 'targets-update', targets, socket.id);
       }
     } catch (error) {
@@ -275,65 +621,150 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle join request responses
-  socket.on('join-request-response', ({ roomId, userId: requesterId, action }) => {
+  // Handle kick participant (admin only)
+  socket.on('kick-participant', async ({ roomId, participantId }) => {
     try {
-      const room = rooms.get(roomId);
-      if (!room || user.roomId !== roomId) return;
-
-      const requesterUser = users.get(requesterId);
-      if (!requesterUser) return;
-
-      room.removeJoinRequest(requesterId);
-
-      if (action === 'approve') {
-        // Add user to room
-        room.addParticipant(requesterId, {
-          name: requesterUser.username,
-          socketId: requesterUser.socketId,
-          isMuted: requesterUser.isMuted,
-          isCameraOff: requesterUser.isCameraOff,
-          isScreenSharing: requesterUser.isScreenSharing
-        });
-
-        // Join socket room
-        io.sockets.sockets.get(requesterUser.socketId)?.join(roomId);
-
-        // Notify approved user
-        io.to(requesterUser.socketId).emit('join-approved', roomId);
-        
-        // Send room state to approved user
-        io.to(requesterUser.socketId).emit('room-state', {
-          roomId,
-          notes: room.notes,
-          timer: room.timer,
-          targets: room.targets,
-          participants: room.getParticipants(),
-          joinRequests: room.joinRequests,
-          localUserId: requesterId
-        });
-
-        // Notify all participants about new user
-        broadcastToRoom(roomId, 'user-connected', {
-          userId: requesterId,
-          username: requesterUser.username,
-          isMuted: requesterUser.isMuted,
-          isCameraOff: requesterUser.isCameraOff,
-          isScreenSharing: requesterUser.isScreenSharing
-        });
-      } else {
-        // Notify rejected user
-        io.to(requesterUser.socketId).emit('join-rejected', roomId);
+      const roomFromDB = await getRoomFromDB(roomId);
+      const isAdmin = roomFromDB && (roomFromDB.createdBy === user.id || roomFromDB.adminId === user.id);
+      
+      if (!isAdmin) {
+        socket.emit('error', { message: 'Only admins can kick participants' });
+        return;
       }
 
-      // Update join requests for all participants
-      broadcastToRoom(roomId, 'update-join-requests', room.joinRequests);
+      const session = roomSessions.get(roomId);
+      if (session) {
+        session.removeParticipant(participantId);
+        await removeParticipantFromDB(roomId, participantId);
+
+        const kickedUser = activeUsers.get(participantId);
+        if (kickedUser) {
+          io.to(kickedUser.socketId).emit('kicked-from-room', roomId);
+          kickedUser.roomId = null;
+        }
+
+        broadcastToRoom(roomId, 'user-disconnected', participantId);
+      }
     } catch (error) {
-      console.error('Error handling join request response:', error);
+      console.error('Error kicking participant:', error);
     }
   });
 
-  // Handle chat messages
+  // Handle audio toggle (for VideoCall compatibility)
+  socket.on('toggle-audio', ({ roomId, isMuted }) => {
+    try {
+      if (user.roomId === roomId) {
+        user.isMuted = isMuted;
+        
+        const session = roomSessions.get(roomId);
+        if (session && session.activeParticipants.has(user.id)) {
+          const participant = session.activeParticipants.get(user.id);
+          participant.isMuted = isMuted;
+          
+          broadcastToRoom(roomId, 'user-audio-toggle', {
+            userId: user.id,
+            isMuted
+          }, socket.id);
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling audio:', error);
+    }
+  });
+
+  // Handle video toggle (for VideoCall compatibility)
+  socket.on('toggle-video', ({ roomId, isCameraOff }) => {
+    try {
+      if (user.roomId === roomId) {
+        user.isCameraOff = isCameraOff;
+        
+        const session = roomSessions.get(roomId);
+        if (session && session.activeParticipants.has(user.id)) {
+          const participant = session.activeParticipants.get(user.id);
+          participant.isCameraOff = isCameraOff;
+          
+          broadcastToRoom(roomId, 'user-video-toggle', {
+            userId: user.id,
+            isCameraOff
+          }, socket.id);
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling video:', error);
+    }
+  });
+
+  // Handle screen share start (for VideoCall compatibility)
+  socket.on('screen-share-start', ({ roomId }) => {
+    try {
+      if (user.roomId === roomId) {
+        user.isScreenSharing = true;
+        
+        const session = roomSessions.get(roomId);
+        if (session && session.activeParticipants.has(user.id)) {
+          const participant = session.activeParticipants.get(user.id);
+          participant.isScreenSharing = true;
+          
+          broadcastToRoom(roomId, 'user-screen-share-start', {
+            userId: user.id,
+            username: user.username
+          }, socket.id);
+        }
+      }
+    } catch (error) {
+      console.error('Error handling screen share start:', error);
+    }
+  });
+
+  // Handle screen share stop (for VideoCall compatibility)
+  socket.on('screen-share-stop', ({ roomId }) => {
+    try {
+      if (user.roomId === roomId) {
+        user.isScreenSharing = false;
+        
+        const session = roomSessions.get(roomId);
+        if (session && session.activeParticipants.has(user.id)) {
+          const participant = session.activeParticipants.get(user.id);
+          participant.isScreenSharing = false;
+          
+          broadcastToRoom(roomId, 'user-screen-share-stop', {
+            userId: user.id,
+            username: user.username
+          }, socket.id);
+        }
+      }
+    } catch (error) {
+      console.error('Error handling screen share stop:', error);
+    }
+  });
+
+  // Handle room lock toggle (for VideoCall compatibility - only for private rooms)
+  socket.on('toggle-room-lock', async ({ roomId }) => {
+    try {
+      const roomFromDB = await getRoomFromDB(roomId);
+      const isCreator = roomFromDB && roomFromDB.createdBy === user.id;
+      
+      if (!isCreator) {
+        socket.emit('error', { message: 'Only room creators can toggle room lock' });
+        return;
+      }
+
+      // Only allow toggling lock for private rooms
+      if (roomFromDB.roomType !== 'private') {
+        socket.emit('error', { message: 'Room lock can only be toggled for private rooms' });
+        return;
+      }
+
+      const newLockStatus = !roomFromDB.requiresApproval;
+      await updateRoomInDB(roomId, { requiresApproval: newLockStatus });
+      
+      broadcastToRoom(roomId, 'room-lock-status', newLockStatus);
+      socket.emit('room-lock-status', newLockStatus);
+    } catch (error) {
+      console.error('Error toggling room lock:', error);
+    }
+  });
+
   socket.on('chat-message', ({ roomId, message }) => {
     try {
       if (user.roomId === roomId) {
@@ -347,185 +778,160 @@ io.on('connection', (socket) => {
         };
 
         broadcastToRoom(roomId, 'chat-message', chatMessage);
-        socket.emit('chat-message', chatMessage); // Send to sender as well
+        socket.emit('chat-message', chatMessage);
       }
     } catch (error) {
       console.error('Error handling chat message:', error);
     }
   });
 
-  // Handle file sharing
-  socket.on('file-share', ({ roomId, fileData, fileName, fileType }) => {
-    try {
-      if (user.roomId === roomId) {
-        const fileMessage = {
-          id: uuidv4(),
-          userId: user.id,
-          username: user.username,
-          fileName,
-          fileType,
-          fileData,
-          timestamp: new Date(),
-          type: 'file'
-        };
-
-        broadcastToRoom(roomId, 'file-share', fileMessage);
-        socket.emit('file-share', fileMessage); // Send to sender as well
-      }
-    } catch (error) {
-      console.error('Error handling file share:', error);
-    }
-  });
-
-  // Handle screen sharing
-  socket.on('screen-share-start', ({ roomId }) => {
-    try {
-      if (user.roomId === roomId) {
-        user.isScreenSharing = true;
-        broadcastToRoom(roomId, 'screen-share-started', {
-          userId: user.id,
-          username: user.username
-        }, socket.id);
-      }
-    } catch (error) {
-      console.error('Error handling screen share start:', error);
-    }
-  });
-
-  socket.on('screen-share-stop', ({ roomId }) => {
-    try {
-      if (user.roomId === roomId) {
-        user.isScreenSharing = false;
-        broadcastToRoom(roomId, 'screen-share-stopped', {
-          userId: user.id,
-          username: user.username
-        }, socket.id);
-      }
-    } catch (error) {
-      console.error('Error handling screen share stop:', error);
-    }
-  });
-
   // Handle disconnect
-  socket.on('disconnect', () => {
+  socket.on('disconnect', async () => {
     try {
       console.log(`User disconnected: ${socket.id}`);
       
       if (user.roomId) {
-        const room = rooms.get(user.roomId);
-        if (room) {
-          room.removeParticipant(user.id);
+        const session = roomSessions.get(user.roomId);
+        if (session) {
+          session.removeParticipant(user.id);
+          await removeParticipantFromDB(user.roomId, user.id);
           
           // Notify other participants
           broadcastToRoom(user.roomId, 'user-disconnected', user.id);
           
-          // Clean up empty rooms
-          if (room.participants.size === 0) {
-            rooms.delete(user.roomId);
-            console.log(`Room ${user.roomId} deleted (empty)`);
+          // Clean up empty sessions
+          if (session.activeParticipants.size === 0) {
+            roomSessions.delete(user.roomId);
+            console.log(`Room session ${user.roomId} cleaned up (empty)`);
           }
         }
       }
       
-      // Remove user from users map
-      users.delete(user.id);
+      // Remove user from active users
+      activeUsers.delete(user.id);
     } catch (error) {
       console.error('Error handling disconnect:', error);
-    }
-  });
-
-  // Handle explicit leave room
-  socket.on('leave-room', () => {
-    try {
-      if (user.roomId) {
-        const room = rooms.get(user.roomId);
-        if (room) {
-          room.removeParticipant(user.id);
-          broadcastToRoom(user.roomId, 'user-disconnected', user.id);
-          
-          if (room.participants.size === 0) {
-            rooms.delete(user.roomId);
-          }
-        }
-        user.roomId = null;
-      }
-    } catch (error) {
-      console.error('Error leaving room:', error);
     }
   });
 });
 
 // REST API endpoints
-app.get('/api/rooms/:roomId/exists', (req, res) => {
-  const { roomId } = req.params;
-  const exists = rooms.has(roomId);
-  res.json({ exists, participantCount: exists ? rooms.get(roomId).participants.size : 0 });
-});
 
-app.post('/api/rooms/:roomId/create', (req, res) => {
-  const { roomId } = req.params;
-  const { username } = req.body;
-  
-  if (!rooms.has(roomId)) {
-    const room = new Room(roomId);
-    rooms.set(roomId, room);
-    res.json({ success: true, message: 'Room created successfully' });
-  } else {
-    res.json({ success: false, message: 'Room already exists' });
+// Get all active rooms with filtering options
+app.get('/api/rooms', async (req, res) => {
+  try {
+    const { type } = req.query; // Filter by room type: 'public', 'private', or all
+    
+    let filter = { isActive: true };
+    if (type && ['public', 'private'].includes(type)) {
+      filter.roomType = type;
+    }
+    
+    const rooms = await db.collection('rooms')
+      .find(filter)
+      .sort({ createdAt: -1 })
+      .toArray();
+    
+    // Add current participant count from active sessions
+    const roomsWithParticipants = rooms.map(room => ({
+      ...room,
+      currentParticipants: roomSessions.get(room.roomId)?.activeParticipants.size || 0
+    }));
+    
+    res.json(roomsWithParticipants);
+  } catch (error) {
+    console.error('Error fetching rooms:', error);
+    res.status(500).json({ error: 'Failed to fetch rooms' });
   }
 });
 
-app.get('/api/rooms/:roomId/info', (req, res) => {
-  const { roomId } = req.params;
-  const room = rooms.get(roomId);
-  
-  if (room) {
+// Create a new room with enhanced validation
+app.post('/api/rooms', async (req, res) => {
+  try {
+    const { name, topic, description, roomType, maxParticipants, createdBy } = req.body;
+    
+    if (!name || !createdBy) {
+      return res.status(400).json({ error: 'Room name and creator ID are required' });
+    }
+
+    if (!['public', 'private'].includes(roomType)) {
+      return res.status(400).json({ error: 'Room type must be either "public" or "private"' });
+    }
+
+    const roomData = {
+      roomId: uuidv4(),
+      name,
+      topic: topic || '',
+      description: description || '',
+      roomType, // 'public' or 'private'
+      requiresApproval: roomType === 'private', // Auto-set based on room type
+      maxParticipants: maxParticipants || 50,
+      createdBy,
+      adminId: createdBy
+    };
+
+    const room = await createRoomInDB(roomData);
+    
+    console.log(`Created new ${roomType} room: ${room.roomId} by user: ${createdBy}`);
+    
+    res.status(201).json(room);
+  } catch (error) {
+    console.error('Error creating room:', error);
+    res.status(500).json({ error: 'Failed to create room' });
+  }
+});
+
+// Get room info
+app.get('/api/rooms/:roomId', async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    const room = await getRoomFromDB(roomId);
+    
+    if (!room) {
+      return res.status(404).json({ error: 'Room not found' });
+    }
+
+    const session = roomSessions.get(roomId);
     res.json({
-      id: room.id,
-      participantCount: room.participants.size,
-      createdAt: room.createdAt,
-      isLocked: room.isLocked,
-      participants: room.getParticipants().map(p => ({
-        id: p.id,
-        name: p.name,
-        joinedAt: p.joinedAt
-      }))
+      ...room,
+      currentParticipants: session?.activeParticipants.size || 0,
+      activeParticipants: session?.getActiveParticipants() || []
     });
-  } else {
-    res.status(404).json({ error: 'Room not found' });
+  } catch (error) {
+    console.error('Error fetching room info:', error);
+    res.status(500).json({ error: 'Failed to fetch room info' });
   }
-});
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    timestamp: new Date(),
-    activeRooms: rooms.size,
-    activeUsers: users.size
-  });
 });
 
 // Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+app.use((error, req, res, next) => {
+  console.error('Error:', error);
+  res.status(500).json({ 
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+  });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Route not found' });
 });
 
 const PORT = process.env.PORT || 3001;
 
 server.listen(PORT, () => {
-  console.log(`🚀 Google Meet Clone Server running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+  console.log(`Backend URL: http://localhost:${PORT}`);
+  
+  // Check for required environment variables
+  const requiredEnvVars = ['SPOTIFY_CLIENT_ID', 'SPOTIFY_CLIENT_SECRET'];
+  const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+  
+  if (missingVars.length > 0) {
+    console.warn('⚠️  Missing Spotify environment variables:', missingVars.join(', '));
+    console.warn('Spotify features will not work. Please check your .env file');
+  } else {
+    console.log('✅ All Spotify environment variables are set');
+  }
 });
-
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('Received SIGTERM, shutting down gracefully');
-  server.close(() => {
-    console.log('Server closed');
-    process.exit(0);
-  });
-});
-
-module.exports = { app, server, io };
