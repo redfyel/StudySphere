@@ -2,7 +2,7 @@ import React from 'react';
 
 const ChartCard = ({ title, chartComponent, insight, children, className }) => { // Removed 'styles', 'gridColumn'
   return (
-    <div className={`card ${className || ''}`}> {/* Use className="card" and merge with passed className */}
+    <div className={`card ${className || ''}`}> 
       <h2 className="card-title">{title}</h2> {/* Use className="card-title" */}
       <div className="chart-content-area"> {/* A new class for the chart wrapper, can be 'chart-placeholder' if you prefer */}
         {chartComponent}

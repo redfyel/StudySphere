@@ -10,7 +10,7 @@ function RootLayout() {
     <div className="app-container">
       <div>
         <Header />
-        <main>
+        <main style={ { minHeight: isRoomsPage ? '100vh' : 'calc(100vh - 120px)' } }>
           <Outlet />
         </main>
         {!isRoomsPage && <Footer />}

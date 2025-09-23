@@ -425,46 +425,6 @@ body {
 }
 
 
-/* Primary Navigation Menu (Pill Menu at the top) */
-.primary-nav-menu {
-  display: flex;
-  justify-content: center;
-  gap: 15px; /* Space between buttons */
-  margin-top: 30px;
-  /* margin-bottom: 50px;  */
-  background-color: var(--color-soft-gray);
-  border-radius: 35px; /* More rounded pills */
-  padding: 8px;
-  box-shadow: inset 0 1px 4px rgba(0,0,0,0.15);
-  max-width: fit-content; /* Make menu only as wide as its content */
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.primary-nav-button {
-  padding: 12px 30px;
-  border-radius: 30px;
-  border: none;
-  background-color: transparent;
-  color: var(--color-text-medium);
-  font-size: 1.1em; /* Slightly larger text */
-  font-weight: 600; /* Bolder text */
-  cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap; /* Prevent text wrapping */
-}
-
-.primary-nav-button.active {
-  background-color: var(--color-deep-teal); /* Vibrant blue for active state */
-  color: white;
-  box-shadow: 0 5px 15px rgba(137, 168, 178, 0.3);
-  transform: translateY(-2px); /* Subtle lift */
-}
-
-.primary-nav-button:hover:not(.active) {
-  background-color: var(--color-light-teal);
-  color: #333;
-}
 
 /* Dashboard Content Area (replaces .dashboard-grid for main content) */
 .moodashboard-content {
@@ -479,10 +439,24 @@ body {
   display: flex;
   flex-direction: column;
   gap: 30px;
-  max-width: 500px;
+  max-width: 980px;
   width: 100%;
 }
 
+/* New container for the logger cards */
+.loggers-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch; /* Ensures cards are the same height */
+  gap: 30px; /* Creates space between the two cards */
+  width: 100%;
+}
+
+/* Make sure each logger card can grow */
+.loggers-container > * {
+  flex: 1;
+}
 
 
 /* Section for Analytics (charts) */

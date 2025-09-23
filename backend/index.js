@@ -3,6 +3,8 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const connectDB = require('./db/connect'); // Import MongoDB connection
+require('dotenv').config(); // Load environment variables
+const aiRoutes = require('./routes/aiRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -17,7 +19,18 @@ const io = new Server(server, {
 
 app.use(cors()); // Enable CORS for Express routes if you add any REST endpoints
 
-const PORT = process.env.PORT || 3001;
+// Middleware for parsing request bodies
+app.use(express.json()); // For parsing application/json
+app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+
+// API Routes
+app.use('/api/ai', aiRoutes); // All AI-related routes will be under /api/ai
+
+// Basic route for testing
+app.get('/', (req, res) => {
+    res.send('StudySphere Backend is running!');
+});
+const PORT = process.env.PORT || 5000;
 
 // --- Server State (In-memory, for transient participant data) ---
 const roomsParticipants = new Map(); // roomId -> { participants: Map<userId, { socketId, username }>, joinRequests }
@@ -314,7 +327,7 @@ function removeParticipantFromRoom(socketId, userId, roomId) {
 // --- Start Server ---
 initializeRooms().then(() => {
   server.listen(PORT, () => {
-    console.log(`Signaling server listening on port ${PORT}`);
+    console.log(`Server is listening on port ${PORT}...`);
     console.log('--- IMPORTANT ---');
     console.log('This server uses MongoDB for persistent room data.');
     console.log('Ensure your MongoDB instance is running and accessible at the configured MONGO_URI.');

@@ -1,0 +1,339 @@
+/* --- Root Variables and Base Styles --- */
+:root {
+    /* Your New Color Palette */
+    --brand-primary: #89A8B2;       /* Muted Blue-Gray for main actions */
+    --brand-primary-dark: #7995A2;   /* Darker version for hover states */
+    --brand-secondary: #B3C8CF;      /* Lighter blue for hover states */
+    --surface-background: #F1F0E8;   /* Lightest off-white for the page background */
+    --surface-card: #FFFFFF;         /* White for the main container to maintain contrast */
+    --surface-interactive: #E5E1DA; /* Warm neutral for interactive element backgrounds like dropzones */
+    --border-color: #E5E1DA;         /* Warm neutral for all borders */
+
+    /* Text & Utility Colors */
+    --text-primary: #343A40;         /* A professional, dark slate gray for readability */
+    --text-secondary: #6C757D;       /* A lighter slate gray for subheadings and labels */
+    --text-light: #ADB5BD;           /* The lightest gray, for disabled states or placeholders */
+    --text-on-primary: #FFFFFF;      /* Text that sits on top of the primary color */
+    --error-color: #E74C3C;          /* A standard error red */
+
+    /* Shadows (Unchanged) */
+    --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
+    --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--surface-background);
+    color: var(--text-primary);
+    line-height: 1.6;
+}
+
+/* --- Main Page Layout --- */
+.page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    box-sizing: border-box;
+}
+
+/* This is the main container for the page with a sidebar */
+.sidebar-page-layout {
+    display: flex;
+    width: 100%;
+}
+
+/* This is the content area next to the sidebar */
+.sidebar-page-content {
+    /*
+     * This is the key change. We add a left margin to push the content
+     * to the right of the sidebar. The margin is equal to the sidebar's width.
+     * We also add a transition to smoothly animate the margin change.
+     */
+    margin-left: 240px; /* Same as the sidebar's width */
+    width: 100%; /* Take up the remaining width */
+    padding: 2rem; /* Add some padding for spacing */
+    transition: margin-left 0.35s ease;
+    box-sizing: border-box; /* Ensures padding is included in the width calculation */
+}
+
+/*
+ * When the sidebar is collapsed, we reduce the margin-left to match
+ * the new, smaller width of the sidebar.
+ */
+.sidebar-page-content.collapsed {
+    margin-left: 70px; /* Same as the collapsed sidebar's width */
+}
+
+/* --- Responsive Adjustments --- */
+/* (You can add this to your existing media queries) */
+
+@media (max-width: 768px) {
+    .sidebar-page-content {
+        /* On smaller screens, you might want to reduce the margin or have the sidebar overlay the content */
+        margin-left: 70px; /* Keep it aligned with the collapsed sidebar on mobile */
+        padding: 1rem;
+    }
+
+    .aigen-container {
+        grid-template-columns: 1fr; /* Stack columns on smaller screens */
+    }
+}
+.aigen-container {
+    width: 100%;
+    max-width: 1200px;
+    background: var(--surface-card);
+    border-radius: 24px;
+    box-shadow: var(--shadow-medium);
+    border: 1px solid var(--border-color);
+    display: grid;
+    grid-template-columns: 1.5fr 1fr; /* Left column is wider */
+    min-height: 700px;
+}
+
+/* --- Left Column: Content Panel --- */
+.aigen-content-panel {
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border-color);
+}
+
+.aigen-header {
+    margin-bottom: 2rem;
+}
+
+.aigen-header h1 {
+    font-size: 1.8rem;
+    margin: 0 0 0.5rem 0;
+}
+
+.aigen-header p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.aigen-input-area {
+    flex-grow: 1; /* Makes textarea fill the space */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.aigen-textarea {
+    flex-grow: 1;
+    width: 100%;
+    padding: 1.5rem;
+    border: 2px dashed var(--border-color);
+    border-radius: 16px;
+    background-color: var(--surface-background);
+    font-size: 1rem;
+    line-height: 1.7;
+    resize: none;
+    transition: all 0.2s ease-in-out;
+    box-sizing: border-box;
+}
+
+.aigen-textarea:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    background-color: var(--surface-card);
+    box-shadow: 0 0 0 4px rgba(137, 168, 178, 0.15); /* Updated focus color */
+}
+
+.aigen-file-dropzone {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    background: var(--surface-background);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.aigen-file-dropzone:hover {
+    background-color: var(--surface-interactive); /* Updated hover color */
+}
+
+.aigen-file-dropzone svg {
+    font-size: 1.5rem;
+    color: var(--brand-primary);
+}
+
+.aigen-file-dropzone p {
+    margin: 0;
+    line-height: 1.2;
+}
+.aigen-file-dropzone p strong {
+    display: block;
+    font-weight: 600;
+}
+.aigen-file-dropzone p span {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+.aigen-file-dropzone input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+
+/* --- Right Column: Control Panel --- */
+.aigen-control-panel {
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Pushes action to the bottom */
+}
+
+.aigen-options-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 2rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.option-row {
+    margin-bottom: 2rem;
+}
+
+.option-row label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* --- UPDATED Segmented Control (to match tab style) --- */
+.segmented-control {
+    display: flex;
+    background-color: var(--surface-interactive);
+    border-radius: 30px; /* Pill shape */
+    padding: 6px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+}
+.segment-button {
+    flex: 1;
+    background-color: transparent;
+    color: var(--text-secondary);
+    padding: 10px 15px; /* Adjusted for inline use */
+    border: none;
+    border-radius: 25px; /* Pill shape */
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+.segment-button.active {
+    background-color: var(--brand-primary); /* Main brand color for active state */
+    color: var(--text-on-primary);
+    box-shadow: 0 3px 10px rgba(137, 168, 178, 0.3);
+    transform: translateY(-1px); /* Subtle lift */
+}
+.segment-button:hover:not(.active):not(:disabled) {
+    background-color: var(--brand-secondary);
+    color: var(--text-primary);
+}
+.segment-button:disabled {
+    color: var(--text-light);
+    cursor: not-allowed;
+}
+
+/* Select and Input fields */
+.aigen-select, .aigen-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background-color: var(--surface-card);
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    box-sizing: border-box;
+}
+
+.aigen-select:focus, .aigen-input:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 4px rgba(137, 168, 178, 0.15); /* Updated focus color */
+}
+
+/* --- Action Area --- */
+.aigen-action-area {
+    text-align: center;
+}
+
+.aigen-generate-button {
+    width: 100%;
+    background: var(--brand-primary);
+    color: var(--text-on-primary);
+    padding: 16px 24px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.aigen-generate-button:hover:not(:disabled) {
+    background: var(--brand-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+.aigen-generate-button:disabled {
+    background: var(--text-light);
+    cursor: not-allowed;
+}
+
+.aigen-error-message, .aigen-loading-message {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+.aigen-error-message { color: var(--error-color); }
+.aigen-loading-message { color: var(--text-secondary); }
+
+.spinner-icon {
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 1024px) {
+    .aigen-container {
+        grid-template-columns: 1fr; /* Stack columns on smaller screens */
+        min-height: auto;
+    }
+    .aigen-content-panel {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .aigen-textarea {
+        min-height: 300px;
+    }
+}
+
+@media (max-width: 600px) {
+    .page-wrapper { padding: 1rem; }
+    .aigen-container { border-radius: 16px; }
+    .aigen-content-panel, .aigen-control-panel { padding: 1.5rem; }
+}
