@@ -86,7 +86,7 @@ function App() {
           path: "rooms",
           children: [
             { index: true, element: <RoomList /> },
-            { path: ":roomId", element: <VideoCall /> },
+            { path: "/rooms/:roomId", element: <VideoCall /> },
           ],
         },
 

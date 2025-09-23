@@ -13,6 +13,14 @@ function FloatingToolbar({
   onToggleNotes,
   onToggleTimer,
   onToggleMusicPlayer,
+  onToggleChat,
+  onToggleParticipants,
+  onLeaveRoom,
+  participantCount,
+  unreadMessages,
+  isCreator,
+  isRoomLocked,
+  onToggleRoomLock,
 }) {
   return (
     <div className="floating-toolbar">
@@ -104,7 +112,66 @@ function FloatingToolbar({
             <path d="M12,3V13.55C11.41,13.21 10.73,13 10,13A3,3 0 0,0 7,16A3,3 0 0,0 10,19A3,3 0 0,0 13,16V7H17V5H12V3Z" />
           </svg>
         </button>
+
+        {/* Chat Button with notification badge */}
+        <button
+          onClick={onToggleChat}
+          className="toolbar-btn btn-default chat-button"
+          title="Toggle Chat Panel"
+        >
+          <svg className="icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
+          </svg>
+          {unreadMessages > 0 && (
+            <span className="notification-badge">{unreadMessages > 99 ? '99+' : unreadMessages}</span>
+          )}
+        </button>
+
+        {/* Participants Button */}
+        <button
+          onClick={onToggleParticipants}
+          className="toolbar-btn btn-default participants-button"
+          title="Toggle Participants Panel"
+        >
+          <svg className="icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16,4C18.21,4 20,5.79 20,8C20,10.21 18.21,12 16,12C13.79,12 12,10.21 12,8C12,5.79 13.79,4 16,4M16,14C20.42,14 24,15.79 24,18V20H8V18C8,15.79 11.58,14 16,14M6,6V9H4V6H1V4H4V1H6V4H9V6M6,16V19H4V16H1V14H4V11H6V14H9V16" />
+          </svg>
+          <span className="participant-count">{participantCount}</span>
+        </button>
       </div>
+
+      {/* Room Controls (Only for creators) */}
+      {isCreator && (
+        <div className="toolbar-section">
+          <button
+            onClick={onToggleRoomLock}
+            className={`toolbar-btn ${isRoomLocked ? 'btn-active' : 'btn-default'}`}
+            title={isRoomLocked ? 'Unlock Room' : 'Lock Room'}
+          >
+            <svg className="icon" viewBox="0 0 24 24" fill="currentColor">
+              {isRoomLocked ? (
+                <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" />
+              ) : (
+                <path d="M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10A2,2 0 0,1 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" />
+              )}
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {/* Leave Room Button */}
+      <div className="toolbar-section">
+        <button
+          onClick={onLeaveRoom}
+          className="toolbar-btn btn-danger"
+          title="Leave Room"
+        >
+          <svg className="icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M14.08,15.59L16.67,13H7V11H16.67L14.08,8.41L15.49,7L20.49,12L15.49,17L14.08,15.59M19,3A2,2 0 0,1 21,5V9.67L19,7.67V5H5V19H19V16.33L21,14.33V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H19Z" />
+          </svg>
+        </button>
+      </div>
+
       <style jsx>{`
         .floating-toolbar {
           position: fixed;
@@ -122,11 +189,14 @@ function FloatingToolbar({
           backdrop-filter: blur(10px);
           z-index: 1000;
           height: 48px;
+          max-width: 90vw;
+          overflow-x: auto;
         }
         .toolbar-section {
           display: flex;
           align-items: center;
           gap: 6px;
+          flex-shrink: 0;
         }
         .toolbar-section:not(:last-child) {
           border-right: 1px solid #E5E1DA;
@@ -145,6 +215,7 @@ function FloatingToolbar({
           font-size: 14px;
           font-weight: 500;
           padding: 0;
+          position: relative;
         }
         .toolbar-btn.btn-default {
           background: #89A8B2;
@@ -169,6 +240,44 @@ function FloatingToolbar({
         .toolbar-btn.btn-active:hover {
           background: #218838;
           transform: scale(1.05);
+        }
+        .chat-button {
+          position: relative;
+        }
+        .notification-badge {
+          position: absolute;
+          top: -4px;
+          right: -4px;
+          background: #dc3545;
+          color: white;
+          border-radius: 50%;
+          width: 18px;
+          height: 18px;
+          font-size: 10px;
+          font-weight: bold;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 2px solid #F1F0E8;
+        }
+        .participants-button {
+          position: relative;
+        }
+        .participant-count {
+          position: absolute;
+          top: -4px;
+          right: -4px;
+          background: #89A8B2;
+          color: white;
+          border-radius: 50%;
+          width: 18px;
+          height: 18px;
+          font-size: 10px;
+          font-weight: bold;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 2px solid #F1F0E8;
         }
         .background-select {
           background: #89A8B2;
@@ -199,6 +308,7 @@ function FloatingToolbar({
             padding: 3px 8px;
             gap: 6px;
             height: 42px;
+            bottom: 10px;
           }
           .toolbar-btn {
             width: 36px;
@@ -218,6 +328,12 @@ function FloatingToolbar({
           .icon {
             width: 22px;
             height: 22px;
+          }
+          .notification-badge,
+          .participant-count {
+            width: 16px;
+            height: 16px;
+            font-size: 9px;
           }
         }
       `}</style>
