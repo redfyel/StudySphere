@@ -1,0 +1,56 @@
+/* --- CONTAINER --- */
+.error-message-container {
+  display: flex;
+  align-items: flex-start; /* Aligns icon to the top of the text */
+  padding: 16px;
+  margin: 1rem 0; /* Provides some space from surrounding elements */
+  border-radius: 12px;
+  background-color: #fdecea; /* A very light, soft red tint */
+  border-left: 5px solid #d9534f; /* An on-theme, desaturated red */
+  box-shadow: 0px 4px 15px -5px rgba(217, 83, 79, 0.2);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* --- ICON --- */
+.error-message-icon {
+  font-size: 1.5rem;
+  color: #d9534f; /* Matches the border color */
+  margin-right: 16px;
+  margin-top: 2px; /* Fine-tunes vertical alignment */
+}
+
+/* --- TEXT CONTENT --- */
+.error-message-content {
+  flex: 1;
+  font-family: 'Poppins', sans-serif;
+}
+
+.error-message-title {
+  margin: 0 0 4px 0;
+  font-weight: 600;
+  color: #a94442; /* A darker shade of the error color for emphasis */
+}
+
+.error-message-text {
+  margin: 0;
+  color: #333;
+  line-height: 1.5;
+}
+
+/* --- FADE-IN ANIMATION --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-message-details-box {
+  background-color: #F1F0E8;
+  color : #89A8B2;
+  font-weight: 600;
+}

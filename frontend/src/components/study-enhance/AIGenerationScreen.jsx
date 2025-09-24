@@ -6,8 +6,9 @@ import axios from "axios";
 import { FaUpload, FaFlask, FaRocket, FaTachometerAlt } from "react-icons/fa";
 import { BsCollectionFill } from "react-icons/bs";
 import { FaLayerGroup } from "react-icons/fa";
-import Sidebar from "../sidebar/Sidebar"; // Adjust path if necessary
+import Sidebar from "../sidebar/Sidebar";
 import Dropdown from "../dropdown/Dropdown";
+import ErrorMessage from "../errormessage/ErrorMessage"; 
 import "./genscreen.css";
 
 const AIGenerationScreen = () => {
@@ -17,7 +18,7 @@ const AIGenerationScreen = () => {
   const [granularity, setGranularity] = useState("medium");
   const [focusArea, setFocusArea] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const navigate = useNavigate();
@@ -31,10 +32,9 @@ const AIGenerationScreen = () => {
 
   const sidebarItems = [
     {
-      // A "home base" for the user. Combines "Study" and "Analytics".
       name: "Dashboard",
-      path: "/study-enhance/dashboard", // A new central dashboard route
-      icon: <FaTachometerAlt />, // A dashboard icon
+      path: "/study-enhance/dashboard",
+      icon: <FaTachometerAlt />,
     },
     {
       section: "Library",
@@ -79,7 +79,7 @@ const AIGenerationScreen = () => {
   };
 
   const handleGenerate = async () => {
-    setError("");
+     setError(null);
     if (!file && !textInput.trim()) {
       setError("Please upload a file or paste text to begin.");
       return;
@@ -118,7 +118,7 @@ const AIGenerationScreen = () => {
 
         const deckTitle = prompt(
           "Your flashcards are ready! Please name your new deck:",
-          generatedData.suggestedTitle // Use the AI's suggestion as the default
+          generatedData.suggestedTitle
         );
 
         if (!deckTitle) {
@@ -158,7 +158,10 @@ const AIGenerationScreen = () => {
         });
       }
     } catch (err) {
-      setError(err.message || "An unexpected error occurred.");
+       setError({
+      message: "The AI couldn't seem to process this content.",
+      details: err.message || "An unexpected error occurred."
+  });
     } finally {
       setIsGenerating(false);
     }
@@ -252,7 +255,14 @@ const AIGenerationScreen = () => {
               </div>
             </div>
             <div className="aigen-action-area">
-              {error && <p className="aigen-error-message">{error}</p>}
+              {/* ✅ 2. REPLACE THE OLD <p> TAG WITH THE NEW COMPONENT */}
+              {error && (
+                <ErrorMessage
+                  title="Generation Failed"
+                  message={error.message}
+                  details={error.details}
+                />
+              )}
               <button
                 className="aigen-generate-button"
                 onClick={handleGenerate}
