@@ -290,15 +290,17 @@
     gap: 0.5rem;
     padding: 8px 16px;
     background-color: transparent;
-    border: 1px solid #F1F0E8;
+    border: 2px solid #E5E1DA;
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
+    color: #E5E1DA;
+     background-color: #89A8B2;
 }
 
-.preview-button:hover {
+.preview-button:hover, .fullscreen-exit-button:hover {
     background-color: #E5E1DA;
     border-color: #89A8B2;
     color: #89A8B2;
@@ -354,7 +356,6 @@
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    /* This button might be over the SVG, so add the blur effect for consistency */
     backdrop-filter: blur(8px);
 }
 

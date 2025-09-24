@@ -12,6 +12,7 @@ dotenv.config();
 require('dotenv').config(); // Load environment variables
 const aiRoutes = require('./routes/aiRoutes');
 
+
 const app = express();
 const server = http.createServer(app);
 
@@ -24,7 +25,11 @@ const io = socketIo(server, {
   }
 });
 
-app.use(cors()); // Enable CORS for Express routes if you add any REST endpoints
+app.use(cors()); // Enable CORS for Express routes
+
+// --- NEW: Add middleware to parse JSON bodies ---
+// This is crucial for your API routes to accept JSON data
+app.use(express.json());
 
 
 // --- Server State (In-memory, for transient participant data) ---
@@ -68,11 +73,11 @@ const saveRoomState = async (roomId, updates) => {
   try {
     const result = await db.collection('rooms').updateOne(
       { roomId },
-      { 
-        $set: { 
-          ...updateData, 
-          updatedAt: new Date() 
-        } 
+      {
+        $set: {
+          ...updateData,
+          updatedAt: new Date()
+        }
       }
     );
     return result.modifiedCount > 0;
@@ -86,7 +91,7 @@ async function addParticipantToDB(roomId, participantData) {
   try {
     const result = await db.collection('rooms').updateOne(
       { roomId },
-      { 
+      {
         $push: { participants: participantData },
         $set: { updatedAt: new Date() },
         $inc: { currentParticipants: 1 }
@@ -103,7 +108,7 @@ async function removeParticipantFromDB(roomId, userId) {
   try {
     const result = await db.collection('rooms').updateOne(
       { roomId },
-      { 
+      {
         $pull: { participants: { userId } },
         $set: { updatedAt: new Date() },
         $inc: { currentParticipants: -1 }
@@ -119,12 +124,12 @@ async function removeParticipantFromDB(roomId, userId) {
 // Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log(`User connected: ${socket.id}`);
-  
+
   // Generate unique user ID and store user
   const userId = uuidv4();
   const user = new User(userId, socket.id);
   activeUsers.set(userId, user);
-  
+
   // Send user ID to client
   socket.emit('user-id-assigned', userId);
 
@@ -132,7 +137,7 @@ io.on('connection', (socket) => {
   socket.on('join-room', async ({ roomId, username }) => {
     try {
       console.log(`Join room request: ${roomId} from user: ${username} (${userId})`);
-      
+
       // Get room from database
       const roomFromDB = await getRoomFromDB(roomId);
       if (!roomFromDB) {
@@ -162,7 +167,7 @@ io.on('connection', (socket) => {
           // Room has active participants, need approval
           console.log(`Private room with active participants - requesting approval`);
           session.addJoinRequest(userId, username);
-          
+
           // Notify existing participants about join request (admins only)
           session.activeParticipants.forEach((participant, participantId) => {
             if (participant.isAdmin) {
@@ -176,7 +181,7 @@ io.on('connection', (socket) => {
               }
             }
           });
-          
+
           socket.emit('join-request-sent', roomId);
           return;
         } else {
@@ -252,10 +257,10 @@ io.on('connection', (socket) => {
   socket.on('join-request-response', async ({ roomId, userId: requesterId, action }) => {
     try {
       console.log(`Join request response: ${action} for user ${requesterId} in room ${roomId}`);
-      
+
       const roomFromDB = await getRoomFromDB(roomId);
       const isAdmin = roomFromDB && (roomFromDB.createdBy === user.id || roomFromDB.adminId === user.id);
-      
+
       if (!isAdmin) {
         socket.emit('error', { message: 'Only admins can approve/reject join requests' });
         return;
@@ -278,7 +283,7 @@ io.on('connection', (socket) => {
 
       if (action === 'approve') {
         console.log(`Approving join request for ${requesterId}`);
-        
+
         // Add user to session
         session.addParticipant(requesterId, {
           userId: requesterId,
@@ -311,7 +316,7 @@ io.on('connection', (socket) => {
 
         // Notify approved user
         io.to(requesterUser.socketId).emit('join-approved', roomId);
-        
+
         // Send room state to approved user
         io.to(requesterUser.socketId).emit('room-state', {
           roomId,
@@ -339,7 +344,7 @@ io.on('connection', (socket) => {
           isAdmin: false,
           isCreator: false
         });
-        
+
         console.log(`User ${requesterId} approved and joined room ${roomId}`);
       } else {
         console.log(`Rejecting join request for ${requesterId}`);
@@ -356,7 +361,7 @@ io.on('connection', (socket) => {
           }
         }
       });
-      
+
     } catch (error) {
       console.error('Error handling join request response:', error);
     }
@@ -427,7 +432,7 @@ io.on('connection', (socket) => {
     try {
       const roomFromDB = await getRoomFromDB(roomId);
       const isAdmin = roomFromDB && (roomFromDB.createdBy === user.id || roomFromDB.adminId === user.id);
-      
+
       if (!isAdmin) {
         socket.emit('error', { message: 'Only admins can update notes' });
         return;
@@ -448,7 +453,7 @@ io.on('connection', (socket) => {
     try {
       const roomFromDB = await getRoomFromDB(roomId);
       const isAdmin = roomFromDB && (roomFromDB.createdBy === user.id || roomFromDB.adminId === user.id);
-      
+
       if (!isAdmin) {
         socket.emit('error', { message: 'Only admins can update timer' });
         return;
@@ -469,7 +474,7 @@ io.on('connection', (socket) => {
     try {
       const roomFromDB = await getRoomFromDB(roomId);
       const isAdmin = roomFromDB && (roomFromDB.createdBy === user.id || roomFromDB.adminId === user.id);
-      
+
       if (!isAdmin) {
         socket.emit('error', { message: 'Only admins can update targets' });
         return;
@@ -490,7 +495,7 @@ io.on('connection', (socket) => {
     try {
       const roomFromDB = await getRoomFromDB(roomId);
       const isAdmin = roomFromDB && (roomFromDB.createdBy === user.id || roomFromDB.adminId === user.id);
-      
+
       if (!isAdmin) {
         socket.emit('error', { message: 'Only admins can kick participants' });
         return;
@@ -519,12 +524,12 @@ io.on('connection', (socket) => {
     try {
       if (user.roomId === roomId) {
         user.isMuted = isMuted;
-        
+
         const session = roomSessions.get(roomId);
         if (session && session.activeParticipants.has(user.id)) {
           const participant = session.activeParticipants.get(user.id);
           participant.isMuted = isMuted;
-          
+
           broadcastToRoom(roomId, 'user-audio-toggle', {
             userId: user.id,
             isMuted
@@ -541,12 +546,12 @@ io.on('connection', (socket) => {
     try {
       if (user.roomId === roomId) {
         user.isCameraOff = isCameraOff;
-        
+
         const session = roomSessions.get(roomId);
         if (session && session.activeParticipants.has(user.id)) {
           const participant = session.activeParticipants.get(user.id);
           participant.isCameraOff = isCameraOff;
-          
+
           broadcastToRoom(roomId, 'user-video-toggle', {
             userId: user.id,
             isCameraOff
@@ -563,12 +568,12 @@ io.on('connection', (socket) => {
     try {
       if (user.roomId === roomId) {
         user.isScreenSharing = true;
-        
+
         const session = roomSessions.get(roomId);
         if (session && session.activeParticipants.has(user.id)) {
           const participant = session.activeParticipants.get(user.id);
           participant.isScreenSharing = true;
-          
+
           broadcastToRoom(roomId, 'user-screen-share-start', {
             userId: user.id,
             username: user.username
@@ -585,12 +590,12 @@ io.on('connection', (socket) => {
     try {
       if (user.roomId === roomId) {
         user.isScreenSharing = false;
-        
+
         const session = roomSessions.get(roomId);
         if (session && session.activeParticipants.has(user.id)) {
           const participant = session.activeParticipants.get(user.id);
           participant.isScreenSharing = false;
-          
+
           broadcastToRoom(roomId, 'user-screen-share-stop', {
             userId: user.id,
             username: user.username
@@ -607,7 +612,7 @@ io.on('connection', (socket) => {
     try {
       const roomFromDB = await getRoomFromDB(roomId);
       const isCreator = roomFromDB && roomFromDB.createdBy === user.id;
-      
+
       if (!isCreator) {
         socket.emit('error', { message: 'Only room creators can toggle room lock' });
         return;
@@ -621,7 +626,7 @@ io.on('connection', (socket) => {
 
       const newLockStatus = !roomFromDB.requiresApproval;
       await updateRoomInDB(roomId, { requiresApproval: newLockStatus });
-      
+
       broadcastToRoom(roomId, 'room-lock-status', newLockStatus);
       socket.emit('room-lock-status', newLockStatus);
     } catch (error) {
@@ -653,16 +658,16 @@ io.on('connection', (socket) => {
   socket.on('disconnect', async () => {
     try {
       console.log(`User disconnected: ${socket.id}`);
-      
+
       if (user.roomId) {
         const session = roomSessions.get(user.roomId);
         if (session) {
           session.removeParticipant(user.id);
           await removeParticipantFromDB(user.roomId, user.id);
-          
+
           // Notify other participants
           broadcastToRoom(user.roomId, 'user-disconnected', user.id);
-          
+
           // Clean up empty sessions
           if (session.activeParticipants.size === 0) {
             roomSessions.delete(user.roomId);
@@ -670,7 +675,7 @@ io.on('connection', (socket) => {
           }
         }
       }
-      
+
       // Remove user from active users
       activeUsers.delete(user.id);
     } catch (error) {
@@ -679,29 +684,34 @@ io.on('connection', (socket) => {
   });
 });
 
+// --- NEW: Mount the AI routes ---
+// All routes defined in aiRoutes.js will be prefixed with /api/ai
+app.use('/api/ai', aiRoutes);
+
+
 // REST API endpoints
 
 // Get all active rooms with filtering options
 app.get('/api/rooms', async (req, res) => {
   try {
     const { type } = req.query; // Filter by room type: 'public', 'private', or all
-    
+
     let filter = { isActive: true };
     if (type && ['public', 'private'].includes(type)) {
       filter.roomType = type;
     }
-    
+
     const rooms = await db.collection('rooms')
       .find(filter)
       .sort({ createdAt: -1 })
       .toArray();
-    
+
     // Add current participant count from active sessions
     const roomsWithParticipants = rooms.map(room => ({
       ...room,
       currentParticipants: roomSessions.get(room.roomId)?.activeParticipants.size || 0
     }));
-    
+
     res.json(roomsWithParticipants);
   } catch (error) {
     console.error('Error fetching rooms:', error);
@@ -713,7 +723,7 @@ app.get('/api/rooms', async (req, res) => {
 app.post('/api/rooms', async (req, res) => {
   try {
     const { name, topic, description, roomType, maxParticipants, createdBy } = req.body;
-    
+
     if (!name || !createdBy) {
       return res.status(400).json({ error: 'Room name and creator ID are required' });
     }
@@ -735,9 +745,9 @@ app.post('/api/rooms', async (req, res) => {
     };
 
     const room = await createRoomInDB(roomData);
-    
+
     console.log(`Created new ${roomType} room: ${room.roomId} by user: ${createdBy}`);
-    
+
     res.status(201).json(room);
   } catch (error) {
     console.error('Error creating room:', error);
@@ -750,7 +760,7 @@ app.get('/api/rooms/:roomId', async (req, res) => {
   try {
     const { roomId } = req.params;
     const room = await getRoomFromDB(roomId);
-    
+
     if (!room) {
       return res.status(404).json({ error: 'Room not found' });
     }
@@ -770,7 +780,7 @@ app.get('/api/rooms/:roomId', async (req, res) => {
 // Error handling middleware
 app.use((error, req, res, next) => {
   console.error('Error:', error);
-  res.status(500).json({ 
+  res.status(500).json({
     error: 'Internal server error',
     message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
   });
@@ -785,13 +795,13 @@ const PORT = process.env.PORT || 3001;
 
 server.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+  console.log(`Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
   console.log(`Backend URL: http://localhost:${PORT}`);
-  
+
   // Check for required environment variables
   const requiredEnvVars = ['SPOTIFY_CLIENT_ID', 'SPOTIFY_CLIENT_SECRET'];
   const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-  
+
   if (missingVars.length > 0) {
     console.warn('⚠️  Missing Spotify environment variables:', missingVars.join(', '));
     console.warn('Spotify features will not work. Please check your .env file');

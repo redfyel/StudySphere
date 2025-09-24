@@ -22,6 +22,7 @@ import {
   FaCog,
 } from "react-icons/fa";
 import Sidebar from "../../sidebar/Sidebar";
+import { saveSvgAsPng } from "./SaveImage"; // Assuming saveImage.js is in the same folder
 import "./MindMapView.css";
 
 // Helper function to wrap SVG text (no changes).
@@ -140,6 +141,13 @@ const MindMapView = () => {
       document.removeEventListener("fullscreenchange", onFullscreenChange);
   }, []);
 
+  // --- Save Image Handler ---
+  const handleSaveImage = () => {
+    if (svgRef.current) {
+      saveSvgAsPng(svgRef.current, "mindmap.png");
+    }
+  };
+
   // --- D3 Rendering Logic ---
   useEffect(() => {
     if (!mindMapData?.root) return;
@@ -161,6 +169,14 @@ const MindMapView = () => {
     const rotationGroup = zoomPanGroup
       .append("g")
       .attr("class", "rotation-group");
+
+    // --- THIS IS THE FIX ---
+    // Apply a default rotation in preview mode for better orientation.
+    // This makes the mind map appear more like a horizontal tree.
+    if (isPreview) {
+      rotationGroup.attr("transform", "rotate(-90)");
+    }
+    // --- END OF FIX ---
 
     if (!isPreview) {
       svg.call(
@@ -248,7 +264,10 @@ const MindMapView = () => {
           textEl = nodeGroup.select(".mindmap-node-label"),
           rectEl = nodeGroup.select("rect"),
           bbox = textEl.node().getBBox(),
-          isLeft = d.x > Math.PI / 2 && d.x < (Math.PI * 3) / 2;
+          // Correct text rotation based on the new default orientation
+          isLeft = isPreview
+            ? d.x > 0 && d.x < Math.PI
+            : d.x > Math.PI / 2 && d.x < (Math.PI * 3) / 2;
         rectEl
           .attr("class", `level-${d.depth}`)
           .attr("width", bbox.width + padding * 2)
@@ -286,9 +305,9 @@ const MindMapView = () => {
       node.exit().transition().duration(duration).remove();
     };
     update(root);
-  }, [mindMapData, isExpanded, timeOfDay]); // Added timeOfDay dependency to re-render SVG if theme changes
+  }, [mindMapData, isExpanded, timeOfDay]);
 
-  // Effect for rotation
+  // Effect for interactive rotation in fullscreen
   useEffect(() => {
     if (svgRef.current && isExpanded) {
       d3.select(svgRef.current)
@@ -301,6 +320,7 @@ const MindMapView = () => {
 
   if (!mindMapData?.root) {
     /* Fallback UI remains the same */
+    return <div>Loading mind map data or no data provided...</div>;
   }
 
   return (
@@ -310,8 +330,6 @@ const MindMapView = () => {
         !isExpanded ? "preview-mode" : ""
       }`}
     >
-      {/* --- THIS IS THE FIX --- */}
-      {/* Only render the Sidebar when NOT in expanded (fullscreen) mode */}
       {!isExpanded && (
         <Sidebar
           sectionName="Smart Mind Maps"
@@ -352,7 +370,7 @@ const MindMapView = () => {
             </button>
             <svg ref={svgRef} className="preview-svg-container"></svg>
             <div className="preview-controls">
-              <button className="preview-button">
+              <button className="preview-button" onClick={handleSaveImage}>
                 <FaSave /> Save Image
               </button>
               <button className="preview-button">
