@@ -181,14 +181,14 @@ const MoodTracker = () => {
 
   const handleLogStudyVibe = (data) => {
     console.log("Logging Study Vibe:", data);
-    showToast("Study Vibe Logged! 🚀", "success");
+    showToast("Study Vibe Logged! 🚀", "info");
     // In a real app, you would dispatch this data to your global state/backend
     // and then potentially refetch analytics if the user switches to 'analytics'
   };
 
   const handleLogOverallMood = (data) => {
     console.log("Logging Overall Mood:", data);
-    showToast("Daily Mood Logged! 😊", "success");
+    showToast("Daily Mood Logged! 😊", "info");
     // In a real app, you would dispatch this data to your global state/backend
   };
 
