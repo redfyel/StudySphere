@@ -1,0 +1,505 @@
+/*=============================================
+=         Global & Night Color Palette        =
+=============================================*/
+:root {
+    --mindmap-bg: #0d1117;
+    --mindmap-text: #e6edf3;
+    --mindmap-link: rgba(88, 166, 255, 0.4);
+    --mindmap-node-fill: #161b22;
+    --mindmap-node-stroke: #30363d;
+    --mindmap-control-bg: rgba(22, 27, 34, 0.8);
+    /* Dark control background */
+    --mindmap-control-border: rgba(255, 255, 255, 0.3);
+    /* Light border for contrast */
+    --mindmap-control-text: #e6edf3;
+    /* Light text */
+    --color-level-0: #f778ba;
+    --color-level-1: #3081f7;
+    --color-level-2: #238636;
+    --color-level-3: #8957e5;
+    --color-default: #8b949e;
+}
+
+/*=============================================
+=         Morning Theme Color Palette         =
+=============================================*/
+.mindmap-view.morning {
+    --mindmap-text: #2c3e50;
+    --mindmap-link: rgba(52, 152, 219, 0.5);
+    --mindmap-node-fill: #ffffff;
+    --mindmap-node-stroke: #bdc3c7;
+    --mindmap-control-bg: rgba(255, 255, 255, 0.7);
+    /* Light control background */
+    --mindmap-control-border: rgba(44, 62, 80, 0.2);
+    /* Darker, subtle border */
+    --mindmap-control-text: #2c3e50;
+    /* Dark text */
+    --color-level-0: #e74c3c;
+    --color-level-1: #3498db;
+    --color-level-2: #2ecc71;
+    --color-level-3: #9b59b6;
+    --color-default: #95a5a6;
+}
+
+
+/*=============================================
+=         Main Canvas & Backgrounds          =
+=============================================*/
+.mindmap-view {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    font-family: 'Inter', sans-serif;
+    color: var(--mindmap-text);
+    position: relative;
+    overflow: hidden;
+    background-color: var(--mindmap-bg);
+    /* Default night color */
+    transition: background-color 1s ease;
+}
+
+/* --- THEMED BACKGROUNDS FOR FULLSCREEN --- */
+.mindmap-view.morning {
+    background: linear-gradient(to top, #d2e3f1 0%, #a6c1ee 100%);
+}
+
+/* --- STATIC BACKGROUND FOR PREVIEW MODE --- */
+.mindmap-view.preview-mode {
+    background-image: none;
+    /* Preview mode's outer background is a solid color from the theme */
+    background-color: var(--mindmap-bg);
+}
+
+/* --- Night Sky (Stars) --- */
+#stars-container,
+#stars,
+#stars2,
+#stars3 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+#stars-container {
+    z-index: 0;
+}
+
+#stars {
+    background: transparent url(https://www.transparenttextures.com/patterns/stardust.png) repeat top center;
+    animation: move-twink-back 200s linear infinite;
+}
+
+#stars2 {
+    background: transparent url(https://www.transparenttextures.com/patterns/stardust.png) repeat top center;
+    opacity: 0.6;
+    animation: move-twink-back 150s linear infinite;
+}
+
+#stars3 {
+    background: transparent url(https://www.transparenttextures.com/patterns/stardust.png) repeat top center;
+    opacity: 0.4;
+    animation: move-twink-back 100s linear infinite;
+}
+
+@keyframes move-twink-back {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: -10000px 5000px;
+    }
+}
+
+/* --- Morning Sky (Clouds) --- */
+#clouds-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.cloud {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    filter: blur(12px);
+}
+
+.cloud::before,
+.cloud::after {
+    content: '';
+    position: absolute;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+}
+
+.cloud-1 {
+    width: 200px;
+    height: 60px;
+    top: 10%;
+    animation: drift 35s linear infinite reverse;
+}
+
+.cloud-1::before {
+    width: 100px;
+    height: 100px;
+    top: -50px;
+    left: 30px;
+}
+
+.cloud-1::after {
+    width: 120px;
+    height: 80px;
+    top: -30px;
+    right: 20px;
+}
+
+.cloud-2 {
+    width: 300px;
+    height: 90px;
+    top: 30%;
+    animation: drift 45s linear infinite;
+}
+
+.cloud-2::before {
+    width: 150px;
+    height: 150px;
+    top: -75px;
+    left: 45px;
+}
+
+.cloud-2::after {
+    width: 180px;
+    height: 120px;
+    top: -45px;
+    right: 30px;
+}
+
+.cloud-3 {
+    width: 250px;
+    height: 75px;
+    top: 65%;
+    animation: drift 40s linear infinite reverse;
+}
+
+.cloud-3::before {
+    width: 125px;
+    height: 125px;
+    top: -62px;
+    left: 37px;
+}
+
+.cloud-3::after {
+    width: 150px;
+    height: 100px;
+    top: -37px;
+    right: 25px;
+}
+
+@keyframes drift {
+    from {
+        transform: translateX(-250px);
+    }
+
+    to {
+        transform: translateX(110vw);
+    }
+}
+
+/*=============================================
+=            Preview Box Styling              =
+=============================================*/
+.mindmap-preview-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    padding: 2rem;
+      background: linear-gradient(135deg, var(--color-light-cream), var(--color-light-teal));
+}
+
+.mindmap-preview-box {
+    width: 100%;
+    max-width: 800px;
+    height: 600px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: fadeIn 0.5s ease-out;
+    /* MODIFIED: Set background to match theme */
+    background-color: var(--mindmap-bg);
+    border: 1px solid var(--mindmap-node-stroke);
+}
+
+/* NEW: Themed background for the morning preview box */
+.mindmap-view.morning .mindmap-preview-box {
+    background: linear-gradient(to top, #d2e3f1 0%, #a6c1ee 100%);
+}
+
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.preview-svg-container {
+    flex-grow: 1;
+    pointer-events: none;
+}
+
+.preview-controls {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid var(--mindmap-node-stroke);
+}
+
+.preview-expand-button {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1;
+}
+
+.preview-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 8px 16px;
+    background-color: transparent;
+    border: 2px solid #E5E1DA;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #E5E1DA;
+     background-color: #89A8B2;
+}
+
+.preview-button:hover, .fullscreen-exit-button:hover {
+    background-color: #E5E1DA;
+    border-color: #89A8B2;
+    color: #89A8B2;
+}
+
+/*=============================================
+=      Full Screen UI Controls (Themed)       =
+=============================================*/
+.mindmap-svg-container {
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+}
+
+.mindmap-footer,
+.mindmap-controls {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--mindmap-control-bg);
+    border: 1px solid var(--mindmap-control-border);
+    color: var(--mindmap-control-text);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    padding: 8px 15px;
+    z-index: 10;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 15px;
+    transition: background-color .8s ease, border-color .8s ease, color .8s ease;
+}
+
+.mindmap-footer {
+    bottom: 1.5rem;
+}
+
+.mindmap-controls {
+    bottom: 5rem;
+}
+
+.fullscreen-exit-button {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 10;
+}
+
+.rotate-button {
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(8px);
+}
+
+.rotate-button svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.rotate-button:hover {
+    background-color: #E5E1DA;
+    border-color: #89A8B2;
+    color: #89A8B2;
+}
+
+/*=============================================
+=           Node & Link Styling (Themed)      =
+=============================================*/
+.mindmap-node rect {
+    fill: var(--mindmap-node-fill);
+    stroke-width: 1.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    rx: 16;
+    ry: 16;
+}
+
+.mindmap-node:hover>rect {
+    transform: scale(1.03);
+    stroke-width: 2.5px;
+}
+
+.mindmap-node .level-0 {
+    stroke: var(--color-level-0);
+}
+
+.mindmap-node .level-1 {
+    stroke: var(--color-level-1);
+}
+
+.mindmap-node .level-2 {
+    stroke: var(--color-level-2);
+}
+
+.mindmap-node .level-3 {
+    stroke: var(--color-level-3);
+}
+
+.mindmap-node .level-4,
+.mindmap-node .level-5 {
+    stroke: var(--color-default);
+}
+
+.mindmap-view.night .mindmap-node rect {
+    filter: drop-shadow(0 0 6px currentColor);
+}
+
+.mindmap-view.night .mindmap-node-label {
+    text-shadow: 0 0 6px var(--mindmap-bg);
+}
+
+.mindmap-node-label {
+    fill: var(--mindmap-text);
+    font-size: 12px;
+    font-weight: 600;
+    pointer-events: none;
+}
+
+.mindmap-indicator-group {
+    cursor: pointer;
+}
+
+.indicator-circle {
+    fill: var(--mindmap-node-fill);
+    stroke: var(--mindmap-text);
+    stroke-width: 1px;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.indicator-path {
+    stroke: var(--mindmap-text);
+    stroke-width: 1.5px;
+    stroke-linecap: round;
+    transition: all 0.3s ease;
+}
+
+.mindmap-node:hover .indicator-circle {
+    opacity: 1;
+}
+
+.mindmap-node:hover .indicator-path {
+    stroke: var(--color-level-0);
+}
+
+.mindmap-link {
+    fill: none;
+    stroke: var(--mindmap-link);
+    stroke-width: 1.5px;
+    stroke-opacity: 0.8;
+}
+
+/* --- Fallback / Loading State --- */
+.fallback-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh; /* Make it take the full screen height */
+  text-align: center;
+  /* Match the background to your theme */
+  background-color: #1a202c; /* Example for a dark theme */
+  color: #e2e8f0;       /* Example for a light text color */
+}
+
+.fallback-icon {
+  font-size: 4rem; /* 64px */
+  margin-bottom: 1rem; /* 16px */
+  /* A subtle animation to indicate activity */
+  animation: pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.fallback-title {
+  font-size: 1.5rem; /* 24px */
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.fallback-text {
+  font-size: 1rem; /* 16px */
+  color: #a0aec0; /* A softer color for the subtext */
+  margin-top: 0.5rem; /* 8px */
+}
+
+/* Keyframes for the pulsing animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+}

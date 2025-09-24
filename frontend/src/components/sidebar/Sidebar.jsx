@@ -1,44 +1,37 @@
 import { NavLink } from "react-router-dom";
 import { IoMenuOutline } from "react-icons/io5";
 import "./Sidebar.css";
-import { IoDocumentsOutline, IoCloudUploadOutline, IoBookmarkOutline, IoPeopleOutline, IoStatsChartOutline } from "react-icons/io5";
-import { CgProfile } from "react-icons/cg";
-import { BsFillSunFill } from "react-icons/bs";
 
-const navItems = [
-    { name: "All Resources", path: "/resources", icon: <IoDocumentsOutline /> },
-    { name: "Upload Resource", path: "/upload", icon: <IoCloudUploadOutline /> },
-    { name: "My Library", path: "/my-library", icon: <IoBookmarkOutline /> },
-    { name: "Group Resources", path: "/groups", icon: <IoPeopleOutline /> },
-    { name: "Trending", path: "/trending", icon: <IoStatsChartOutline /> },
-  ];
-
-export default function Sidebar({ sectionName, isCollapsed, toggleSidebar, items = navItems }) {
+export default function Sidebar({ sectionName, isCollapsed, toggleSidebar, items = [] }) {
     return (
         <aside className={`resource-sidebar ${isCollapsed ? "collapsed" : ""}`}>
             {/* Header */}
             <div className="resource-sidebar-header">
-                <div className="logo">{!isCollapsed && sectionName}</div>
+                {!isCollapsed && <div className="logo">{sectionName}</div>}
                 <button className="toggle-btn" onClick={toggleSidebar}>
                     <IoMenuOutline />
                 </button>
             </div>
 
             {/* Nav */}
-            <nav className="res-nav-menu">
-                {items.map((item) => (
-                    <NavLink
-                        key={item.name}
-                        to={item.path}
-                        className={({ isActive }) =>
-                            isActive ? "sidebar-nav-link active" : "sidebar-nav-link"
-                        }
-                        end={item.path === "/resources"}
-                    >
-                        <span className="res-nav-icon">{item.icon}</span>
-                        {!isCollapsed && <span className="res-nav-name">{item.name}</span>}
-                    </NavLink>
-                ))}
+            <nav className="sidebar-nav">
+                {items.map((item, index) => {
+                    // This allows for both flat arrays and sectioned arrays
+                    const isSection = item.section && Array.isArray(item.items);
+                    const navItems = isSection ? item.items : [item];
+
+                    return (
+                        <div key={index} className="sidebar-section">
+                            {isSection && !isCollapsed && <h3 className="sidebar-section-title">{item.section}</h3>}
+                            {navItems.map((navItem, itemIndex) => (
+                                <NavLink key={itemIndex} to={navItem.path} className={({ isActive }) => isActive ? "sidebar-nav-link active" : "sidebar-nav-link"} end={navItem.path === "/resources"}>
+                                    <span className="res-nav-icon">{navItem.icon}</span>
+                                    {!isCollapsed && <span className="res-nav-name">{navItem.name}</span>}
+                                </NavLink>
+                            ))}
+                        </div>
+                    );
+                })}
             </nav>
         </aside>
     );

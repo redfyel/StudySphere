@@ -1,18 +1,24 @@
+/* Sidebar.css */
+
 /* Sidebar Container */
 .resource-sidebar {
+  /* --- Key Change: Make the sidebar fixed --- */
+  position: fixed; /* This makes the sidebar stick to the viewport */
+  top: 0;
+  left: 0;
+  height: 100vh; /* Ensure it takes the full height of the screen */
+
   width: 240px;
   background: linear-gradient(180deg, #89A8B2, #B3C8CF);
   color: #fff;
   transition: width 0.35s ease, background 0.3s ease;
-  height: 100vh;
   display: flex;
   flex-direction: column;
   border-right: 1px solid rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(10px);
   box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
-  position: fixed;
+  z-index: 1000; /* Add a z-index to ensure it stays on top of other content */
 }
-
 .resource-sidebar.collapsed {
   width: 70px;
 }
@@ -28,6 +34,8 @@
   letter-spacing: 0.5px;
   text-transform: uppercase;
   color: #f1f0e8;
+  /* This ensures the header does not shrink */
+  flex-shrink: 0;
 }
 
 .logo {
@@ -48,14 +56,39 @@
   transform: rotate(90deg);
 }
 
-/* Nav Links */
-.res-nav-menu {
-  display: flex;
-  flex-direction: column;
-  margin-top: 20px;
-  padding: 0 6px;
+
+/* --- MODIFIED: Make Nav Area Scrollable --- */
+.sidebar-nav {
+  /* This is the key: It makes the nav container fill the remaining vertical space */
+  flex: 1; 
+  /* This is the second key: It adds a scrollbar ONLY when the content overflows */
+  overflow-y: auto; 
+  /* Add some padding so the links and scrollbar aren't squished to the edges */
+  padding: 0 10px;
 }
 
+
+/* --- ADDED: Custom Scrollbar for a Cleaner Look --- */
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent; /* Makes the track invisible */
+  margin-block: 5px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 10px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+
+/* Nav Links (No changes needed below this line) */
 .sidebar-nav-link {
   display: flex;
   align-items: center;
@@ -99,17 +132,16 @@
   letter-spacing: 0.3px;
 }
 
-/* Page Layout */
-.resources-page-layout {
-  display: flex;
+/* Section Title */
+.sidebar-section {
+    padding: 10px 0;
 }
 
-.resources-page-content {
-  flex: 1;
-  padding: 20px;
-  transition: margin-left 0.3s ease;
-}
-
-.resources-page-content.collapsed {
-  margin-left: -170px; /* adjust if needed */
+.sidebar-section-title {
+    padding: 0 14px 5px 14px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
 }

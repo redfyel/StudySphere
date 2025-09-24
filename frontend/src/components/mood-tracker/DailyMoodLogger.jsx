@@ -9,7 +9,7 @@ const DUMMY_OVERALL_MOODS = [
   { id: 6, emoji: '🤩', label: 'Awesome' },
 ];
 
-const DailyMoodLogger = ({ onLog }) => { // Removed 'styles' prop
+const DailyMoodLogger = ({ onLog }) => { 
   const [selectedOverallMood, setSelectedOverallMood] = useState(DUMMY_OVERALL_MOODS[3]); // Default to 'Balanced'
   const [overallMoodNotes, setOverallMoodNotes] = useState('');
 
@@ -23,12 +23,12 @@ const DailyMoodLogger = ({ onLog }) => { // Removed 'styles' prop
   };
 
   return (
-    <div className="card"> {/* Use className="card" */}
-      <h2 className="card-title">Log Your <span style={{ color: '#000' }}>Daily Overall </span>Vibe</h2> {/* Use className="card-title" */}
-      <div className="overall-mood-slider-container"> {/* Assuming you'll add this class if needed, or remove this div */}
-        <div className="overall-mood-display"> {/* Use className="overall-mood-display" */}
+    <div className="moocard"> {/* Use className="card" */}
+      <h2 className="moocard-title">Log Your <span style={{ color: '#000' }}>Overall </span>Vibe</h2> {/* Use className="card-title" */}
+      <div className="overall-mood-slider-container"> 
+        <div className="overall-mood-display"> 
           {selectedOverallMood.emoji}
-          <p className="overall-mood-label">{selectedOverallMood.label}</p> {/* Use className="overall-mood-label" */}
+          <p className="overall-mood-label">{selectedOverallMood.label}</p> 
         </div>
         <input
           type="range"
@@ -45,7 +45,7 @@ const DailyMoodLogger = ({ onLog }) => { // Removed 'styles' prop
         onChange={(e) => setOverallMoodNotes(e.target.value)}
         className="text-area" // Use className="text-area"
       />
-      <button onClick={handleLog} className="log-button"> {/* Use className="log-button" */}
+      <button onClick={handleLog} className="log-button"> 
         Log Daily Mood
       </button>
     </div>

@@ -1,0 +1,85 @@
+.custom-toolbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #EAEAEA;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.calendar-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.view-switcher {
+  display: flex;
+  background-color: #F3F3F3;
+  border-radius: 6px;
+  padding: 4px;
+}
+.view-switcher button {
+  background: transparent;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-light);
+  transition: all 0.2s ease;
+}
+.view-switcher button.active, .view-switcher button:hover {
+  background-color: var(--bg-content);
+  color: var(--text-main);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.toolbar-label {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.toolbar-nav {
+  display: flex;
+  align-items: center;
+  border: 1px solid #EAEAEA;
+  border-radius: 6px;
+}
+.toolbar-nav button {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+.toolbar-nav button:first-child {
+  border-right: 1px solid #EAEAEA;
+}
+
+.add-event-btn {
+  background-color: var(--add-event-bg);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.add-event-btn:hover {
+  background-color: var(--add-event-hover);
+}

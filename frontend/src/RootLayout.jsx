@@ -4,17 +4,17 @@ import Footer from "./components/footer/Footer";
 
 function RootLayout() {
   const location = useLocation();
-  const isRoomsPage = location.pathname.startsWith("/rooms");
+  const isVideoCallPage = location.pathname.startsWith("/rooms/");
 
   return (
+    // The className here is important for the flexbox layout
     <div className="app-container">
-      <div>
-        <Header />
-        <main>
-          <Outlet />
-        </main>
-        {!isRoomsPage && <Footer />}
-      </div>
+      {!isVideoCallPage && <Header />}
+      {/* The inline style is removed, replaced by a class */}
+      <main className="app-main-content">
+        <Outlet />
+      </main>
+      {!isVideoCallPage && <Footer />}
     </div>
   );
 }

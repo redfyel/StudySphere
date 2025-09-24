@@ -1,0 +1,150 @@
+/* src/components/tasks/CalendarView.css */
+
+/* --- Main Container: Establishes the overall look and feel --- */
+.calendar-container {
+  flex-grow: 1; /* CRITICAL: Allows the calendar to fill the page layout */
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: #fff; /* A crisp white background */
+  border-radius: 12px;
+  border: 1px solid #E5E1DA; /* Soft Parchment border */
+  box-shadow: 0 8px 24px -4px rgba(179, 200, 207, 0.3); /* Softer, more professional shadow */
+  overflow: hidden;
+}
+
+/* --- Toolbar: Navigation and Title --- */
+.rbc-toolbar {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #E5E1DA;
+  background-color: #F1F0E8; /* Subtle Eggshell background for the header */
+}
+
+.rbc-toolbar .rbc-toolbar-label {
+  color: #5d757e;
+  font-size: 1.75rem;
+  font-weight: 600; /* Bolder for emphasis */
+}
+
+.rbc-btn-group button {
+  color: #89A8B2;
+  background-color: #fff;
+  border: 1px solid #B3C8CF;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.rbc-btn-group button:hover,
+.rbc-btn-group button:focus {
+  background-color: #f7f6f2;
+  border-color: #a3b8bf;
+}
+
+.rbc-btn-group button.rbc-active {
+  background-color: #89A8B2 !important;
+  border-color: #89A8B2 !important;
+  color: #fff !important;
+  box-shadow: inset 0 2px 3px rgba(0,0,0,0.1);
+}
+
+/* --- Calendar Grid: The main view --- */
+.rbc-month-view {
+  border: none;
+  flex-grow: 1; /* CRITICAL: Allows the grid to fill the container */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Day headers (SUN, MON, etc.) */
+.rbc-header {
+  padding: 0.75rem 0;
+  text-align: center;
+  font-weight: 500;
+  color: #89A8B2; /* Cool Gray */
+  border: none;
+  border-bottom: 1px solid #E5E1DA;
+}
+
+
+/* --- THE DEFINITIVE FIX FOR CUT-OFF CELLS --- */
+.rbc-month-row {
+  flex-grow: 1; /* Allows rows to expand vertically */
+  display: flex;
+  flex-direction: row;
+  min-height: 120px; /* Provides a minimum height for rows */
+  border-bottom: 1px solid #E5E1DA;
+}
+.rbc-month-row:last-child {
+  border-bottom: none;
+}
+
+.rbc-row-content {
+  display: flex; /* Ensures content inside rows is also flexible */
+  flex-direction: column;
+  flex: 1 0 0%; /* THE MAGIC: Forces content to take up all available space */
+}
+/* --- END OF FIX --- */
+
+
+/* Date Cells */
+.rbc-day-bg {
+  border-left: 1px solid #E5E1DA;
+}
+.rbc-day-bg:first-child {
+  border-left: none;
+}
+
+.rbc-date-cell {
+  padding: 8px;
+  text-align: right;
+  color: #79949f;
+}
+
+/* Highlight for Today's Date */
+.rbc-today {
+  background-color: #F1F0E8; /* Light Eggshell tint for the whole cell */
+}
+.rbc-date-cell.rbc-now .rbc-button-link {
+  background-color: #89A8B2; /* Cool Gray circle */
+  color: #fff;
+  font-weight: bold;
+  height: 28px;
+  width: 28px;
+  line-height: 28px;
+  border-radius: 50%;
+  text-align: center;
+  display: inline-block;
+}
+
+/* Dates outside the current month */
+.rbc-off-range-bg {
+  background-color: #f9f9f9;
+}
+.rbc-off-range .rbc-button-link {
+  opacity: 0.4;
+}
+
+/* --- Event Styling: Making events REMARKABLE --- */
+.rbc-event {
+  padding: 5px 8px;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rbc-event:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.rbc-event.rbc-selected {
+  outline: 2px solid #3174ad;
+}

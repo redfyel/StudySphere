@@ -1,0 +1,70 @@
+.calendar-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  border-right: 1px solid #EAEAEA;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.sidebar-section .sidebar-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+}
+
+.filters-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.filter-item input {
+  display: none;
+}
+
+.custom-checkbox {
+  width: 16px;
+  height: 16px;
+  border: 1px solid;
+  border-radius: 4px;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.filter-item input:checked + .custom-checkbox::after {
+  content: '✔';
+  color: white;
+  font-size: 12px;
+}
+
+/* Mini Calendar Styles */
+.calendar-sidebar .rbc-calendar {
+  border: none;
+}
+.calendar-sidebar .rbc-header {
+  padding: 8px 0;
+  font-size: 11px;
+}
+.calendar-sidebar .rbc-month-row {
+  min-height: auto;
+}
+.calendar-sidebar .rbc-date-cell {
+  padding: 4px;
+  font-size: 11px;
+}
+.calendar-sidebar .rbc-today .rbc-date-cell span {
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+}

@@ -1,10 +1,10 @@
 // ViewSwitcher.js
 import React from 'react';
-import './MoodTracker.css'; // Make sure the CSS is available, adjust path as needed
+import './MoodTracker.css'; 
 
-const ViewSwitcher = ({ selectedView, setSelectedView }) => { // <--- Removed 'styles' prop
+const ViewSwitcher = ({ selectedView, setSelectedView }) => { 
   return (
-    <div className="view-switcher-container"> {/* <--- Using className */}
+    <div className="view-switcher-container"> 
       {['Day', 'Week', 'Month'].map((view) => (
         <button
           key={view}
