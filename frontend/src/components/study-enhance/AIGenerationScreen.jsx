@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
+import axios from "axios";
 import { FaUpload, FaFlask, FaRocket, FaTachometerAlt } from "react-icons/fa";
 import { BsCollectionFill } from "react-icons/bs";
 import { FaLayerGroup } from "react-icons/fa";
 import Sidebar from "../sidebar/Sidebar"; // Adjust path if necessary
-
+import Dropdown from "../dropdown/Dropdown";
 import "./genscreen.css";
 
 const AIGenerationScreen = () => {
@@ -19,11 +19,17 @@ const AIGenerationScreen = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
   const [isCollapsed, setIsCollapsed] = useState(false);
-  
+
   const navigate = useNavigate();
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-const sidebarItems = [
+   const detailLevelOptions = [
+    { value: "high", label: "Main Concepts Only" },
+    { value: "medium", label: "Key Details" },
+    { value: "detailed", label: "In-Depth Questions" },
+  ];
+
+  const sidebarItems = [
     {
       // A "home base" for the user. Combines "Study" and "Analytics".
       name: "Dashboard",
@@ -68,6 +74,10 @@ const sidebarItems = [
     setFile(null);
   };
 
+  const handleGranularitySelect = (selectedOption) => {
+    setGranularity(selectedOption.value);
+  };
+
   const handleGenerate = async () => {
     setError("");
     if (!file && !textInput.trim()) {
@@ -92,12 +102,17 @@ const sidebarItems = [
       });
       if (!aiResponse.ok) {
         const errorData = await aiResponse.json();
-        throw new Error(errorData.error || `HTTP error! Status: ${aiResponse.status}`);
+        throw new Error(
+          errorData.error || `HTTP error! Status: ${aiResponse.status}`
+        );
       }
       const generatedData = await aiResponse.json();
 
       if (generateType === "flashcards") {
-        if (!generatedData.flashcards || generatedData.flashcards.length === 0) {
+        if (
+          !generatedData.flashcards ||
+          generatedData.flashcards.length === 0
+        ) {
           throw new Error("No flashcards could be generated from the content.");
         }
 
@@ -108,25 +123,39 @@ const sidebarItems = [
 
         if (!deckTitle) {
           setIsGenerating(false);
-          navigate("/study-enhance/flashcards", { state: { generatedFlashcards: generatedData.flashcards } });
+          navigate("/study-enhance/flashcards", {
+            state: { generatedFlashcards: generatedData.flashcards },
+          });
           return;
         }
 
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         if (!token) throw new Error("You must be logged in to save a deck.");
-        
-        const config = { headers: { 'Content-Type': 'application/json', 'x-auth-token': token } };
+
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": token,
+          },
+        };
         const body = { title: deckTitle, flashcards: generatedData.flashcards };
 
-        await axios.post('http://localhost:5000/api/flashcards/decks', body, config);
-        
-        navigate("/study-enhance/flashcards", { state: { generatedFlashcards: generatedData.flashcards } });
+        await axios.post(
+          "http://localhost:5000/api/flashcards/decks",
+          body,
+          config
+        );
 
+        navigate("/study-enhance/flashcards", {
+          state: { generatedFlashcards: generatedData.flashcards },
+        });
       } else if (generateType === "mindmap") {
         if (!generatedData || !generatedData.root) {
           throw new Error("No mind map could be generated.");
         }
-        navigate("/study-enhance/mindmaps", { state: { mindMapData: generatedData } });
+        navigate("/study-enhance/mindmaps", {
+          state: { mindMapData: generatedData },
+        });
       }
     } catch (err) {
       setError(err.message || "An unexpected error occurred.");
@@ -135,50 +164,117 @@ const sidebarItems = [
     }
   };
 
+
   return (
     <div className="sidebar-page-layout">
-      <Sidebar sectionName="Smart Learn" isCollapsed={isCollapsed} toggleSidebar={toggleSidebar} items={sidebarItems} />
+      <Sidebar
+        sectionName="Smart Learn"
+        isCollapsed={isCollapsed}
+        toggleSidebar={toggleSidebar}
+        items={sidebarItems}
+      />
       <div className={`sidebar-page-content ${isCollapsed ? "collapsed" : ""}`}>
         <div className="aigen-container">
           <div className="aigen-content-panel">
-            <div className="aigen-header"><h1>Provide Your Content</h1><p>Paste notes, upload a document, or start from scratch.</p></div>
+            <div className="aigen-header">
+              <h1>Provide Your Content</h1>
+              <p>Paste notes, upload a document, or start from scratch.</p>
+            </div>
             <div className="aigen-input-area">
-              <textarea placeholder="Paste your notes here..." value={textInput} onChange={handleTextInputChange} className="aigen-textarea"></textarea>
+              <textarea
+                placeholder="Paste your notes here..."
+                value={textInput}
+                onChange={handleTextInputChange}
+                className="aigen-textarea"
+              ></textarea>
               <div className="aigen-file-dropzone">
-                <FaUpload /><p><strong>Or upload a file</strong><span>{file ? file.name : "PDF, DOCX, or TXT"}</span></p>
-                <input type="file" id="file-upload" onChange={handleFileChange} accept=".pdf,.docx,.txt" />
+                <FaUpload />
+                <p>
+                  <strong>Or upload a file</strong>
+                  <span>{file ? file.name : "PDF, DOCX, or TXT"}</span>
+                </p>
+                <input
+                  type="file"
+                  id="file-upload"
+                  onChange={handleFileChange}
+                  accept=".pdf,.docx,.txt"
+                />
               </div>
             </div>
           </div>
           <div className="aigen-control-panel">
             <div className="aigen-options">
-              <h2 className="aigen-options-title"><FaFlask />Customize Your Tools</h2>
+              <h2 className="aigen-options-title">
+                <FaFlask />
+                Customize Your Tools
+              </h2>
               <div className="option-row">
                 <label htmlFor="tool-type">Tool Type</label>
                 <div className="segmented-control">
-                  <button className={`segment-button ${generateType === "flashcards" ? "active" : ""}`} onClick={() => setGenerateType("flashcards")}>Flashcards</button>
-                  <button className={`segment-button ${generateType === "mindmap" ? "active" : ""}`} onClick={() => setGenerateType("mindmap")}>Mind Map</button>
+                  <button
+                    className={`segment-button ${
+                      generateType === "flashcards" ? "active" : ""
+                    }`}
+                    onClick={() => setGenerateType("flashcards")}
+                  >
+                    Flashcards
+                  </button>
+                  <button
+                    className={`segment-button ${
+                      generateType === "mindmap" ? "active" : ""
+                    }`}
+                    onClick={() => setGenerateType("mindmap")}
+                  >
+                    Mind Map
+                  </button>
                 </div>
               </div>
               <div className="option-row">
-                <label htmlFor="granularity-select">Level of Detail</label>
-                <select id="granularity-select" value={granularity} onChange={(e) => setGranularity(e.target.value)} className="aigen-select">
-                  <option value="high">Main Concepts Only</option>
-                  <option value="medium">Key Details</option>
-                  <option value="detailed">In-Depth Questions</option>
-                </select>
+                <label>Level of Detail</label>
+                <Dropdown
+                  options={detailLevelOptions}
+                  onSelect={handleGranularitySelect}
+                  placeholder={
+                    detailLevelOptions.find(opt => opt.value === granularity)?.label || "Select detail..."
+                  }
+                />
               </div>
               <div className="option-row">
                 <label htmlFor="focus-input">Focus Area (Optional)</label>
-                <input type="text" id="focus-input" value={focusArea} onChange={(e) => setFocusArea(e.target.value)} placeholder="e.g., 'key dates, formulas'" className="aigen-input" />
+                <input
+                  type="text"
+                  id="focus-input"
+                  value={focusArea}
+                  onChange={(e) => setFocusArea(e.target.value)}
+                  placeholder="e.g., 'key dates, formulas'"
+                  className="aigen-input"
+                />
               </div>
             </div>
             <div className="aigen-action-area">
               {error && <p className="aigen-error-message">{error}</p>}
-              <button className="aigen-generate-button" onClick={handleGenerate} disabled={isGenerating || (!file && !textInput.trim())}>
-                {isGenerating ? <><FaRocket className="spinner-icon" />Generating...</> : <><FaRocket />Generate Study Tools</>}
+              <button
+                className="aigen-generate-button"
+                onClick={handleGenerate}
+                disabled={isGenerating || (!file && !textInput.trim())}
+              >
+                {isGenerating ? (
+                  <>
+                    <FaRocket className="spinner-icon" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <FaRocket />
+                    Generate Study Tools
+                  </>
+                )}
               </button>
-              {isGenerating && <p className="aigen-loading-message">The AI is working its magic!</p>}
+              {isGenerating && (
+                <p className="aigen-loading-message">
+                  The AI is working its magic!
+                </p>
+              )}
             </div>
           </div>
         </div>
