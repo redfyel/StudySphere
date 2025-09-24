@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
-import { IoMenuOutline } from "react-icons/io5";
+import { GoSidebarExpand } from "react-icons/go";
+import { GoSidebarCollapse } from "react-icons/go";
 import "./Sidebar.css";
 
 export default function Sidebar({ sectionName, isCollapsed, toggleSidebar, items = [] }) {
@@ -8,8 +9,8 @@ export default function Sidebar({ sectionName, isCollapsed, toggleSidebar, items
             {/* Header */}
             <div className="resource-sidebar-header">
                 {!isCollapsed && <div className="logo">{sectionName}</div>}
-                <button className="toggle-btn" onClick={toggleSidebar}>
-                    <IoMenuOutline />
+                <button className="sidebar-toggle-btn" onClick={toggleSidebar}>
+                    {isCollapsed ? <GoSidebarExpand size={25} /> : <GoSidebarCollapse size={25} />}
                 </button>
             </div>
 
