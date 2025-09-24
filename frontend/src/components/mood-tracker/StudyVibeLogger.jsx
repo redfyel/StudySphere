@@ -26,8 +26,8 @@ const StudyVibeLogger = ({ onLog }) => {
   };
 
   return (
-    <div className="card">
-      <h2 className="card-title">Log Your <span style={{ color: '#000' }}>Study</span> Vibe</h2>
+    <div className="moocard">
+      <h2 className="moocard-title">Log Your <span style={{ color: '#000' }}>Study</span> Vibe</h2>
       <div className="study-vibe-grid">
         {DUMMY_STUDY_VIBES.map((vibe) => (
           <div

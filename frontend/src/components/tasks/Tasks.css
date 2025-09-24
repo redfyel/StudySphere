@@ -1,0 +1,116 @@
+/* === PROFESSIONAL & CLEAN AESTHETIC === */
+:root {
+  /* Your Palette */
+  --primary-accent: #89A8B2;
+  --secondary-accent: #B3C8CF;
+  --border-color: #E5E1DA;
+  --bg-main: #F1F0E8;
+
+  /* Functional Colors Inspired by Reference */
+  --bg-content: #FFFFFF;
+  --text-main: #333333;
+  --text-light: #888888;
+  --header-bg: #F9F9F9;
+  --today-indicator: #000000;
+  --add-event-bg: #F56565;
+  --add-event-hover: #E53E3E;
+}
+
+body {
+  background-color: var(--bg-main);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--text-main);
+}
+
+.calendar-container {
+  display: flex;
+  height: calc(100vh - 40px);
+  max-width: 1600px;
+  margin: 20px auto;
+  background-color: var(--bg-content);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #EAEAEA;
+}
+
+/* === MAIN CALENDAR AREA === */
+.calendar-main {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Calendar Grid Styling */
+.rbc-calendar {
+  flex: 1;
+  border: none;
+}
+
+.rbc-month-view {
+  border: 1px solid #EAEAEA;
+  border-radius: 4px;
+}
+
+.rbc-header {
+  border-bottom: 1px solid #EAEAEA;
+  padding: 12px 0;
+  text-align: right;
+  padding-right: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-light);
+  text-transform: uppercase;
+}
+
+.rbc-month-row {
+  flex: 1;
+  min-height: 120px;
+  border-top: 1px solid #EAEAEA;
+}
+.rbc-month-row:first-child {
+  border-top: none;
+}
+
+.rbc-day-bg {
+  border-left: 1px solid #EAEAEA !important;
+}
+.rbc-day-bg:first-child {
+  border-left: none !important;
+}
+
+.rbc-date-cell {
+  text-align: right;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.rbc-off-range-bg {
+  background-color: #F9F9F9;
+}
+.rbc-off-range .rbc-date-cell {
+  color: #CCCCCC;
+}
+
+.rbc-today {
+  background-color: transparent;
+}
+.rbc-today .rbc-date-cell span {
+  background-color: var(--today-indicator);
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  line-height: 24px;
+  text-align: center;
+}
+
+.rbc-event {
+  background-color: transparent !important;
+  padding: 2px 4px;
+  color: var(--text-main);
+  border-radius: 4px;
+  margin-bottom: 2px;
+}

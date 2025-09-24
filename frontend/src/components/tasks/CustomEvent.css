@@ -1,0 +1,45 @@
+:root {
+  /* Event-specific Colors inspired by your reference */
+  --color-work-orders: #F56565;
+  --color-work-orders-bg: #FED7D7;
+  --color-move-ins: #48BB78;
+  --color-move-ins-bg: #C6F6D5;
+  --color-move-outs: #4299E1;
+  --color-move-outs-bg: #BEE3F8;
+  --color-notes-reminders: #F6AD55;
+  --color-notes-reminders-bg: #FEEBC8;
+}
+
+.custom-event {
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  padding: 4px;
+  border-radius: 4px;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-icon {
+  margin-right: 6px;
+  font-size: 14px;
+}
+
+.event-title {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-count {
+  margin-left: auto;
+  background-color: #EAEAEA;
+  color: var(--text-main);
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+}

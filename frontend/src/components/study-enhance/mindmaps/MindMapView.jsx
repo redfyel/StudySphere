@@ -318,9 +318,14 @@ const MindMapView = () => {
     }
   }, [rotation, isExpanded]);
 
-  if (!mindMapData?.root) {
-    /* Fallback UI remains the same */
-    return <div>Loading mind map data or no data provided...</div>;
+   if (!mindMapData?.root) {
+    // return (
+    //   <div className="fallback-container">
+    //     <FaBrain className="fallback-icon" />
+    //     <h2 className="fallback-title">Loading Mind Map</h2>
+    //     <p className="fallback-text">Please wait while the content is being prepared...</p>
+    //   </div>
+    // );
   }
 
   return (

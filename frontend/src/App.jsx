@@ -1,4 +1,4 @@
-// App.js
+// App.jsx
 
 import "./App.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -9,11 +9,10 @@ import RootLayout from "./RootLayout";
 import Home from "./components/home/Home";
 import MoodTracker from "./components/mood-tracker/MoodTracker";
 
-// Study Enhance
+// Study Enhance Components
 import AIGenerationScreen from "./components/study-enhance/AIGenerationScreen";
-import FlashcardsLayout from "./components/study-enhance/flashcards/FlashcardsLayout";
-import FlashcardsView from "./components/study-enhance/flashcards/FlashCardsView"; // Assuming this is the study session component
-import AllCardsView from "./components/study-enhance/flashcards/AllCardsView";
+import FlashcardsView from "./components/study-enhance/flashcards/FlashCardsView";
+import AllDecksView from "./components/study-enhance/flashcards/AllDecksView"; // Corrected import name
 import MindMapView from "./components/study-enhance/mindmaps/MindMapView";
 
 // Rooms
@@ -28,6 +27,15 @@ import MyLibrary from "./components/myLibrary/MyLibrary";
 import GroupResources from "./components/group-resources/GroupResources";
 import TrendingPage from "./components/trending-page/TrendingPage";
 
+// Tasks
+import Tasks from "./components/tasks/Tasks";
+import CalendarView from "./components/tasks/CalendarView";
+
+// Auth
+import Login from "./components/login/Login";
+import Register from "./components/register/Register";
+import StartStudyPage from "./components/study-enhance/flashcards/StartStudyPage";
+
 function App() {
   const router = createBrowserRouter([
     {
@@ -41,43 +49,32 @@ function App() {
         { path: "mood-tracker", element: <MoodTracker /> },
 
         // 🎓 Study Enhance (Corrected and Restructured)
+        // THE FIX: The routes are now "flat". Each path directly renders its component
+        // without being nested inside a layout component that was causing conflicts.
         {
           path: "study-enhance",
           children: [
+            // Default and generation routes
             { index: true, element: <AIGenerationScreen /> },
             { path: "generate", element: <AIGenerationScreen /> },
-            // FIX #1: Path corrected from "mindmap" to "mindmaps" to match sidebar link
+
+            // All Mind Map related routes
             { path: "mindmaps", element: <MindMapView /> },
+            { path: "mindmaps/session", element: <MindMapView /> },
+            { path: "mindmaps/shared", element: <MindMapView /> },
+            { path: "mindmaps/review", element: <MindMapView /> },
+            { path: "mind-maps", element: <MindMapView /> },
 
-            // --- Layout Route Group ---
-            // FIX #2: This pathless route renders FlashcardsLayout and then renders
-            // one of its children in the <Outlet /> based on the URL.
-            // This is the main fix for your error.
-            {
-              element: <FlashcardsLayout />,
-              children: [
-                { path: "flashcards", element: <FlashcardsView /> },
-                { path: "flashcards/session", element: <FlashcardsView /> },
-                { path: "flashcards/review", element: <FlashcardsView /> },
-                { path: "decks", element: <AllCardsView /> },
-                { path: "flashcards/shared", element: <AllCardsView /> },
-                // You can add real components for these later
-                { path: "stats", element: <h2>Statistics Page</h2> },
-                { path: "settings", element: <h2>Settings Page</h2> },
-              ],
-            },
+            // All Flashcard related routes
+            { path: "decks", element: <AllDecksView /> }, // This will now render correctly
+            { path: "flashcards", element: <FlashcardsView /> },
+            { path: "flashcards/session", element: <StartStudyPage/> },
+            { path: "flashcards/review", element: <FlashcardsView /> },
+            { path: "flashcards/shared", element: <FlashcardsView /> },
 
-            {
-              element : <MindMapView/>,
-              children : [
-                {path : "mindmaps/session", element : <MindMapView/>},
-                {path : "mindmaps/shared", element : <MindMapView/>},
-                {path : "generate", element : <AIGenerationScreen/>},
-                {path : "mindmaps/review", element : <MindMapView/>},
-                {path : "mind-maps", element : <MindMapView/>},
-
-              ]
-            }
+            // Other Study Enhance routes
+            { path: "stats", element: <h2>Statistics Page</h2> },
+            { path: "settings", element: <h2>Settings Page</h2> },
           ],
         },
 
@@ -86,7 +83,7 @@ function App() {
           path: "rooms",
           children: [
             { index: true, element: <RoomList /> },
-            { path: "/rooms/:roomId", element: <VideoCall /> },
+            { path: ":roomId", element: <VideoCall /> }, 
           ],
         },
 
@@ -102,6 +99,13 @@ function App() {
             { path: "pdf/:id", element: <PdfReader /> },
           ],
         },
+        
+        // Other top-level routes
+        { path: "tasksu", element: <Tasks /> }, // Note: consider renaming to "tasks-summary" or similar
+        { path: "tasks", element: <CalendarView /> },
+        { path: "login", element: <Login /> },
+        { path: "register", element: <Register /> },
+        { path: "dashboard", element: <h2>Dashboard - Protected Route</h2> },
       ],
     },
   ]);

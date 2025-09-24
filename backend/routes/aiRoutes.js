@@ -19,60 +19,47 @@ router.post("/generate-flashcards", upload.single("file"), async (req, res) => {
     let inputText = "";
 
     if (req.file) {
-      // Read content from the uploaded file
       const filePath = req.file.path;
-      const fileContent = fs.readFileSync(filePath, "utf8");
-      inputText = fileContent;
-
-      // Clean up the temporary file
+      inputText = fs.readFileSync(filePath, "utf8");
       fs.unlinkSync(filePath);
-      console.log(`Deleted temporary file: ${filePath}`);
     } else if (textInput) {
       inputText = textInput;
     } else {
-      return res
-        .status(400)
-        .json({ error: "No file uploaded or text provided." });
+      return res.status(400).json({ error: "No file uploaded or text provided." });
     }
 
     if (inputText.length === 0) {
-      return res
-        .status(400)
-        .json({ error: "Input text is empty. Please provide content." });
+      return res.status(400).json({ error: "Input text is empty." });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
 
-    // Construct a more detailed prompt for flashcard generation
     const prompt = `
-You are an AI assistant specialized in generating concise study flashcards.
-Given the following text and parameters, create a list of flashcards.
+You are an AI assistant specialized in generating concise study materials.
+Your task is to analyze the provided text and create a structured JSON output.
 
 Instructions:
-- The goal is to create "atomic" flashcards, each testing a single, core concept.
-- Each flashcard must have a 'question' and an 'answer'.
-- Questions should be direct and simple, phrased to test recall (e.g., "What is X?", "Define Y.", "Who invented Z?").
-- Answers should be short and to the point, containing only the key information.
-- The output must be a JSON array of flashcard objects. Each object should have 'id', 'question', 'answer', and an optional 'tags' array.
-- Assign unique IDs to each flashcard, starting from 1.
-- If no relevant flashcards can be generated, return an empty array.
+- The output MUST be a single, valid JSON object. Do not include any text, explanations, or markdown formatting outside of this JSON object.
+- The root object must contain two keys: "suggestedTitle" (a string) and "flashcards" (an array of flashcard objects).
+- The "suggestedTitle" should be a short, descriptive name for the deck based on the main subject of the text (e.g., "Principles of Photosynthesis", "Key Events of World War II").
+- Each object in the "flashcards" array must have 'id' (a unique number), 'question' (a string), 'answer' (a string), and 'tags' (an array of strings).
+- Create "atomic" flashcards, each testing a single, core concept.
+- Generate relevant, concise tags for each card to categorize the information (e.g., "Definition", "Formula", "Historical Figure").
 
 Parameters:
-- Granularity: ${
-      granularity || "medium"
-    } (e.g., 'high' for main concepts only, 'medium' for key details, 'detailed' for specific facts)
-- Focus Area: ${
-      focusArea ? focusArea : "None specified"
-    } (prioritize questions related to these keywords)
+- Granularity: ${granularity || "medium"}
+- Focus Area: ${focusArea || "None specified"}
 
 Text to analyze:
 "${inputText}"
 
 Output JSON format example:
-[
-    { "id": 1, "question": "What is X?", "answer": "X is Y.", "tags": ["Concept", "Definition"] },
-    { "id": 2, "question": "Who invented Z?", "answer": "Z was invented by John Doe.", "tags": ["History"] }
-]
+{
+    "suggestedTitle": "Introduction to Computer Science",
+    "flashcards": [
+        { "id": 1, "question": "What is an algorithm?", "answer": "A set of rules to be followed in calculations or other problem-solving operations.", "tags": ["Algorithms", "Core Concepts"] }
+    ]
+}
 `;
 
     const result = await model.generateContent(prompt);
@@ -81,49 +68,40 @@ Output JSON format example:
 
     console.log("Gemini Raw Response:", text);
 
-    // Attempt to parse the JSON string from Gemini's response
-    let flashcards = [];
+    let generatedData = {};
     try {
-      // Gemini might wrap JSON in markdown, so extract it
       const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/);
       if (jsonMatch && jsonMatch[1]) {
-        flashcards = JSON.parse(jsonMatch[1]);
+        generatedData = JSON.parse(jsonMatch[1]);
       } else {
-        // If not markdown-wrapped, try direct parse
-        flashcards = JSON.parse(text);
+        generatedData = JSON.parse(text);
       }
     } catch (parseError) {
       console.error("Failed to parse Gemini response as JSON:", parseError);
-      console.error("Problematic text:", text);
-      // Fallback for unparseable responses
-      return res
-        .status(500)
-        .json({
-          error: "Failed to parse AI response. It might not be valid JSON.",
-          rawResponse: text,
-        });
+      return res.status(500).json({
+        error: "Failed to parse AI response. It might not be valid JSON.",
+        rawResponse: text,
+      });
     }
 
-    // Add a simple fallback for empty tags array if Gemini doesn't always provide it
-    flashcards = flashcards.map((card) => ({
+    if (!generatedData.suggestedTitle || !Array.isArray(generatedData.flashcards)) {
+      return res.status(500).json({ error: "AI response did not match the required format { suggestedTitle, flashcards }." });
+    }
+
+    generatedData.flashcards = generatedData.flashcards.map((card) => ({
       id: card.id,
       question: card.question,
       answer: card.answer,
-      tags: card.tags || [], // Ensure tags is an array
+      tags: card.tags || [],
     }));
 
-    res.json(flashcards);
+    res.json(generatedData);
   } catch (error) {
     console.error("Error generating flashcards:", error);
-    if (error.response && error.response.data) {
-      console.error("Gemini API Error details:", error.response.data);
-    }
-    res
-      .status(500)
-      .json({
-        error: "Failed to generate flashcards. Please try again.",
-        details: error.message,
-      });
+    res.status(500).json({
+      error: "Failed to generate flashcards. Please try again.",
+      details: error.message,
+    });
   }
 });
 

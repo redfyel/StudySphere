@@ -1,0 +1,39 @@
+.calendar-filters-container {
+  border-top: 1px solid var(--border-color);
+  padding-top: 24px;
+  margin-bottom: 24px;
+}
+.filters-title { font-size: 16px; font-weight: 600; margin: 0 0 16px 0; }
+.filter-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+.filter-item input[type="checkbox"] {
+  display: none; /* Hide the default checkbox */
+}
+.filter-item .custom-checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  margin-right: 10px;
+  display: inline-block;
+  position: relative;
+  transition: all 0.2s ease;
+}
+.filter-item input[type="checkbox"]:checked + .custom-checkbox {
+  background-color: var(--checkbox-color);
+}
+.filter-item input[type="checkbox"]:checked + .custom-checkbox::after {
+  content: '✓';
+  color: white;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 12px;
+  font-weight: bold;
+}

@@ -23,8 +23,8 @@ const DailyMoodLogger = ({ onLog }) => {
   };
 
   return (
-    <div className="card"> {/* Use className="card" */}
-      <h2 className="card-title">Log Your <span style={{ color: '#000' }}>Overall </span>Vibe</h2> {/* Use className="card-title" */}
+    <div className="moocard"> {/* Use className="card" */}
+      <h2 className="moocard-title">Log Your <span style={{ color: '#000' }}>Overall </span>Vibe</h2> {/* Use className="card-title" */}
       <div className="overall-mood-slider-container"> 
         <div className="overall-mood-display"> 
           {selectedOverallMood.emoji}

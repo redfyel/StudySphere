@@ -1,0 +1,214 @@
+/* frontend/src/components/all-decks/AllDecksView.css */
+
+.decks-container {
+  padding: 2rem;
+}
+
+.decks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #E5E1DA;
+}
+
+.decks-header h1 {
+  color: #5d757e;
+  font-size: 2rem;
+}
+
+.create-deck-button-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 10px 20px;
+  background-color: #89A8B2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+.create-deck-button-header:hover {
+  background-color: #708c96;
+}
+
+/* --- Responsive Grid for Decks --- */
+.decks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+/* --- Individual Deck Card Styling --- */
+.deck-card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(179, 200, 207, 0.3);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.deck-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(179, 200, 207, 0.4);
+}
+
+.deck-card-info h3 {
+  margin: 0 0 0.5rem 0;
+  color: #5d757e;
+  font-size: 1.25rem;
+}
+
+.deck-card-info p {
+  margin: 0.25rem 0;
+  color: #89A8B2;
+}
+
+.deck-card-date {
+  font-size: 0.8rem;
+  color: #a0aec0;
+  margin-top: 1rem;
+}
+
+.deck-card-actions {
+  margin-top: 1.5rem;
+  border-top: 1px solid #F1F0E8;
+  padding-top: 1rem;
+}
+
+.study-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 10px;
+  background-color: #89A8B2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.study-button:hover {
+  background-color: #708c96;
+}
+
+
+/* --- Feedback and State Indicators --- */
+.no-decks-container {
+  text-align: center;
+  padding: 4rem 2rem;
+  background-color: #f7f9fa;
+  border-radius: 12px;
+}
+
+.no-decks-container h2 {
+  color: #5d757e;
+}
+
+.no-decks-container p {
+  color: #89A8B2;
+  margin-bottom: 2rem;
+}
+
+.create-deck-button {
+  display: inline-flex; /* Changed to inline-flex */
+  align-items: center;
+  gap: 0.5rem;
+  padding: 12px 24px;
+  background-color: #89A8B2;
+  color: white;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+.create-deck-button:hover {
+  background-color: #708c96;
+}
+
+.loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #89A8B2;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 4rem auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  text-align: center;
+  padding: 1rem;
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+}
+
+/* NEW: Deck Card Tags */
+.deck-card-tags {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag-pill {
+  background-color: #f1f0e8;
+  color: #89A8B2;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.deck-card-actions {
+  margin: 1.5rem 1.5rem 1.5rem 1.5rem;
+  border-top: 1px solid #F1F0E8;
+  padding-top: 1rem;
+}
+
+.study-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 10px;
+  background-color: #89A8B2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.study-button:hover {
+  background-color: #708c96;
+}
+
+.no-results-message {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  color: #89A8B2;
+}

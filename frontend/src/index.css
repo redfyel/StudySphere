@@ -25,3 +25,20 @@ body {
   --color-text-dark: #333;
   --color-text-medium: #555;
 }
+/* Add this to your global stylesheet (e.g., index.css) */
+
+/* 1. Make the main app container a vertical flexbox that fills the viewport */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* 2. Tell the main content area to take up all available space */
+.app-main-content {
+  flex-grow: 1; /* This is the most important rule! */
+
+  /* 3. Make the main content area a flex container itself, so its children (like the calendar) can also fill the space */
+  display: flex;
+  flex-direction: column;
+}

@@ -457,3 +457,49 @@
     stroke-width: 1.5px;
     stroke-opacity: 0.8;
 }
+
+/* --- Fallback / Loading State --- */
+.fallback-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh; /* Make it take the full screen height */
+  text-align: center;
+  /* Match the background to your theme */
+  background-color: #1a202c; /* Example for a dark theme */
+  color: #e2e8f0;       /* Example for a light text color */
+}
+
+.fallback-icon {
+  font-size: 4rem; /* 64px */
+  margin-bottom: 1rem; /* 16px */
+  /* A subtle animation to indicate activity */
+  animation: pulse 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.fallback-title {
+  font-size: 1.5rem; /* 24px */
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.fallback-text {
+  font-size: 1rem; /* 16px */
+  color: #a0aec0; /* A softer color for the subtext */
+  margin-top: 0.5rem; /* 8px */
+}
+
+/* Keyframes for the pulsing animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+}

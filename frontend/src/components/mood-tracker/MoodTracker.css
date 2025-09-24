@@ -95,7 +95,7 @@ body {
 
 /* --- Card Base Style (for StudyVibeLogger, DailyMoodLogger, ChartCard) --- */
 /* Assuming these components internally use a div with a class like 'card' */
-.card {
+.moocard {
   background: white;
   border-radius: 18px;
   padding: 30px; 
@@ -105,7 +105,7 @@ body {
   border: 1px solid #e0e7eb; /* Subtle border */
 }
 
-.card-title {
+.moocard-title {
   font-size: 1.6em;
   font-weight: 600;
   color: var(--color-deep-teal);
@@ -319,11 +319,11 @@ body {
     font-size: 2.2em;
   }
 
-  .card {
+  .moocard {
     padding: 20px;
   }
 
-  .card-title {
+  .moocard-title {
     font-size: 1.4em;
     margin-bottom: 15px;
   }

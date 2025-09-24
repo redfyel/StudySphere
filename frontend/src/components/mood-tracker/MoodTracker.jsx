@@ -1,23 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Line, Pie } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  ArcElement,
-  Tooltip,
-  Legend,
-  Filler,
-} from "chart.js";
-
+import {Chart as ChartJS,CategoryScale,LinearScale,PointElement,LineElement,ArcElement,Tooltip,Legend,Filler,} from "chart.js";
 import ViewSwitcher from "./ViewSwitcher"; // This will become our "timeframe pill menu" for charts
 import StudyVibeLogger from "./StudyVibeLogger";
 import DailyMoodLogger from "./DailyMoodLogger";
 import ChartCard from "./ChartCard";
 import "./MoodTracker.css";
-import PrimaryNavTabs from "../tabs/PrimaryNavTabs"; // Import the reusable tab component
+import PrimaryNavTabs from "../tabs/PrimaryNavTabs"; 
+import { useToast } from "../../contexts/ToastProvider";
 
 ChartJS.register(
   CategoryScale,
@@ -48,6 +38,7 @@ const MoodTracker = () => {
   const [currentInsight, setCurrentInsight] = useState(
     "Log your moods and study vibes to uncover powerful insights!"
   );
+  const { showToast } = useToast();
 
   useEffect(() => {
     // Only generate chart data if we are in the analytics section or about to switch to it
@@ -188,14 +179,14 @@ const MoodTracker = () => {
 
   const handleLogStudyVibe = (data) => {
     console.log("Logging Study Vibe:", data);
-    alert("Study Vibe Logged! 🚀");
+    showToast("Study Vibe Logged! 🚀", "success");
     // In a real app, you would dispatch this data to your global state/backend
     // and then potentially refetch analytics if the user switches to 'analytics'
   };
 
   const handleLogOverallMood = (data) => {
     console.log("Logging Overall Mood:", data);
-    alert("Daily Mood Logged! 😊");
+    showToast("Daily Mood Logged! 😊", "success");
     // In a real app, you would dispatch this data to your global state/backend
   };
 
@@ -265,7 +256,7 @@ const MoodTracker = () => {
                 insight="Understand the breakdown of your emotions over this period."
               >
                 <button
-                  onClick={() => alert("Navigating to detailed analytics...")}
+                  onClick={() => showToast("Navigating to detailed analytics...", "info")}
                   className="view-analytics-button"
                 >
                   View Full Analytics

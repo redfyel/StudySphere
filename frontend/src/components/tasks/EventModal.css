@@ -1,0 +1,100 @@
+/* src/components/tasks/EventModal.css */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #F1F0E8; /* Eggshell */
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: #89A8B2; /* Cool Gray */
+  font-weight: 600;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #B3C8CF; /* Powder Blue */
+  border-radius: 8px;
+  margin-top: 1rem;
+  font-size: 1rem;
+  background-color: #fff;
+}
+
+.modal-input:focus {
+  outline: none;
+  border-color: #89A8B2;
+  box-shadow: 0 0 0 2px rgba(137, 168, 178, 0.3);
+}
+
+.color-picker {
+  display: flex;
+  gap: 10px;
+  margin-top: 1.5rem;
+}
+
+.color-dot {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 2px solid transparent;
+}
+
+.color-dot.selected {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 3px #F1F0E8, 0 0 0 5px #89A8B2;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+  background-color: #89A8B2;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #708c96;
+}
+
+.btn-secondary {
+  background-color: #E5E1DA; /* Parchment */
+  color: #89A8B2;
+}
+
+.btn-secondary:hover {
+  background-color: #d1ccc1;
+}

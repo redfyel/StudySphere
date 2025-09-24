@@ -11,6 +11,8 @@ const { v4: uuidv4 } = require('uuid');
 dotenv.config();
 require('dotenv').config(); // Load environment variables
 const aiRoutes = require('./routes/aiRoutes');
+const authRoutes = require('./routes/authRoutes');
+const flashcardRoutes = require('./routes/flashcardRoutes');
 
 
 const app = express();
@@ -20,6 +22,7 @@ const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
     origin: "http://localhost:5173",
+    allowedHeaders: ['Content-Type', 'x-auth-token'], 
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
   }
@@ -42,6 +45,17 @@ let db; // MongoDB database instance
 const initializeRooms = async () => {
   db = await connectDB(); // Connect to MongoDB and get the db instance
   const roomsCollection = db.collection('rooms');
+
+  // Initialize the database and rooms before starting the server
+initializeRooms().then(() => {
+  server.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    // ... (the rest of your console.log messages)
+  });
+}).catch(err => {
+  console.error("Failed to initialize server:", err);
+  process.exit(1);
+});
 
   const count = await roomsCollection.countDocuments();
   if (count === 0) {
@@ -687,7 +701,8 @@ io.on('connection', (socket) => {
 // --- NEW: Mount the AI routes ---
 // All routes defined in aiRoutes.js will be prefixed with /api/ai
 app.use('/api/ai', aiRoutes);
-
+app.use('/api/auth', authRoutes);
+app.use('/api/flashcards', flashcardRoutes);
 
 // REST API endpoints
 
