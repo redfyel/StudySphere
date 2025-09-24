@@ -1,0 +1,41 @@
+/* --- WRAPPER --- */
+.tooltip-wrapper {
+  position: relative;
+  display: inline-flex; /* Ensures the wrapper fits the content */
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- TOOLTIP BOX --- */
+.tooltip-box {
+  position: absolute;
+  bottom: calc(100% + 10px); /* Position above the element with 10px spacing */
+    transform: translateX(-50%);
+  
+  background-color: #3b525b; 
+
+  color: #F1F0E8;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+  white-space: nowrap; /* Prevents the tooltip text from wrapping */
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1001; /* Ensure it's above other elements */
+  pointer-events: none; /* Allows mouse events to pass through to elements below */
+}
+
+/* --- TOOLTIP ARROW (CARET) --- */
+.tooltip-arrow {
+  position: absolute;
+  bottom: -5px; /* Positions the arrow just below the tooltip box */
+  left: 50%;
+  transform: translateX(-50%);
+  
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 6px solid #3b525b; /* Must match the tooltip background color */
+}

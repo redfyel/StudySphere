@@ -106,7 +106,7 @@
   justify-content: space-between;
 }
 
-.icon-btn {
+.resource-icon-btn {
   background: none;
   border: none;
   font-size: 1.4rem;
@@ -115,7 +115,9 @@
   transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
 }
 
-.icon-btn:hover {
-  color: #6e8e9c;
+.resource-icon-btn:hover {
+  /* color: #E5E1DA; */
+  border: 1px solid #89A8B2;
+  background-color: #E5E1DA;
   transform: scale(1.1);
 }
