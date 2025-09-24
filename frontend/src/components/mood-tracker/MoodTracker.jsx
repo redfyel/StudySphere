@@ -8,6 +8,7 @@ import ChartCard from "./ChartCard";
 import "./MoodTracker.css";
 import PrimaryNavTabs from "../tabs/PrimaryNavTabs"; 
 import { useToast } from "../../contexts/ToastProvider";
+import Toast from "../toast/Toast";
 
 ChartJS.register(
   CategoryScale,
@@ -38,7 +39,8 @@ const MoodTracker = () => {
   const [currentInsight, setCurrentInsight] = useState(
     "Log your moods and study vibes to uncover powerful insights!"
   );
-  const { showToast } = useToast();
+
+  const { toast, showToast } = useToast();
 
   useEffect(() => {
     // Only generate chart data if we are in the analytics section or about to switch to it
@@ -192,6 +194,13 @@ const MoodTracker = () => {
 
   return (
     <div className="mood-tracker-container">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => showToast(null)}
+        />
+      )}
       <header className="mood-tracker-header">
         <h1>How are you feeling today?</h1>
         {/* Primary navigation: Logging vs. Analytics */}

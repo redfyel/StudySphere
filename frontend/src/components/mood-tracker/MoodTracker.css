@@ -103,6 +103,7 @@ body {
   display: flex;
   flex-direction: column;
   border: 1px solid #e0e7eb; /* Subtle border */
+  width: 500px;
 }
 
 .moocard-title {
@@ -439,7 +440,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 30px;
-  max-width: 980px;
+  max-width: 900px;
   width: 100%;
 }
 
