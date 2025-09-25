@@ -6,6 +6,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { check, validationResult } = require('express-validator');
 const connectDB = require('../db/connect'); // Assuming you have a connect.js that exports a connection function
+const auth=require('../middleware/auth');
+const { ObjectId } = require('mongodb');
 
 /**
  * @route   POST /api/auth/register
@@ -137,5 +139,27 @@ router.post(
     }
   }
 );
+
+router.get('/', auth, async (req, res) => {
+    try {
+        const db = await connectDB();
+        const usersCollection = db.collection('users');
+
+        // req.user is set by the 'auth' middleware
+        const user = await usersCollection.findOne(
+            { _id: new ObjectId(req.user.id) },
+            { projection: { password: 0 } } // Correctly use the projection option
+        ); 
+
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        res.json(user);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
 
 module.exports = router;
