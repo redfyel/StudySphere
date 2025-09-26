@@ -80,21 +80,195 @@ router.post('/upload', auth, upload.single('file'), async (req, res) => {
     }
 });
 
+router.post('/action', auth, async (req, res) => {
+    try {
+        const { resourceId, actionType } = req.body;
+        const userId = req.user.id;
+
+        if (!ObjectId.isValid(resourceId)) {
+            return res.status(400).json({ msg: 'Invalid resource ID.' });
+        }
+
+        const db = await connectDB();
+        const resourcesCollection = db.collection('resources');
+        let updateQuery = {};
+
+        switch (actionType) {
+            case 'like':
+                // For a 'like', we'll use a simple array of user IDs
+                updateQuery = { $addToSet: { likes: new ObjectId(userId) } };
+                break;
+            case 'save':
+                // For 'save', we'll use a simple array of user IDs as well
+                updateQuery = { $addToSet: { savedBy: new ObjectId(userId) } };
+                break;
+            case 'comment':
+                // Comments would require a separate modal and endpoint, but for now, we'll
+                // just acknowledge the action.
+                return res.status(200).json({ msg: 'Comment action received.' });
+            default:
+                return res.status(400).json({ msg: 'Invalid action type.' });
+        }
+
+        const result = await resourcesCollection.updateOne(
+            { _id: new ObjectId(resourceId) },
+            updateQuery
+        );
+
+        if (result.modifiedCount === 0) {
+            return res.status(404).json({ msg: 'Resource not found or already has this action.' });
+        }
+
+        res.status(200).json({ msg: `${actionType} action successful.` });
+
+    } catch (err) {
+        console.error('Error performing resource action:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+router.post('/comment', auth, async (req, res) => {
+    try {
+        const { resourceId, comment } = req.body;
+        const userId = req.user.id;
+        const username = req.user.username; // Assuming your auth middleware adds username
+
+        if (!ObjectId.isValid(resourceId) || !comment) {
+            return res.status(400).json({ msg: 'Invalid resource ID or empty comment.' });
+        }
+
+        const db = await connectDB();
+        const resourcesCollection = db.collection('resources');
+
+        const newComment = {
+            _id: new ObjectId(),
+            userId: new ObjectId(userId),
+            username,
+            text: comment,
+            createdAt: new Date()
+        };
+
+        const result = await resourcesCollection.updateOne(
+            { _id: new ObjectId(resourceId) },
+            { $push: { comments: newComment } }
+        );
+
+        if (result.modifiedCount === 0) {
+            return res.status(404).json({ msg: 'Resource not found.' });
+        }
+
+        res.status(201).json({ msg: 'Comment added successfully.', newComment });
+
+    } catch (err) {
+        console.error('Error adding comment:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+/**
+ * @route   GET /api/resources/:id/comments
+ * @desc    Get comments for a specific resource
+ * @access  Private
+ */
+router.get('/:id/comments', auth, async (req, res) => {
+    try {
+        const resourceId = req.params.id;
+        if (!ObjectId.isValid(resourceId)) {
+            return res.status(400).json({ msg: 'Invalid resource ID.' });
+        }
+
+        const db = await connectDB();
+        const resourcesCollection = db.collection('resources');
+        
+        const resource = await resourcesCollection.findOne(
+            { _id: new ObjectId(resourceId) },
+            { projection: { comments: 1, _id: 0 } }
+        );
+
+        if (!resource) {
+            return res.status(404).json({ msg: 'Resource not found.' });
+        }
+
+        res.status(200).json(resource);
+
+    } catch (err) {
+        console.error('Error fetching comments:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+
+// router.get('/', auth, async (req, res) => {
+//     try {
+//         const db = await connectDB();
+//         const resourcesCollection = db.collection('resources');
+//         const userId = req.user.id;
+
+//         const resources = await resourcesCollection.find({
+//             $or: [
+//                 { scope: 'public' },
+//                 { uploadedBy: new ObjectId(userId) }
+//             ]
+//         })
+//         .sort({ createdAt: -1 })
+//         .toArray();
+
+//         res.json(resources);
+//     } catch (err) {
+//         console.error('Error fetching resources:', err.message);
+//         res.status(500).send('Server Error');
+//     }
+// });
 
 router.get('/', auth, async (req, res) => {
     try {
         const db = await connectDB();
         const resourcesCollection = db.collection('resources');
-        const userId = req.user.id;
+        const userId = req.user.id; // Get user ID from the authentication middleware
 
-        const resources = await resourcesCollection.find({
-            $or: [
-                { scope: 'public' },
-                { uploadedBy: new ObjectId(userId) }
-            ]
-        })
-        .sort({ createdAt: -1 })
-        .toArray();
+        const resources = await resourcesCollection.aggregate([
+            // Match public resources or resources uploaded by the current user
+            {
+                $match: {
+                    $or: [
+                        { scope: 'public' },
+                        { uploadedBy: new ObjectId(userId) }
+                    ]
+                }
+            },
+            // Left outer join with the 'users' collection
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'uploadedBy',
+                    foreignField: '_id',
+                    as: 'uploaderDetails'
+                }
+            },
+            // Deconstruct the array created by $lookup
+            {
+                $unwind: {
+                    path: '$uploaderDetails',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            // Add the username as a new field
+            {
+                $addFields: {
+                    author: '$uploaderDetails.username'
+                }
+            },
+            // Sort by most recent
+            {
+                $sort: { createdAt: -1 }
+            },
+            // Exclude the uploaderDetails field from the final result
+            {
+                $project: {
+                    uploaderDetails: 0
+                }
+            }
+        ]).toArray();
 
         res.json(resources);
     } catch (err) {

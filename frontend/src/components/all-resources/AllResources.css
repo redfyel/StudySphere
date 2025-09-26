@@ -5,12 +5,10 @@
   display: flex;
   height: 100vh;
   width: 100vw;
-  
 }
 
 /* Sidebar Styling (assuming a Sidebar component) */
 .sidebar {
-  /* ... (your sidebar styling, width, etc.) */
   transition: width 0.3s ease-in-out;
   overflow-y: auto;
   box-shadow: 2px 0 5px rgba(0,0,0,0.1);
@@ -18,19 +16,19 @@
 }
 
 .sidebar.collapsed {
-  width: 70px; /* Adjust as per your collapsed sidebar width */
+  width: 70px;
 }
 
 /* Main Content Container */
 .resources-page-content {
-  flex-grow: 1; /* This is key - allows content to fill remaining space */
+  flex-grow: 1;
   padding: 2rem;
   overflow-y: auto;
-  transition: margin-left 0.3s ease-in-out; /* Smooth transition for content shift */
+  transition: margin-left 0.3s ease-in-out;
 }
 
 .resources-page-content.collapsed {
-  margin-left: 70px; /* Matches the collapsed sidebar width to prevent overlap */
+  margin-left: 70px;
 }
 
 /* Search and Filters Container */
@@ -150,4 +148,127 @@
   border: 1px solid #89A8B2;
   background-color: #E5E1DA;
   transform: scale(1.1);
+}
+
+/*
+  Comment Modal CSS
+*/
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #f7f7f7;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 1rem;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-header button {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #888;
+  transition: color 0.2s;
+}
+
+.modal-header button:hover {
+  color: #333;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  /* Make left and right margins uniform */
+  /*margin: 0 1rem;*/
+}
+
+.comments-list {
+  max-height: 300px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  color:var(--color-primary);
+}
+
+.comment {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.comment-date {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 0.5rem;
+  display: block;
+}
+
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.comment-form textarea {
+  width: 93%;
+  padding: 0.8rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  resize: vertical;
+  min-height:40px;
+  
+}
+
+.comment-form button {
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.comment-form button:hover {
+  background-color: #5d757d;
+}
+
+.no-comments-message {
+    color: var(--color-primary); /* Changed to use the primary color */
+    text-align: center;
+    padding: 2rem 0;
 }
