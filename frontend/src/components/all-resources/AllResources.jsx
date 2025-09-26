@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Link } from "react-router-dom";
 import "./AllResources.css";
 import { BiLike } from "react-icons/bi";
@@ -13,18 +13,21 @@ import {
 import { FaRegComments } from "react-icons/fa6";
 import { GrAttachment } from "react-icons/gr";
 import Sidebar from "../sidebar/Sidebar";
-import Dropdown from "../dropdown/Dropdown"; 
-import Tooltip from "../tooltips/Tooltip"; 
-
-
-// Import your PDF files directly from the src/assets/pdfs directory
-import mathNotes from "../../assets/pdfs/mathNotes.pdf";
+import Dropdown from "../dropdown/Dropdown";
+import Tooltip from "../tooltips/Tooltip";
+import axios from "axios";
+import { UserLoginContext } from "../../contexts/UserLoginContext";
 
 export default function ResourcesPage() {
   const [search, setSearch] = useState("");
   const [subject, setSubject] = useState("");
   const [type, setType] = useState("");
   const [sort, setSort] = useState("recent");
+  const [resources, setResources] = useState([]); // Will store fetched resources
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const { token, isAuthenticated } = useContext(UserLoginContext);
 
   const navItems = [
     { name: "All Resources", path: "/resources", icon: <IoDocumentsOutline /> },
@@ -52,106 +55,36 @@ export default function ResourcesPage() {
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
-  const resources = [
-    // ... your resources data remains unchanged
-    {
-      id: 1,
-      title: "Maths Notes",
-      author: "Dr. Smith",
-      type: "pdf",
-      subject: "Math",
-      thumbnail:
-        "https://imgv2-1-f.scribdassets.com/img/document/384088861/original/b5633f3ee1/1667609834?v=1",
-      url: mathNotes,
-    },
-    {
-      id: 2,
-      title: "Physics Lecture",
-      author: "Prof. Johnson",
-      type: "video",
-      subject: "Physics",
-      url: "https://www.w3schools.com/html/mov_bbb.mp4",
-    },
-    {
-      id: 3,
-      title: "Chemistry Guide",
-      author: "Dr. Brown",
-      type: "pdf",
-      subject: "Chemistry",
-      thumbnail:
-        "https://www.bing.com/th/id/OIP.WpNTI71d4f-oqWj6pY1ElQHaJ4?w=160&h=211&c=8&rs=1&qlt=70&o=7&cb=thws5&dpr=1.5&pid=3.1&rm=3",
-      url: mathNotes,
-    },
-    {
-      id: 4,
-      title: "Environmental Sciences",
-      author: "Dr. Clark",
-      type: "video",
-      subject: "Biology",
-      url: "https://www.w3schools.com/html/movie.mp4",
-    },
-    {
-      id: 5,
-      title: "Algebra Cheat Sheet",
-      author: "Tutor Sam",
-      type: "pdf",
-      subject: "Math",
-      thumbnail:
-        "https://www.edn.com/eeweb-content/wp-content/uploads/algebra.png",
-      url: mathNotes,
-    },
-    {
-      id: 6,
-      title: "Discrete Mathematics ",
-      author: "Dr. Smith",
-      type: "pdf",
-      subject: "Math",
-      thumbnail:
-        "https://imgv2-1-f.scribdassets.com/img/document/384088861/original/b5633f3ee1/1667609834?v=1",
-      url: mathNotes,
-    },
-    {
-      id: 7,
-      title: "Engineering Physics",
-      author: "Prof. Johnson",
-      type: "video",
-      subject: "Physics",
-      url: "https://www.w3schools.com/html/mov_bbb.mp4",
-    },
-    {
-      id: 8,
-      title: "Engineering Chemistry",
-      author: "Dr. Brown",
-      type: "pdf",
-      subject: "Chemistry",
-      thumbnail:
-        "https://www.bing.com/th/id/OIP.WpNTI71d4f-oqWj6pY1ElQHaJ4?w=160&h=211&c=8&rs=1&qlt=70&o=7&cb=thws5&dpr=1.5&pid=3.1&rm=3",
-      url: mathNotes,
-    },
-    {
-      id: 9,
-      title: "Life Sciences",
-      author: "Dr. Clark",
-      type: "video",
-      subject: "Biology",
-      url: "https://www.w3schools.com/html/movie.mp4",
-    },
-    {
-      id: 10,
-      title: "Probability and Statistics",
-      author: "Tutor Sam",
-      type: "pdf",
-      subject: "Math",
-      thumbnail:
-        "https://www.edn.com/eeweb-content/wp-content/uploads/algebra.png",
-      url: mathNotes,
-    },
-  ];
+  
+  // ✅ NEW: Fetch resources from the backend
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const config = {
+          headers: {
+            'x-auth-token': token,
+          },
+        };
+        const res = await axios.get("http://localhost:5000/api/resources", config);
+        setResources(res.data);
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Error fetching resources:", err);
+        setError("Failed to load resources. Please try again later.");
+        setIsLoading(false);
+      }
+    };
+    if (isAuthenticated) {
+      fetchResources();
+    } else {
+      setIsLoading(false); // If not authenticated, stop loading but show no resources
+    }
+  }, [token, isAuthenticated]);
 
   // ✅ 2. DEFINE OPTIONS FOR EACH DROPDOWN
   const subjectOptions = [
     { value: "", label: "All Subjects" },
-    // This dynamically creates options from your resources data
+    // This dynamically creates options from your fetched resources
     ...[...new Set(resources.map((r) => r.subject))].map((s) => ({
       value: s,
       label: s,
@@ -162,6 +95,7 @@ export default function ResourcesPage() {
     { value: "", label: "All Types" },
     { value: "pdf", label: "PDF" },
     { value: "video", label: "Video" },
+    { value: "link", label: "Link" },
   ];
 
   const sortOptions = [
@@ -179,14 +113,55 @@ export default function ResourcesPage() {
       (r) =>
         r.title.toLowerCase().includes(search.toLowerCase()) &&
         (subject === "" || r.subject === subject) &&
-        (type === "" || r.type === type)
+        (type === "" || r.resourceType === type) // Changed r.type to r.resourceType
     )
     .sort((a, b) => {
+      if (sort === "recent") {
+        return new Date(b.createdAt) - new Date(a.createdAt);
+      }
+      // Assuming a 'popularity' field in your database for this to work
       if (sort === "popular") {
-        return b.id - a.id;
+        return b.popularity - a.popularity;
       }
       return 0;
     });
+
+  if (isLoading) {
+    return (
+      <div className="resources-page-layout">
+        <Sidebar
+          sectionName="Resources"
+          isCollapsed={isCollapsed}
+          toggleSidebar={toggleSidebar}
+          items={navItems}
+        />
+        <div className={`resources-page-content ${isCollapsed ? "collapsed" : ""}`}>
+          <div className="loading-state">
+            <div className="spinner"></div>
+            <p>Loading resources...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="resources-page-layout">
+        <Sidebar
+          sectionName="Resources"
+          isCollapsed={isCollapsed}
+          toggleSidebar={toggleSidebar}
+          items={navItems}
+        />
+        <div className={`resources-page-content ${isCollapsed ? "collapsed" : ""}`}>
+          <div className="error-state">
+            <p className="error-message">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="resources-page-layout">
@@ -207,7 +182,6 @@ export default function ResourcesPage() {
             onChange={(e) => setSearch(e.target.value)}
             className="search-bar"
           />
-          {/* ✅ 4. REPLACE <select> WITH <Dropdown> */}
           <Dropdown
             options={subjectOptions}
             onSelect={handleSubjectSelect}
@@ -235,25 +209,27 @@ export default function ResourcesPage() {
         <div className="resource-grid">
           {filtered.map((r) => (
             <Link
-              to={`/resources/pdf/${r.id}`}
-              key={r.id}
+              to={`/resources/pdf/${r._id}`} // Use MongoDB's _id
+              key={r._id}
               className="resource-card-link"
             >
               <div className="resource-card">
                 <div className="preview-box">
-                  {r.type === "pdf" && (
-                    <img src={r.thumbnail} alt="PDF Preview" />
+                  {r.resourceType === "file" && (
+                    <img src={r.thumbnail || `https://placehold.co/100x140?text=${r.subject}`} alt="PDF Preview" />
                   )}
-                  {r.type === "video" && (
+                  {r.resourceType === "link" && (
+                    <img src={r.thumbnail || `https://placehold.co/100x140?text=Link`} alt="Link Preview" />
+                  )}
+                  {r.resourceType === "video" && (
                     <video controls>
                       <source src={r.url} type="video/mp4" />
                     </video>
                   )}
                 </div>
                 <h3>{r.title}</h3>
-                <p className="author">By {r.author}</p>
+                <p className="author">By {r.author || "Unknown"}</p>
                 <div className="card-actions">
-                  {/* ✅ 2. WRAP EACH BUTTON WITH THE TOOLTIP COMPONENT */}
                   <Tooltip content="Like Resource">
                     <button
                       className="resource-icon-btn"
