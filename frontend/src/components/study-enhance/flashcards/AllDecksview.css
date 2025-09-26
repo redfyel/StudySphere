@@ -37,6 +37,109 @@
   background-color: #708c96;
 }
 
+/* ================================================== */
+/*          ✅ NEW: FOLDABLE TAG FILTER STYLES           */
+/* ================================================== */
+
+.tag-filter-wrapper {
+  background-color: #fff;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  border: 1px solid #E5E1DA;
+  box-shadow: 0 4px 12px rgba(179, 200, 207, 0.1);
+  overflow: hidden;
+}
+
+.tag-filter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #5d757e;
+  text-align: left;
+}
+
+.tag-filter-header:hover {
+  background-color: #89A8B2;
+  color: white;
+}
+
+.tag-filter-header span {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.chevron-icon {
+  transition: transform 0.3s ease;
+}
+
+.chevron-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.tags-collapsible-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease-out, padding 0.3s ease;
+  padding: 0 1.5rem;
+}
+
+.tags-collapsible-content.expanded {
+  max-height: 500px; /* Adjust if you expect a huge number of tags */
+  padding-bottom: 1.5rem;
+  transition: max-height 0.4s ease-in;
+}
+
+.tag-buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid #E5E1DA;
+}
+
+/* ================================================== */
+/*             ✅ NEW: PRETTIER TAG BUTTONS              */
+/* ================================================== */
+
+.tag-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 8px 16px;
+  background-color: #f1f0e8;
+  color: #89A8B2;
+  border: 1px solid #E5E1DA;
+  border-radius: 20px; /* Pill shape */
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.tag-button:hover {
+  border-color: #B3C8CF;
+  background-color: #eaf2f5;
+  transform: translateY(-2px);
+
+}
+
+.tag-button.active {
+  background-color: #89A8B2;
+  color: white;
+  border-color: #89A8B2;
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(137, 168, 178, 0.4);
+}
+
 /* --- Responsive Grid for Decks --- */
 .decks-grid {
   display: grid;
@@ -104,7 +207,6 @@
   background-color: #708c96;
 }
 
-
 /* --- Feedback and State Indicators --- */
 .no-decks-container {
   text-align: center;
@@ -123,7 +225,7 @@
 }
 
 .create-deck-button {
-  display: inline-flex; /* Changed to inline-flex */
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 12px 24px;
@@ -163,7 +265,7 @@
   border-radius: 8px;
 }
 
-/* NEW: Deck Card Tags */
+/* Deck Card Tags */
 .deck-card-tags {
   margin-top: 1rem;
   display: flex;
@@ -180,35 +282,78 @@
   font-weight: 500;
 }
 
-.deck-card-actions {
-  margin: 1.5rem 1.5rem 1.5rem 1.5rem;
-  border-top: 1px solid #F1F0E8;
-  padding-top: 1rem;
-}
-
-.study-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 10px;
-  background-color: #89A8B2;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-.study-button:hover {
-  background-color: #708c96;
-}
-
 .no-results-message {
   grid-column: 1 / -1;
   text-align: center;
   padding: 2rem;
   color: #89A8B2;
+}
+
+/* ================================================== */
+/*        ✅ NEW: COLLAPSIBLE TAGS WITHIN CARD         */
+/* ================================================== */
+
+.deck-card-tags-container {
+  margin-top: 1rem;
+  border-top: 1px solid #F1F0E8;
+  padding-top: 0.75rem;
+}
+
+.deck-card-tags-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0.25rem 0;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #5d757e;
+}
+
+.deck-card-tags-header:hover {
+  background-color: #89A8B2;
+  color: white;
+}
+
+
+.card-chevron-icon {
+  color: #89A8B2;
+  transition: transform 0.3s ease;
+}
+
+.card-chevron-icon:hover {
+  color: white;
+  transition: transform 0.3s ease;
+}
+
+.card-chevron-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.deck-card-tags-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.deck-card-tags-content.expanded {
+  max-height: 200px; /* Adjust if cards can have many tags */
+  padding-top: 0.75rem;
+  transition: max-height 0.3s ease-in;
+}
+
+.tag-pill {
+  background-color: #f1f0e8;
+  color: #89A8B2;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
 }

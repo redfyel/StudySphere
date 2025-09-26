@@ -32,7 +32,7 @@ router.post("/generate-flashcards", upload.single("file"), async (req, res) => {
       return res.status(400).json({ error: "Input text is empty." });
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
 
     const prompt = `
 You are an AI assistant specialized in generating concise study materials.
