@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './CreateRoomModal.css';
+import './createRoomModal.css';
 
 function CreateRoomModal({ onClose, onCreateRoom, user }) {
   const [roomName, setRoomName] = useState('');
