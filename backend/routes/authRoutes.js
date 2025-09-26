@@ -162,4 +162,80 @@ router.get('/', auth, async (req, res) => {
     }
 });
 
+/**
+ * @route   GET /api/auth/me
+ * @desc    Get current user's profile and actions
+ * @access  Private
+ */
+router.get('/me', auth, async (req, res) => {
+    try {
+        const db = await connectDB();
+        const usersCollection = db.collection('users');
+
+        const user = await usersCollection.findOne(
+            { _id: new ObjectId(req.user.id) },
+            { projection: { password: 0 } } // Exclude password
+        );
+
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        res.json(user);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+/**
+ * @route   POST /api/auth/action
+ * @desc    Toggle a resource liked/saved status on the user's profile
+ * @access  Private
+ */
+router.post('/action', auth, async (req, res) => {
+    try {
+        const { resourceId, actionType } = req.body;
+        const userId = req.user.id;
+
+        if (!ObjectId.isValid(resourceId)) {
+            return res.status(400).json({ msg: 'Invalid resource ID.' });
+        }
+
+        const db = await connectDB();
+        const usersCollection = db.collection('users');
+        
+        let updateQuery = {};
+        
+        if (actionType === 'like') {
+            const user = await usersCollection.findOne({ _id: new ObjectId(userId), likedResources: new ObjectId(resourceId) });
+            if (user) {
+                updateQuery = { $pull: { likedResources: new ObjectId(resourceId) } };
+            } else {
+                updateQuery = { $addToSet: { likedResources: new ObjectId(resourceId) } };
+            }
+        } else if (actionType === 'save') {
+            const user = await usersCollection.findOne({ _id: new ObjectId(userId), savedResources: new ObjectId(resourceId) });
+            if (user) {
+                updateQuery = { $pull: { savedResources: new ObjectId(resourceId) } };
+            } else {
+                updateQuery = { $addToSet: { savedResources: new ObjectId(resourceId) } };
+            }
+        } else {
+            return res.status(400).json({ msg: 'Invalid action type.' });
+        }
+
+        await usersCollection.updateOne(
+            { _id: new ObjectId(userId) },
+            updateQuery
+        );
+
+        res.status(200).json({ msg: `${actionType} action toggled successfully.` });
+
+    } catch (err) {
+        console.error('Error toggling resource action:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
 module.exports = router;

@@ -28,7 +28,6 @@ import PdfReader from "./components/pdf-reader/PdfReader";
 import UploadPage from "./components/upload-page/UploadPage";
 import MyLibrary from "./components/myLibrary/MyLibrary";
 import GroupResources from "./components/group-resources/GroupResources";
-import TrendingPage from "./components/trending-page/TrendingPage";
 
 // Tasks
 import Tasks from "./components/tasks/Tasks";
@@ -99,7 +98,6 @@ function App() {
             { path: "upload", element: <UploadPage /> },
             { path: "library", element: <MyLibrary /> },
             { path: "groups", element: <GroupResources /> },
-            { path: "trending", element: <TrendingPage /> },
             { path: "pdf/:id", element: <PdfReader /> },
           ],
         },

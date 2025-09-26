@@ -277,6 +277,234 @@ router.get('/', auth, async (req, res) => {
     }
 });
 
+
+/**
+ * @route   GET /api/resources/mylibrary
+ * @desc    Get all resources saved by the current user (using user's savedResources array)
+ * @access  Private
+ */
+router.get('/mylibrary', auth, async (req, res) => {
+    try {
+        const db = await connectDB();
+        const usersCollection = db.collection('users');
+        const resourcesCollection = db.collection('resources');
+        const userId = req.user.id;
+
+        // 1. Get the list of saved resource IDs and liked resource IDs from the user's document
+        const user = await usersCollection.findOne(
+            { _id: new ObjectId(userId) },
+            { projection: { savedResources: 1, likedResources: 1, _id: 0 } }
+        );
+
+        const savedResourceIds = user?.savedResources || [];
+        const likedResourceIds = user?.likedResources || [];
+
+        if (savedResourceIds.length === 0) {
+            return res.json([]);
+        }
+
+        // 2. Aggregate the full resource data based on the saved IDs
+        const savedResourcesData = await resourcesCollection.aggregate([
+            // Match resources whose _id is in the savedResourceIds array
+            {
+                $match: {
+                    _id: { $in: savedResourceIds }
+                }
+            },
+            // Left outer join with the 'users' collection to get uploader details
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'uploadedBy',
+                    foreignField: '_id',
+                    as: 'uploaderDetails'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$uploaderDetails',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $addFields: {
+                    author: '$uploaderDetails.username',
+                    // ✅ NEW: Return true if the resource's _id is found in the user's likedResources array
+                    isLiked: { $in: ['$_id', likedResourceIds] } 
+                }
+            },
+            {
+                $sort: { createdAt: -1 }
+            },
+            {
+                $project: {
+                    uploaderDetails: 0
+                }
+            }
+        ]).toArray();
+
+        res.json(savedResourcesData);
+    } catch (err) {
+        console.error('Error fetching user library:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+/**
+ * @route   GET /api/resources/groups/me
+ * @desc    Get all groups the current user is a member of
+ * @access  Private
+ */
+router.get('/groups/me', auth, async (req, res) => {
+    try {
+        const db = await connectDB();
+        const groupsCollection = db.collection('groups');
+        const userId = req.user.id;
+
+        const groups = await groupsCollection.find({
+             members: new ObjectId(userId) // Assuming a members array on the group doc
+        }).toArray();
+        
+        // Mock a list of groups if none found for demo purposes
+        if (groups.length === 0) {
+          return res.json([
+             { _id: new ObjectId('60c72b2f9b1d2e3f4a567890'), name: 'Math Study Group', adminId: new ObjectId(userId), isMember: true },
+             { _id: new ObjectId('60c72b2f9b1d2e3f4a567891'), name: 'Science Club', adminId: new ObjectId(userId), isMember: true }
+          ]);
+        }
+
+        res.json(groups);
+
+    } catch (err) {
+        console.error('Error fetching user groups:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+
+/**
+ * @route   GET /api/groups/:groupId/resources
+ * @desc    Get resources for a specific group
+ * @access  Private
+ */
+router.get('/groups/:groupId/resources', auth, async (req, res) => {
+    try {
+        const { groupId } = req.params;
+        const userId = req.user.id;
+        
+        if (!ObjectId.isValid(groupId)) {
+            return res.status(400).json({ msg: 'Invalid group ID.' });
+        }
+        
+        const db = await connectDB();
+        const resourcesCollection = db.collection('resources');
+        const groupsCollection = db.collection('groups');
+
+        // Check if the user is a member of the group
+        const group = await groupsCollection.findOne({
+            _id: new ObjectId(groupId),
+            members: new ObjectId(userId) // Assuming 'members' array exists
+        });
+
+        if (!group) {
+            return res.status(403).json({ msg: 'Access denied. You are not a member of this group.' });
+        }
+        
+        const resources = await resourcesCollection.aggregate([
+            {
+                $match: {
+                    groupId: new ObjectId(groupId), // Match resources by group ID
+                }
+            },
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'uploadedBy',
+                    foreignField: '_id',
+                    as: 'uploaderDetails'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$uploaderDetails',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $addFields: {
+                    author: '$uploaderDetails.username',
+                    // Check if the resource is liked by the current user
+                    isLiked: { $in: [new ObjectId(userId), '$likes'] },
+                    // Check if the resource is saved by the current user
+                    isSaved: { $in: [new ObjectId(userId), '$savedBy'] }
+                }
+            },
+            {
+                $sort: { createdAt: -1 }
+            },
+            {
+                $project: {
+                    uploaderDetails: 0,
+                    likes: 0, // Exclude these fields from the response for cleaner data
+                    savedBy: 0,
+                }
+            }
+        ]).toArray();
+        
+        res.json(resources);
+        
+    } catch (err) {
+        console.error('Error fetching group resources:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+/**
+ * @route   POST /api/resources/pin
+ * @desc    Toggle a resource as pinned in a group
+ * @access  Private (Group Admin)
+ */
+router.post('/pin', auth, async (req, res) => {
+    try {
+        const { resourceId, groupId, isPinned } = req.body;
+        const userId = req.user.id;
+
+        if (!ObjectId.isValid(resourceId) || !ObjectId.isValid(groupId)) {
+            return res.status(400).json({ msg: 'Invalid resource or group ID.' });
+        }
+        
+        const db = await connectDB();
+        const resourcesCollection = db.collection('resources');
+        const groupsCollection = db.collection('groups'); // Assuming a groups collection
+
+        // Check if user is a group admin
+        const group = await groupsCollection.findOne({ 
+            _id: new ObjectId(groupId), 
+            adminId: new ObjectId(userId) 
+        });
+
+        if (!group) {
+            return res.status(403).json({ msg: 'Access denied. Only group admins can pin resources.' });
+        }
+
+        const result = await resourcesCollection.updateOne(
+            { _id: new ObjectId(resourceId), groupId: new ObjectId(groupId) },
+            { $set: { isPinned } }
+        );
+
+        if (result.modifiedCount === 0) {
+            return res.status(404).json({ msg: 'Resource not found in this group or pin state unchanged.' });
+        }
+
+        res.status(200).json({ msg: `Resource pin state updated successfully.` });
+
+    } catch (err) {
+        console.error('Error toggling pin state:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+
 router.get('/:id', auth, async (req, res) => {
     try {
         const db = await connectDB();
