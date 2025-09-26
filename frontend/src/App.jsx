@@ -3,6 +3,9 @@
 import "./App.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
+// Import UserLoginStore
+import { UserLoginStore } from "./contexts/UserLoginContext";
+
 import RootLayout from "./RootLayout";
 
 // Core pages
@@ -12,7 +15,7 @@ import WellnessPage from "./components/mood-tracker/Wellness";
 // Study Enhance Components
 import AIGenerationScreen from "./components/study-enhance/AIGenerationScreen";
 import FlashcardsView from "./components/study-enhance/flashcards/FlashCardsView";
-import AllDecksView from "./components/study-enhance/flashcards/AllDecksView"; // Corrected import name
+import AllDecksView from "./components/study-enhance/flashcards/AllDecksView";
 import MindMapView from "./components/study-enhance/mindmaps/MindMapView";
 
 // Rooms
@@ -35,6 +38,7 @@ import CalendarView from "./components/tasks/CalendarView";
 import Login from "./components/login/Login";
 import Register from "./components/register/Register";
 import StartStudyPage from "./components/study-enhance/flashcards/StartStudyPage";
+import Dashboard from "./components/dashboard/Dashboard";
 
 function App() {
   const router = createBrowserRouter([
@@ -51,8 +55,6 @@ function App() {
 
 
         // 🎓 Study Enhance (Corrected and Restructured)
-        // THE FIX: The routes are now "flat". Each path directly renders its component
-        // without being nested inside a layout component that was causing conflicts.
         {
           path: "study-enhance",
           children: [
@@ -68,9 +70,9 @@ function App() {
             { path: "mind-maps", element: <MindMapView /> },
 
             // All Flashcard related routes
-            { path: "decks", element: <AllDecksView /> }, // This will now render correctly
+            { path: "decks", element: <AllDecksView /> },
             { path: "flashcards", element: <FlashcardsView /> },
-            { path: "flashcards/session", element: <StartStudyPage/> },
+            { path: "flashcards/session", element: <StartStudyPage /> },
             { path: "flashcards/review", element: <FlashcardsView /> },
             { path: "flashcards/shared", element: <FlashcardsView /> },
 
@@ -85,7 +87,7 @@ function App() {
           path: "rooms",
           children: [
             { index: true, element: <RoomList /> },
-            { path: ":roomId", element: <VideoCall /> }, 
+            { path: ":roomId", element: <VideoCall /> },
           ],
         },
 
@@ -101,18 +103,23 @@ function App() {
             { path: "pdf/:id", element: <PdfReader /> },
           ],
         },
-        
+
         // Other top-level routes
-        { path: "tasksu", element: <Tasks /> }, // Note: consider renaming to "tasks-summary" or similar
-        { path: "tasks", element: <CalendarView /> },
+        { path: "tasksu", element: <Tasks /> },
+        { path: "tasks", element: <CalendarView /> }, 
         { path: "login", element: <Login /> },
         { path: "register", element: <Register /> },
-        { path: "dashboard", element: <h2>Dashboard - Protected Route</h2> },
+        { path: "dashboard", element: <Dashboard/> },
       ],
     },
   ]);
 
-  return <RouterProvider router={router} />;
+  // Wrap the RouterProvider with the UserLoginStore
+  return (
+    <UserLoginStore>
+      <RouterProvider router={router} />
+    </UserLoginStore>
+  );
 }
 
 export default App;

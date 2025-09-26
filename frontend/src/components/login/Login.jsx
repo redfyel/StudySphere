@@ -1,9 +1,11 @@
 // frontend/src/components/login/Login.jsx
 
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
+import { UserLoginContext } from '../../contexts/UserLoginContext'; // Import the context
+import logo from "/logo.png";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +14,8 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  // Use the useContext hook to access the context's functions
+  const { login } = useContext(UserLoginContext);
 
   const { email, password } = formData;
 
@@ -21,7 +25,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); // Clear previous errors
+    setError('');
 
     try {
       const res = await axios.post('http://localhost:5000/api/auth/login', {
@@ -30,17 +34,15 @@ const Login = () => {
       });
 
       // --- Success ---
-      // The backend sends back a token, save it
-      localStorage.setItem('token', res.data.token);
+      // Call the login function from the context
+      login(res.data.token);
       
       // Redirect to a protected page, like a dashboard
       navigate('/dashboard'); 
 
     } catch (err) {
       // --- Error ---
-      // The backend sends specific error messages
       if (err.response && err.response.data) {
-        // Handle validation errors array or a single message
         const errorMsg = err.response.data.errors ? err.response.data.errors[0].msg : err.response.data.msg;
         setError(errorMsg || 'Login failed. Please check your credentials.');
       } else {
@@ -52,7 +54,10 @@ const Login = () => {
   return (
     <div className="auth-container">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h2>Login</h2>
+        <div className="logo-container"> 
+                            <img src={logo} alt="StudySphere Logo" width="50" height="50" />
+                        </div>
+        <h2>StudySphere</h2>
         {error && <p className="error-message">{error}</p>}
         <div className="form-group">
           <label htmlFor="email">Email</label>

@@ -50,7 +50,7 @@ function Header() {
 
       {/* Right: Buttons */}
       <div className="header-buttons">
-        <button className="rbtn">Dashboard</button>
+        <NavLink to="/dashboard" className="rbtn">Dashboard</NavLink>
         <NavLink to="/register" className="rbtn join">
           Join Now
         </NavLink>

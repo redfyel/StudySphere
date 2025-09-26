@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { useParams, Link } from "react-router-dom";
 import { MdClose } from "react-icons/md";
 import "./PdfReader.css";
-
-// Import your PDF files directly from the src/assets/pdfs directory
-import mathNotes from "../../assets/pdfs/mathNotes.pdf";
-// Assuming you have these files, update the paths accordingly
-// import chemistryGuide from "../../assets/pdfs/chemistryGuide.pdf";
-// import algebraSheet from "../../assets/pdfs/algebraSheet.pdf";
+import axios from "axios";
+import { UserLoginContext } from "../../contexts/UserLoginContext";
 
 export default function PdfReader() {
   const { id } = useParams();
+  const { token, isAuthenticated, isLoading: isAuthLoading } = useContext(UserLoginContext);
+
+  const [resource, setResource] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const [timer, setTimer] = useState(0);
   const [isActive, setIsActive] = useState(false);
@@ -19,13 +20,29 @@ export default function PdfReader() {
   // Hardcoded average time for UI demonstration purposes
   const avgTime = "00:05:30";
 
-  // This object holds all PDF URLs and their associated titles
-  const resources = {
-    1: { id: 1, url: mathNotes, title: "Math Notes" },
-    3: { id: 3, url: mathNotes, title: "Chemistry Guide" },
-    5: { id: 5, url: mathNotes, title: "Algebra Cheat Sheet" },
-  };
-  const currentResource = resources[id];
+  // ✅ NEW: Fetch the specific resource from the backend
+  useEffect(() => {
+    // Only fetch if authentication state has been resolved
+    if (!isAuthLoading) { 
+        const fetchResource = async () => {
+          if (!isAuthenticated || !token) {
+            setIsLoading(false);
+            setError("You must be logged in to view resources.");
+            return;
+          }
+          try {
+            const res = await axios.get(`http://localhost:5000/api/resources/${id}`);
+            setResource(res.data);
+            setIsLoading(false);
+          } catch (err) {
+            console.error("Error fetching resource:", err);
+            setError("Failed to load resource. Please ensure you have access.");
+            setIsLoading(false);
+          }
+        };
+        fetchResource();
+    }
+  }, [id, token, isAuthenticated, isAuthLoading]);
 
   useEffect(() => {
     if (isActive) {
@@ -54,7 +71,15 @@ export default function PdfReader() {
     return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
 
-  if (!currentResource) {
+  if (isLoading || isAuthLoading) {
+    return <div className="loading-state">Loading resource...</div>;
+  }
+  
+  if (error) {
+    return <div className="loading-state">{error}</div>;
+  }
+
+  if (!resource) {
     return <div className="loading-state">Resource not found.</div>;
   }
 
@@ -62,26 +87,36 @@ export default function PdfReader() {
     <div className="pdf-reader-container">
       <div className="reader-header">
         <Link to="/resources" className="back-btn">← Back to Resources</Link>
-        <div className="pdf-header-placeholder"></div> {/* Empty div to occupy space */}
+        <div className="pdf-header-placeholder"></div>
         <button onClick={() => window.history.back()} className="close-btn">
           <MdClose size={24} />
         </button>
       </div>
       <div className="pdf-and-timer-container">
         <div className="pdf-document-container">
-          <iframe
-            src={currentResource.url}
-            title={currentResource.title}
-            width="100%"
-            height="100%"
-            style={{ border: "none" }}
-          >
-            This browser does not support PDFs.
-          </iframe>
+          {resource.resourceType === 'file' ? (
+            <iframe
+              src={resource.fileURL}
+              title={resource.title}
+              width="100%"
+              height="100%"
+              style={{ border: "none" }}
+            >
+              This browser does not support PDFs.
+            </iframe>
+          ) : (
+            <div className="unsupported-resource-view">
+              <h3>This resource is a {resource.resourceType}</h3>
+              <p>You can access it by clicking the link below.</p>
+              <a href={resource.linkURL} target="_blank" rel="noopener noreferrer">
+                Open Resource Link
+              </a>
+            </div>
+          )}
         </div>
-        <div className="side-panel-container"> {/* New container for right-side content */}
-          <div className="pdf-title-card"> {/* New card for title and avg time */}
-            <h2 className="pdf-title">{currentResource.title}</h2>
+        <div className="side-panel-container">
+          <div className="pdf-title-card">
+            <h2 className="pdf-title">{resource.title}</h2>
             <div className="avg-time">
               Avg. reading time: <span>{avgTime}</span>
             </div>

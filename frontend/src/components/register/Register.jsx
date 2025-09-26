@@ -1,9 +1,11 @@
-// frontend/src/components/register/Register.jsx
-
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './Register.css'; // We'll create this file next
+import './Register.css';
+import { Link } from 'react-router-dom';
+import { UserLoginContext } from '../../contexts/UserLoginContext'; // Import the context
+import logo from "/logo.png";
+
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +15,8 @@ const Register = () => {
   });
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  // Use the useContext hook to access the context's functions
+  const { login } = useContext(UserLoginContext); 
 
   const { username, email, password } = formData;
 
@@ -32,8 +36,9 @@ const Register = () => {
       });
 
       // --- Success ---
-      localStorage.setItem('token', res.data.token);
-      navigate('/login'); // Redirect after successful registration
+      // Call the login function from the context
+      login(res.data.token); 
+      navigate('/login'); // Redirect to a protected route after successful registration
 
     } catch (err) {
       // --- Error ---
@@ -49,7 +54,10 @@ const Register = () => {
   return (
     <div className="auth-container">
       <form className="auth-form" onSubmit={handleSubmit}>
-        <h2>Create Account</h2>
+         <div className="logo-container"> 
+                    <img src={logo} alt="StudySphere Logo" width="50" height="50" />
+                </div>
+        <h2>StudySphere</h2>
         {error && <p className="error-message">{error}</p>}
         <div className="form-group">
           <label htmlFor="username">Username</label>
@@ -85,8 +93,11 @@ const Register = () => {
             required
           />
         </div>
+        
         <button type="submit" className="auth-button">Register</button>
+        <div className="login-link">Already have an account? <Link to="/login">Login here</Link></div>
       </form>
+      
     </div>
   );
 };
