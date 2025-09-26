@@ -55,7 +55,7 @@ const MindMapView = () => {
   // Effect to set morning/night theme
   useEffect(() => {
     const currentHour = new Date().getHours();
-    setTimeOfDay(currentHour >= 4 && currentHour < 22 ? "morning" : "night");
+    setTimeOfDay(currentHour >= 4&& currentHour < 18 ? "morning" : "night");
   }, []);
 
   // Effect to manage fullscreen state
