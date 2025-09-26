@@ -10,21 +10,19 @@ function RoomCard({ room, userId, onDelete }) {
   const isOwner = room.createdBy === userId || room.adminId === userId;
   const participantCount = room.currentParticipants || 0;
   const maxParticipants = room.maxParticipants || 50;
-  const roomType = room.roomType || 'private'; // Default to private for backward compatibility
+  const roomType = room.roomType || 'private';
 
   const handleJoinRoom = async (e) => {
     e.stopPropagation();
     
     if (isLoading) return;
     
-    // Validate room data
     if (!room.roomId || room.roomId === 'undefined') {
       setError('Invalid room ID');
       console.error('Invalid room ID:', room.roomId);
       return;
     }
     
-    // Check if room is full
     if (participantCount >= maxParticipants) {
       setError('Room is full');
       return;
@@ -36,7 +34,6 @@ function RoomCard({ room, userId, onDelete }) {
     try {
       console.log('Joining room:', room.roomId, 'Room data:', room);
       
-      // Optional: Verify room exists before navigating
       const response = await fetch(`http://localhost:3001/api/rooms/${room.roomId}`);
       
       if (!response.ok) {
@@ -50,14 +47,12 @@ function RoomCard({ room, userId, onDelete }) {
       const roomData = await response.json();
       console.log('Room verification successful:', roomData);
       
-      // Navigate to the video call route with roomId as parameter
-      navigate(`/rooms/${room.roomId}`);
+      navigate(`/room/lobby/${room.roomId}`);
       
     } catch (error) {
       console.error('Error joining room:', error);
       setError(error.message || 'Failed to join room');
       
-      // If room not found, suggest deletion
       if (error.message === 'Room not found' && isOwner) {
         const shouldDelete = window.confirm(
           'This room no longer exists. Would you like to remove it from the list?'
@@ -106,6 +101,7 @@ function RoomCard({ room, userId, onDelete }) {
 
   const getParticipantStatus = () => {
     if (participantCount === 0) return 'empty';
+    if (participantCount >= maxParticipants) return 'full';
     if (participantCount >= maxParticipants * 0.8) return 'almost-full';
     if (participantCount >= maxParticipants * 0.5) return 'half-full';
     return 'active';
@@ -125,11 +121,11 @@ function RoomCard({ room, userId, onDelete }) {
   const getRoomTypeDisplay = () => {
     switch (roomType) {
       case 'public':
-        return { icon: '🌐', text: 'Public', color: '#10b981' };
+        return { icon: 'public', text: 'Public' };
       case 'private':
-        return { icon: '🔒', text: 'Private', color: '#f59e0b' };
+        return { icon: 'lock', text: 'Private' };
       default:
-        return { icon: '🔒', text: 'Private', color: '#f59e0b' };
+        return { icon: 'lock', text: 'Private' };
     }
   };
 
@@ -137,136 +133,165 @@ function RoomCard({ room, userId, onDelete }) {
 
   return (
     <div className={`room-card ${getParticipantStatus()} ${roomType}`}>
-      {/* Error Display */}
+      {/* Error Banner */}
       {error && (
-        <div className="room-card-error">
-          <span>⚠️ {error}</span>
-          <button 
-            className="error-dismiss"
-            onClick={() => setError(null)}
-            title="Dismiss error"
-          >
-            ×
-          </button>
+        <div className="error-banner">
+          <div className="error-content">
+            <span className="material-icons error-icon">error</span>
+            <span className="error-message">{error}</span>
+            <button 
+              className="error-close"
+              onClick={() => setError(null)}
+              aria-label="Dismiss error"
+            >
+              <span className="material-icons">close</span>
+            </button>
+          </div>
         </div>
       )}
       
-      <div className="room-card-header">
-        <div className="room-info">
-          <div className="room-title-row">
-            <h3 className="room-name" title={room.name}>
-              {room.name || 'Unnamed Room'}
-            </h3>
-            <div className="room-type-badge" style={{ backgroundColor: roomTypeDisplay.color }}>
-              <span className="room-type-icon">{roomTypeDisplay.icon}</span>
-              <span className="room-type-text">{roomTypeDisplay.text}</span>
-            </div>
-          </div>
-          {room.topic && (
-            <span className="room-topic" title={room.topic}>
-              📚 {room.topic}
+      {/* Card Header */}
+      <div className="card-header">
+        <div className="room-title-section">
+          <h3 className="room-title">{room.name || 'Unnamed Room'}</h3>
+          <div className="room-badges">
+            <span className={`type-badge ${roomType}`}>
+              <span className="material-icons badge-icon">{roomTypeDisplay.icon}</span>
+              <span className="badge-text">{roomTypeDisplay.text}</span>
             </span>
-          )}
+            {isOwner && (
+              <span className="owner-badge">
+                <span className="material-icons badge-icon">admin_panel_settings</span>
+                <span className="badge-text">Owner</span>
+              </span>
+            )}
+          </div>
         </div>
         
         {isOwner && (
-          <div className="room-actions">
-            <button
-              className="delete-btn"
-              onClick={handleDeleteRoom}
-              title="Delete room"
-              aria-label="Delete room"
-            >
-              🗑️
-            </button>
+          <button
+            className="delete-button"
+            onClick={handleDeleteRoom}
+            title="Delete room"
+            aria-label="Delete room"
+          >
+            <span className="material-icons">delete</span>
+          </button>
+        )}
+      </div>
+
+      {/* Room Topic */}
+      {room.topic && (
+        <div className="room-topic">
+          <span className="material-icons topic-icon">topic</span>
+          <span className="topic-text">{room.topic}</span>
+        </div>
+      )}
+
+      {/* Room Description */}
+      {room.description && (
+        <div className="room-description">
+          <p className="description-text">
+            {room.description.length > 120 
+              ? `${room.description.substring(0, 120)}...` 
+              : room.description}
+          </p>
+        </div>
+      )}
+
+      {/* Participants Section */}
+      <div className="participants-section">
+        <div className="participant-count">
+          <span className="material-icons count-icon">group</span>
+          <span className="count-text">{participantCount}/{maxParticipants}</span>
+          <span className={`status-indicator ${getParticipantStatus()}`}>
+            {participantCount > 0 && <span className="live-dot"></span>}
+            {participantCount > 0 ? 'Live' : 'Waiting'}
+          </span>
+        </div>
+        
+        <div className="progress-bar">
+          <div 
+            className={`progress-fill ${getParticipantStatus()}`}
+            style={{ width: `${(participantCount / maxParticipants) * 100}%` }}
+          ></div>
+        </div>
+      </div>
+
+      {/* Room Settings Info */}
+      <div className="room-settings">
+        {roomType === 'private' && room.requiresApproval && (
+          <div className="setting-item">
+            <span className="material-icons setting-icon">verified_user</span>
+            <span className="setting-text">Approval Required</span>
+          </div>
+        )}
+        {roomType === 'public' && (
+          <div className="setting-item">
+            <span className="material-icons setting-icon">meeting_room</span>
+            <span className="setting-text">Open Access</span>
           </div>
         )}
       </div>
 
-      {room.description && (
-        <p className="room-description" title={room.description}>
-          {room.description.length > 100 
-            ? `${room.description.substring(0, 100)}...` 
-            : room.description}
-        </p>
-      )}
-
-      <div className="room-metadata">
-        <div className="participant-info">
-          <span className={`participant-count ${getParticipantStatus()}`}>
-            👥 {participantCount}/{maxParticipants}
-          </span>
-          {participantCount > 0 && (
-            <span className="live-indicator">
-              🔴 Live
-            </span>
-          )}
-        </div>
-        
-        <div className="room-settings">
-          {roomType === 'private' && room.requiresApproval && (
-            <span className="approval-required" title="Requires admin approval to join">
-              🔐 Approval Required
-            </span>
-          )}
-          {roomType === 'public' && (
-            <span className="open-access" title="Anyone can join">
-              🚪 Open Access
-            </span>
-          )}
-          {isOwner && (
-            <span className="owner-badge" title="You own this room">
-              👑 Admin
-            </span>
-          )}
-        </div>
-      </div>
-
-      <div className="room-footer">
-        <div className="room-footer-info">
+      {/* Card Footer */}
+      <div className="card-footer">
+        <div className="footer-info">
           <span className="created-time">
+            <span className="material-icons time-icon">schedule</span>
             Created {formatDate(room.createdAt)}
           </span>
           {roomType === 'private' && !isOwner && participantCount > 0 && (
             <span className="join-note">
-              ⏳ Admin approval needed
+              <span className="material-icons note-icon">pending</span>
+              Admin approval needed
             </span>
           )}
         </div>
         
         <button 
-          className={`join-btn ${roomType} ${isLoading ? 'loading' : ''} ${isJoinDisabled() ? 'disabled' : ''}`}
+          className={`join-button ${roomType} ${getParticipantStatus()} ${isLoading ? 'loading' : ''}`}
           disabled={isJoinDisabled()}
           onClick={handleJoinRoom}
         >
-          {isLoading ? (
-            <span className="loading-text">
-              <span className="loading-dots">...</span>
-              {roomType === 'private' && !isOwner ? 'Requesting...' : 'Joining...'}
-            </span>
-          ) : error ? (
-            'Try Again'
-          ) : (
-            getRoomStatusText()
-          )}
+          <span className="button-content">
+            {isLoading ? (
+              <>
+                <span className="loading-spinner"></span>
+                {roomType === 'private' && !isOwner ? 'Requesting...' : 'Joining...'}
+              </>
+            ) : error ? (
+              <>
+                <span className="material-icons button-icon">refresh</span>
+                Try Again
+              </>
+            ) : (
+              <>
+                <span className="material-icons button-icon">
+                  {participantCount >= maxParticipants ? 'block' : 
+                   participantCount === 0 ? 'play_arrow' : 'meeting_room'}
+                </span>
+                {getRoomStatusText()}
+              </>
+            )}
+          </span>
         </button>
       </div>
 
-      {/* Room ID Debug Info (remove in production) */}
+      {/* Development Debug Info */}
       {process.env.NODE_ENV === 'development' && (
-        <div className="debug-info" style={{ 
-          fontSize: '10px', 
-          color: '#666', 
-          marginTop: '5px',
-          fontFamily: 'monospace'
-        }}>
+        <div className="debug-info">
           ID: {room.roomId || 'undefined'} | Type: {roomType}
         </div>
       )}
 
+      {/* Full Room Overlay */}
       {participantCount >= maxParticipants && (
-        <div className="room-full-overlay">
-          <span>Room is full</span>
+        <div className="full-room-overlay">
+          <div className="overlay-content">
+            <span className="material-icons overlay-icon">block</span>
+            <span className="overlay-text">Room is Full</span>
+          </div>
         </div>
       )}
     </div>

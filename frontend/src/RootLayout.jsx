@@ -4,7 +4,7 @@ import Footer from "./components/footer/Footer";
 
 function RootLayout() {
   const location = useLocation();
-  const isVideoCallPage = location.pathname.startsWith("/rooms/");
+  const isVideoCallPage = location.pathname.startsWith("/room/");
 
   return (
     // The className here is important for the flexbox layout

@@ -686,7 +686,7 @@ function SpotifyMusicPlayer() {
       <style jsx>{`
         .music-player {
           width: 100%;
-          max-width: 400px;
+          max-width: 250px;
           margin: 0 auto;
           padding: 20px;
           background: #F1F0E8;
@@ -1021,6 +1021,7 @@ function SpotifyMusicPlayer() {
         }
 
         .speed-section {
+          
           display: flex;
           align-items: center;
           gap: 6px;
