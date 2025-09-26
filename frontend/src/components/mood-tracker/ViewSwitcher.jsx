@@ -1,17 +1,17 @@
-// ViewSwitcher.js
 import React from 'react';
-import './MoodTracker.css'; 
 
-const ViewSwitcher = ({ selectedView, setSelectedView }) => { 
+const ViewSwitcher = ({ selectedView, setSelectedView, views }) => {
   return (
-    <div className="view-switcher-container"> 
-      {['Day', 'Week', 'Month'].map((view) => (
+    <div className="view-switcher-container">
+      {views.map((view) => (
         <button
-          key={view}
-          onClick={() => setSelectedView(view.toLowerCase())}
-          className={`view-switcher-button ${selectedView === view.toLowerCase() ? 'active' : ''}`} // <--- Using className and 'active' class
+          key={view.id}
+          className={`view-switcher-button ${selectedView === view.id ? 'active' : ''}`}
+          // Use the 'id' for state logic ('week', 'month', 'year')
+          onClick={() => setSelectedView(view.id)}
         >
-          {view}
+          {view.icon} {/* Render the icon */}
+          <span>{view.label}</span> {/* Render the label */}
         </button>
       ))}
     </div>

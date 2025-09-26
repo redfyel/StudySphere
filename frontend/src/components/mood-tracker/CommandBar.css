@@ -1,0 +1,216 @@
+/* CommandBar.css */
+
+/* --- Color Palette & Base Variables --- */
+:root {
+  --brand-primary: #89A8B2;
+  --brand-secondary: #B3C8CF;
+  --bg-light: #F1F0E8;
+  --bg-very-light: #f8fafc;
+  --border-color: #E5E1DA;
+  --text-dark: #334155;
+  --text-light: #64748b;
+  --shadow-color: rgba(137, 168, 178, 0.15);
+  --shadow-color-light: rgba(137, 168, 178, 0.1);
+}
+
+/* --- The new, sleek Command Bar --- */
+.command-bar-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem; /* Increased gap for a more spacious feel */
+  padding: 1rem;
+  width: 100%;
+  max-width: 550px;
+  margin-bottom: 2.5rem;
+
+   position: relative; /* Establishes a stacking context */
+  z-index: 10; 
+  
+  /* Glassmorphism Effect */
+  background: rgba(248, 250, 252, 0.7); /* Lighter, semi-transparent bg */
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+
+  border-radius: 24px; /* More rounded corners */
+  border: 1px solid rgba(229, 225, 218, 0.6); /* Softer border */
+  box-shadow: 0 10px 30px var(--shadow-color);
+  
+  /* Add a subtle glow effect */
+  animation: subtle-glow 5s infinite alternate;
+}
+
+/* Keyframes for the glowing border effect */
+@keyframes subtle-glow {
+  from {
+    box-shadow: 0 10px 30px var(--shadow-color);
+  }
+  to {
+    box-shadow: 0 10px 30px var(--shadow-color), 0 0 15px var(--shadow-color-light);
+  }
+}
+
+/* --- Revamped ViewSwitcher --- */
+.view-switcher-container {
+  display: flex;
+  gap: 0.5rem;
+  background-color: rgba(229, 225, 218, 0.5); /* Semi-transparent inner bg */
+  border-radius: 18px; /* Match the pill shape */
+  padding: 6px;
+  width: 100%;
+}
+.view-switcher-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 12px 20px;
+  border-radius: 14px;
+  border: none;
+  background-color: transparent;
+  color: var(--text-light);
+  font-size: 1rem;
+  font-weight: 600; /* Bolder text */
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.view-switcher-button.active {
+  background-color: var(--brand-primary);
+  color: white;
+  box-shadow: 0 6px 12px rgba(137, 168, 178, 0.3);
+  transform: translateY(-2px); /* Slight lift effect */
+}
+.view-switcher-button:not(.active):hover {
+    background-color: rgba(255, 255, 255, 0.6);
+}
+
+/* --- The Main Selection Button --- */
+.selection-bar {
+  width: 100%;
+}
+.selection-bar-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(145deg, #ffffff, #f0f0f0);
+  border: 1px solid #ffffff;
+  border-radius: 16px;
+  font-size: 1.1rem; /* Slightly larger font */
+  font-weight: 600;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05), inset 0 1px 1px #fff;
+}
+.selection-bar-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.1), inset 0 1px 1px #fff;
+  border-color: var(--brand-secondary);
+}
+.selection-bar-button svg {
+  color: var(--brand-primary);
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+.selection-bar-button:hover svg {
+  transform: scale(1.1);
+}
+
+/* --- The Floating Picker Pop-up --- */
+.picker-popup {
+  position: absolute;
+  top: calc(100% + 12px); /* More space */
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(15px) saturate(200%);
+  -webkit-backdrop-filter: blur(15px) saturate(200%);
+  border-radius: 20px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  z-index: 100;
+  padding: 0.75rem;
+  width: max-content;
+}
+
+/* --- Polished Picker Styles (Month/Year/Week) --- */
+.month-picker, .year-picker-grid { padding: 0.5rem; }
+.month-picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+}
+.year-display { font-size: 1rem; font-weight: 700; color: var(--text-dark); }
+.year-arrow { background: transparent; border: none; padding: 0.5rem; cursor: pointer; color: var(--text-light); border-radius: 50%; transition: all 0.2s ease; }
+.year-arrow:hover { background-color: var(--bg-light); color: var(--text-dark); }
+
+.month-grid, .year-picker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+.month-pill, .year-pill { background-color: transparent; border: 1px solid transparent; border-radius: 12px; padding: 0.75rem; font-size: 0.95rem; font-weight: 600; color: var(--text-dark); cursor: pointer; transition: all 0.25s ease; }
+.month-pill:hover, .year-pill:hover { background-color: var(--brand-secondary); color: white; transform: scale(1.05); }
+.month-pill.active, .year-pill.active { background-color: var(--brand-primary); color: white; transform: scale(1.05); box-shadow: 0 4px 10px rgba(137, 168, 178, 0.4); }
+
+/* --- Week Picker (react-day-picker) --- */
+.week-picker {
+  margin: 0;
+  --rdp-cell-size: 44px; /* Larger cells */
+  --rdp-accent-color: var(--brand-primary);
+  --rdp-background-color: #E5E1DA; /* Hover color */
+}
+.rdp-day_selected_custom, .rdp-day_selected_custom:hover { background-color: var(--brand-primary) !important; color: #fff; border-radius: 50%; box-shadow: 0 4px 10px rgba(137, 168, 178, 0.4); }
+.rdp-day_today_custom:not(.rdp-day_selected_custom) { font-weight: bold; color: var(--brand-primary); border: 1px solid var(--brand-primary); border-radius: 50%; }
+.rdp-button:hover:not([disabled]):not(.rdp-day_selected_custom) { background-color: var(--brand-secondary); color: white; }
+.rdp-nav_button:hover { background-color: var(--bg-light); }
+
+/* --- NEW: Week Picker Range Selection Styles --- */
+
+/* Base style for any day within a hovered or selected range */
+.rdp-day_hovered_week,
+.rdp-day_selected_week {
+  border-radius: 0 !important; /* Reset individual day rounding */
+}
+.rdp-day_hovered_week:not([disabled]),
+.rdp-day_selected_week:not([disabled]) {
+    background-color: var(--brand-secondary); /* A single color for both states */
+    color: white;
+}
+
+/* Specific style for the selected week to make it more prominent */
+.rdp-day_selected_week:not([disabled]) {
+    background-color: var(--brand-primary) !important;
+}
+
+/* Style for the day the user is actively hovering over */
+.rdp-day_hovered_week:not([disabled]) {
+    opacity: 0.7;
+}
+
+/* Apply rounded corners to the start and end of a range */
+.rdp-day_range_start {
+    border-top-left-radius: 50% !important;
+    border-bottom-left-radius: 50% !important;
+}
+
+.rdp-day_range_end {
+    border-top-right-radius: 50% !important;
+    border-bottom-right-radius: 50% !important;
+}
+/* --- The Main Selection Button --- */
+.selection-bar {
+  width: 100%;
+  display: flex; /* Add flex display */
+  flex-direction: column; /* Stack label and button vertically */
+}
+
+/* ✅ NEW: Style for the label above the button */
+.selection-bar-label {
+  font-size: 0.75rem;      /* Make it small and unobtrusive */
+  font-weight: 600;        /* Give it some presence */
+  color: var(--text-light);/* Use a softer color from your palette */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;  /* Add spacing for a premium feel */
+  margin: 0 0 0.5rem 0.75rem; /* Position it nicely above the button */
+  align-self: flex-start;  /* Ensure it stays to the left */
+}

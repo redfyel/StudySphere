@@ -16,9 +16,10 @@ const AllDecksView = () => {
   const [selectedTag, setSelectedTag] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  
   
   const navigate = useNavigate();
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
    const sidebarItems = [
       {

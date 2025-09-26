@@ -1,0 +1,196 @@
+/* Using your color palette: #89A8B2 (Primary), #B3C8CF (Secondary), #E5E1DA (Accent), #F1F0E8 (Background) */
+
+/* ... (All styles for .debrief-container, .debrief-header, etc., are the same) ... */
+.debrief-container {
+  width: 100%;
+  background-color: #fff;
+  border: 1px solid #E5E1DA;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(137, 168, 178, 0.07);
+  overflow: hidden;
+}
+.debrief-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  width: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.debrief-header:hover {
+  background-color: #F1F0E8;
+}
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.header-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #89A8B2;
+}
+.header-summary-text {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  color: #64748b;
+}
+.header-summary-text strong {
+  color: #334155;
+}
+.separator {
+  color: #E5E1DA;
+}
+.chevron-icon {
+  font-size: 1rem;
+  color: #B3C8CF;
+  transition: transform 0.3s ease-in-out;
+}
+.chevron-icon.expanded {
+  transform: rotate(180deg);
+}
+.debrief-content {
+  border-top: 1px solid #F1F0E8;
+}
+.summary-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+@media (min-width: 768px) {
+  .summary-card-grid {
+    grid-template-columns: 1fr 2fr;
+  }
+}
+.summary-card {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid #F1F0E8;
+  box-shadow: 0 8px 16px rgba(137, 168, 178, 0.05);
+}
+.mood-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 200px;
+}
+.mood-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.mood-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #89A8B2;
+  margin-top: 0.25rem;
+}
+.mood-card-stressed, .mood-card-down {
+  background: radial-gradient(circle, #f1f0e8, #e5e1da);
+}
+.mood-card-neutral {
+  background: radial-gradient(circle, #f8fafc, #f1f5f9);
+}
+.mood-card-balanced, .mood-card-happy {
+  background: radial-gradient(circle, #f0fdf4, #e6f2ed);
+}
+.mood-card-awesome {
+  background: radial-gradient(circle, #fefce8, #fef9c3);
+}
+.vibe-card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #89A8B2;
+  margin-bottom: 1.5rem;
+}
+.vibe-timeline-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.vibe-icon {
+  color: #B3C8CF;
+  font-size: 1.25rem;
+}
+.vibe-details {
+  display: flex;
+  flex-direction: column;
+}
+.vibe-name {
+  font-weight: 600;
+  color: #475569;
+  text-transform: capitalize;
+}
+.vibe-subject {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+.vibe-item-spacer {
+  flex-grow: 1;
+}
+.vibe-time {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #64748b;
+  background-color: #F1F0E8;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+}
+
+
+/*
+* ===============================================
+* SLEEK SCROLLBAR STYLES
+* (Applied to the Vibe Timeline)
+* ===============================================
+*/
+.vibe-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  
+  /* 1. Constrain the height and enable scrolling when content overflows */
+  max-height: 280px;
+  overflow-y: auto; 
+  
+  /* 2. Add padding to prevent content from touching the scrollbar */
+  padding-right: 10px;
+}
+
+/* 3. Style the scrollbar itself (for Webkit browsers: Chrome, Safari, Edge) */
+.vibe-timeline::-webkit-scrollbar {
+  width: 8px; /* Thin scrollbar */
+}
+
+.vibe-timeline::-webkit-scrollbar-track {
+  background: transparent; /* Makes the track invisible for a minimalist look */
+}
+
+.vibe-timeline::-webkit-scrollbar-thumb {
+  background-color: #E5E1DA; /* Your subtle accent color */
+  border-radius: 10px; /* Fully rounded handle */
+  border: 2px solid #fff; /* Creates a clean "padding" effect around the handle */
+}
+
+.vibe-timeline::-webkit-scrollbar-thumb:hover {
+  background-color: #B3C8CF; /* Your secondary color for hover state */
+}
+
+/* 4. Style for Firefox */
+.vibe-timeline {
+  scrollbar-width: thin; /* "thin" or "auto" */
+  scrollbar-color: #E5E1DA transparent; /* thumb color track color */
+}

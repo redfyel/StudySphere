@@ -108,13 +108,13 @@ router.post(
       // 2. Check if the user exists
       const user = await usersCollection.findOne({ email });
       if (!user) {
-        return res.status(400).json({ msg: 'Invalid Credentials' });
+        return res.status(400).json({ msg: 'Invalid email Credentials' });
       }
 
       // 3. Compare the provided password with the stored hashed password
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
-        return res.status(400).json({ msg: 'Invalid Credentials' });
+        return res.status(400).json({ msg: 'Invalid password Credentials' });
       }
 
       // 4. If credentials are correct, create and return a JWT

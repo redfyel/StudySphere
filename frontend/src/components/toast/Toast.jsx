@@ -2,7 +2,7 @@ import React, { useEffect , useState} from "react";
 import ReactDOM from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoClose } from "react-icons/io5";
-import { FaAward, FaBell, FaInfoCircle } from "react-icons/fa";
+import { FaAward, FaBell, FaInfoCircle, FaExclamationTriangle } from "react-icons/fa";
 import "./Toast.css";
 
 const toastConfig = {
@@ -17,6 +17,10 @@ const toastConfig = {
   info: {
     icon: <FaInfoCircle />,
     className: "info",
+  },
+  error: {
+    icon: <FaExclamationTriangle />,
+    className: "error",
   },
 };
 

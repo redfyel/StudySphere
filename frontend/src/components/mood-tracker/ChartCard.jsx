@@ -1,18 +1,19 @@
 import React from 'react';
+import './ChartCard.css';
 
-const ChartCard = ({ title, chartComponent, insight, children, className }) => { // Removed 'styles', 'gridColumn'
+// Add 'subtitle' to the component's props
+const ChartCard = ({ title, subtitle, children, className }) => {
   return (
-    <div className={`moocard ${className || ''}`}> 
-      <h2 className="moocard-title">{title}</h2> {/* Use className="card-title" */}
-      <div className="chart-content-area"> {/* A new class for the chart wrapper, can be 'chart-placeholder' if you prefer */}
-        {chartComponent}
+    <div className={`analy-chart-card ${className || ''}`}>
+      
+      <div className="analy-chart-card-header">
+        <h2 className="analy-chart-card-title">{title}</h2>
+        {subtitle && <h3 className="analy-chart-card-subtitle">{subtitle}</h3>}
       </div>
-      {insight && (
-        <div className="insight-box"> {/* Use className="insight-box" */}
-          {insight}
-        </div>
-      )}
-      {children}
+      
+      <div className="analy-chart-content-area">
+        {children}
+      </div>
     </div>
   );
 };

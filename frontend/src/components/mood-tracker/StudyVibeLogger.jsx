@@ -1,6 +1,7 @@
 // StudyVibeLogger.js
 import React, { useState } from 'react';
-import './MoodTracker.css';
+import { useToast } from '../../contexts/ToastProvider';
+
 
 const DUMMY_STUDY_VIBES = [
   { id: 'energized', icon: '💪', label: 'ENERGIZED', desc: 'Ready to tackle tasks!' },
@@ -14,10 +15,12 @@ const DUMMY_STUDY_VIBES = [
 const StudyVibeLogger = ({ onLog }) => {
   const [selectedStudyVibe, setSelectedStudyVibe] = useState(null);
   const [studySubject, setStudySubject] = useState('');
+  const { showToast } = useToast();
+
 
   const handleLog = () => {
     if (!selectedStudyVibe) {
-      alert('Please select a study vibe!');
+      showToast('Please select a study vibe!', "error");
       return;
     }
     onLog({ vibe: selectedStudyVibe.id, subject: studySubject });
