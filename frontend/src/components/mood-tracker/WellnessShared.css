@@ -1,0 +1,68 @@
+/* WellnessShared.css */
+
+/* --- Base Card Style (for ALL cards) --- */
+.moocard {
+  background: white;
+  border-radius: 18px;
+  padding: 30px;
+  width: 500px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #E5E1DA;
+}
+
+.moocard-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #89A8B2;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #F1F0E8;
+  padding-bottom: 15px;
+}
+
+/* --- Shared Form Elements --- */
+.input-field,
+.text-area {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #E5E1DA;
+  font-size: 1rem;
+  margin-top: auto; /* Pushes input to bottom of flex card */
+  margin-bottom: 15px;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-field:focus,
+.text-area:focus {
+  border-color: #89A8B2;
+  box-shadow: 0 0 0 3px rgba(137, 168, 178, 0.2);
+  outline: none;
+}
+
+.text-area {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* --- Shared Button Style --- */
+.log-button {
+  padding: 12px 25px;
+  border-radius: 10px;
+  border: none;
+  background-color: #89A8B2;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  align-self: flex-end;
+  margin-top: 15px;
+}
+
+.log-button:hover {
+  background-color: #6e8a94;
+  transform: translateY(-2px);
+}

@@ -1,0 +1,201 @@
+/* LoggingSection.css */
+@import './WellnessShared.css'; /* This import is correct */
+
+/* --- Layout for the Logging Section --- */
+.logger-section {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  width: 100%;
+  max-width: 1000px;
+}
+.loggers-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: stretch;
+  gap: 30px;
+  width: 100%;
+}
+.loggers-container > * {
+  flex: 1;
+}
+
+/* --- DailyMoodLogger Specific Styles --- */
+.mood-slider {
+  width: 100%;
+  height: 10px;
+  background: linear-gradient(to right, #FCA5A5, #FDE047, #A7F3D0, #93C5FD);
+  border-radius: 5px;
+  -webkit-appearance: none; appearance: none;
+  cursor: pointer;
+  margin: 15px 0;
+  outline: none;
+}
+.mood-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: white;
+  border: 3px solid #89A8B2;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  cursor: grab;
+}
+
+/* --- ✅ UPDATED: Styles for the emoji display --- */
+.overall-mood-display {
+  font-size: 4rem;
+  line-height: 1;
+  /* Make it a circle */
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  margin: 0 auto 15px auto; /* Center it */
+  /* Center the emoji inside */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Add a smooth color transition */
+  z-index: 1000;
+  transition: background-color 0.3s ease;
+}
+
+/* --- ✅ NEW: Dynamic background colors for each mood --- */
+.overall-mood-display.mood-stressed,
+.overall-mood-display.mood-down {
+  background-color: #fdecea; 
+}
+.overall-mood-display.mood-neutral {
+  background-color: #eaf2f5; /* Soft blue/grey */
+}
+.overall-mood-display.mood-balanced {
+  background-color: #d1fae5; /* Soft green */
+  background-color: #fef3c7;
+}
+.overall-mood-display.mood-happy,
+.overall-mood-display.mood-awesome {
+  background-color: #d1fae5; /* Soft yellow */
+}
+
+.overall-mood-label {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #555;
+  text-align: center;
+}
+
+/* --- StudyVibeLogger Specific Styles --- */
+.study-vibe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+.study-vibe-card {
+  background: #F1F0E8;
+  border-radius: 15px;
+  padding: 15px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid #E5E1DA;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100px;
+}
+.study-vibe-card:hover:not(.selected) {
+  transform: translateY(-3px);
+  border-color: #B3C8CF;
+}
+.study-vibe-card.selected {
+  border-color: #89A8B2;
+  transform: scale(1.03);
+  background-color: #eaf2f5;
+}
+.study-vibe-icon { font-size: 2.2rem; margin-bottom: 8px; }
+.study-vibe-label { font-weight: bold; font-size: 0.95rem; }
+.study-vibe-desc { font-size: 0.75rem; color: #666; margin-top: 3px; }
+
+
+/* --- Responsive for Logging --- */
+@media (max-width: 800px) {
+  .loggers-container {
+    flex-direction: column;
+  }
+}
+
+
+/* Energetic vibes */
+.vibe-energized {
+  background-color: #BDE4A8; /* Soft Mint Green */
+}
+
+.vibe-focused {
+  background-color: #F7E5A5; /* Muted Yellow */
+}
+
+.vibe-accomplished {
+  background-color: #A9D6E5; /* Light Sky Blue */
+}
+
+.vibe-calm {
+  background-color: #D3B8E3; /* Lavender */
+}
+
+/* Overwhelmed vibes */
+.vibe-overwhelmed {
+  background-color: #FFC0CB; /* Light Pink */
+}
+
+.vibe-burntout {
+  background-color: #F0A3A9; /* Dusty Rose */
+}
+
+
+
+.moocard.disabled {
+  position: relative; /* Needed for the overlay */
+}
+
+.mood-logger-instruction {
+  font-size: 0.9rem;
+  color: #6c757d;
+  text-align: center;
+  margin-bottom: 1rem;
+  max-width: 350px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.logger-disabled-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(241, 240, 232, 0.7); /* Use your light background color with transparency */
+  backdrop-filter: blur(2px);
+  border-radius: 15px; /* Match the parent card */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.disabled-message {
+  background-color: #89A8B2;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Ensure the disabled card's contents are not interactive */
+.moocard.disabled > *:not(.logger-disabled-overlay) {
+  opacity: 0.5;
+  pointer-events: none;
+}

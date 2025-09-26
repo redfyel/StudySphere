@@ -1,0 +1,111 @@
+/* WeeklyMoodStrip.css */
+
+/* --- Main container for the horizontal strip --- */
+.mood-strip-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  padding: 1rem 0;
+}
+
+.mood-strip-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  width: 100%;
+  height: 100%;
+}
+
+.week-range-title {
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: #3b525b;
+  margin: 0;
+  padding: 0;
+}
+
+/* --- Container for each individual day --- */
+.mood-day-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mood-date-number {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.mood-day-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  margin-top: -5px;
+}
+
+/* --- The mood square --- */
+.mood-square {
+  width: 40px;  /* Slightly larger for better visibility */
+  height: 40px;
+  border-radius: 10px;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  /* ✅ FIXED: Use flexbox to center the emoji */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem; /* Controls the size of the emoji */
+}
+
+.mood-square:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* --- ✅ CHANGED: Color definitions now match the monthly/logger views --- */
+.mood-square.empty {
+  background-color: #f1f0e8;
+  border: 1px dashed #e5e1da;
+}
+
+.mood-square.mood-stressed,
+.mood-square.mood-down {
+  background-color: #fdecea;
+}
+.mood-square.mood-neutral {
+  background-color: #eaf2f5;
+}
+.mood-square.mood-balanced {
+   background-color: #fef3c7;
+}
+.mood-square.mood-happy,
+.mood-square.mood-awesome {
+   background-color: #d1fae5;
+}
+
+/* --- Insight Box Styling --- */
+.mood-insight-box {
+  background-color: #f8fafc;
+  border: 1px solid #f1f0e8;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  width: 80%;
+  text-align: center;
+}
+
+.mood-insight-box p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #3b525b;
+  line-height: 1.5;
+}
+
+.mood-insight-box strong {
+  color: #89a8b2;
+  font-weight: 600;
+}

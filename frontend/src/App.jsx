@@ -7,7 +7,7 @@ import RootLayout from "./RootLayout";
 
 // Core pages
 import Home from "./components/home/Home";
-import MoodTracker from "./components/mood-tracker/MoodTracker";
+import WellnessPage from "./components/mood-tracker/Wellness";
 
 // Study Enhance Components
 import AIGenerationScreen from "./components/study-enhance/AIGenerationScreen";
@@ -46,7 +46,9 @@ function App() {
         { index: true, element: <Home /> },
 
         // 📊 Mood Tracker
-        { path: "mood-tracker", element: <MoodTracker /> },
+        // { path: "mood-tracker", element: <MoodTracker /> },
+        { path: "mood-tracker", element: <WellnessPage /> },
+
 
         // 🎓 Study Enhance (Corrected and Restructured)
         // THE FIX: The routes are now "flat". Each path directly renders its component

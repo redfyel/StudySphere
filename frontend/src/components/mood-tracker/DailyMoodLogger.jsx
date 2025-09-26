@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './LoggingSection.css';
 
 const DUMMY_OVERALL_MOODS = [
   { id: 1, emoji: '😞', label: 'Stressed' },
@@ -9,27 +10,43 @@ const DUMMY_OVERALL_MOODS = [
   { id: 6, emoji: '🤩', label: 'Awesome' },
 ];
 
-const DailyMoodLogger = ({ onLog }) => { 
+const DailyMoodLogger = ({ onLog, isLoggedToday }) => {
   const [selectedOverallMood, setSelectedOverallMood] = useState(DUMMY_OVERALL_MOODS[3]); // Default to 'Balanced'
   const [overallMoodNotes, setOverallMoodNotes] = useState('');
 
   const handleLog = () => {
-    if (!selectedOverallMood) {
-      alert('Please select an overall mood!');
-      return;
-    }
+    if (!selectedOverallMood) return;
     onLog({ mood: selectedOverallMood, notes: overallMoodNotes });
-    setOverallMoodNotes('');
+    setOverallMoodNotes(''); // Clear notes after logging
   };
 
+  const moodColorClass = `mood-${selectedOverallMood.label.toLowerCase()}`;
+
   return (
-    <div className="moocard"> {/* Use className="card" */}
-      <h2 className="moocard-title">Log Your <span style={{ color: '#000' }}>Overall </span>Vibe</h2> {/* Use className="card-title" */}
-      <div className="overall-mood-slider-container"> 
-        <div className="overall-mood-display"> 
+    // ✅ The main container now becomes disabled when a mood is logged
+    <div className={`moocard ${isLoggedToday ? 'disabled' : ''}`}>
+      <h2 className="moocard-title">Log Your <span>Overall</span> Vibe</h2>
+      
+      {/* ✅ INSTRUCTIONAL TEXT: Informs the user about the one-time nature */}
+      <p className="mood-logger-instruction">
+        Your overall mood can be logged once per day to track long-term trends.
+      </p>
+      
+      {/* ✅ DISABLED OVERLAY: Visually blocks the component when logged */}
+      {isLoggedToday && (
+          <div className="logger-disabled-overlay">
+              <span className="disabled-message">Logged for Today</span>
+          </div>
+      )}
+
+      {/* --- The original logger UI is below --- */}
+      <div className="overall-mood-slider-container">
+        <div className={`overall-mood-display ${moodColorClass}`}>
           {selectedOverallMood.emoji}
-          <p className="overall-mood-label">{selectedOverallMood.label}</p> 
         </div>
+        
+        <p className="overall-mood-label">{selectedOverallMood.label}</p>
+        
         <input
           type="range"
           min="0"
@@ -43,9 +60,9 @@ const DailyMoodLogger = ({ onLog }) => {
         placeholder="Why this mood? (Optional notes)"
         value={overallMoodNotes}
         onChange={(e) => setOverallMoodNotes(e.target.value)}
-        className="text-area" // Use className="text-area"
+        className="text-area"
       />
-      <button onClick={handleLog} className="log-button"> 
+      <button onClick={handleLog} className="log-button">
         Log Daily Mood
       </button>
     </div>
