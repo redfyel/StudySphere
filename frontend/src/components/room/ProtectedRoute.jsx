@@ -16,7 +16,7 @@ const ProtectedRoute = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:3001/api/users/validate-session', {
+        const response = await fetch('http://localhost:5000/api/users/validate-session', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

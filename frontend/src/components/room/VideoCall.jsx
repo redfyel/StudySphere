@@ -508,7 +508,7 @@ function VideoCall() {
   useEffect(() => {
     if (!isAuthenticated || !sessionToken || !user) return;
 
-    socketRef.current = io('http://localhost:3001', {
+    socketRef.current = io('http://localhost:5000', {
       transports: ['websocket'],
       upgrade: false,
       rememberUpgrade: false,

@@ -45,7 +45,7 @@ function MeetingRoom({ roomId }) {
   useEffect(() => {
     if (!username) return;
 
-    const newSocket = io('http://localhost:3001', {
+    const newSocket = io('http://localhost:5000', {
       transports: ['websocket']
     });
 

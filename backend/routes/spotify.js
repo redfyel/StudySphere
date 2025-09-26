@@ -7,7 +7,7 @@ const router = express.Router();
 const spotifyAuth = new SpotifyAuth(
   process.env.SPOTIFY_CLIENT_ID,
   process.env.SPOTIFY_CLIENT_SECRET,
-  process.env.SPOTIFY_REDIRECT_URI || 'http://localhost:3001/api/spotify/auth/spotify/callback'
+  process.env.SPOTIFY_REDIRECT_URI || 'http://localhost:5000/api/spotify/auth/spotify/callback'
 );
 
 // Store tokens temporarily (in production, use a proper database)

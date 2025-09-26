@@ -30,7 +30,7 @@ function SpotifyMusicPlayer() {
   const [showSpotifyPlaylists, setShowSpotifyPlaylists] = useState(false);
   const [activeView, setActiveView] = useState('demo'); // 'demo', 'spotify', 'search'
 
-  const API_BASE_URL = 'http://localhost:3001';
+  const API_BASE_URL = 'http://localhost:5000';
 
   // Default demo tracks
   const demoTracks = [

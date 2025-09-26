@@ -34,7 +34,7 @@ function RoomCard({ room, userId, onDelete }) {
     try {
       console.log('Joining room:', room.roomId, 'Room data:', room);
       
-      const response = await fetch(`http://localhost:3001/api/rooms/${room.roomId}`);
+      const response = await fetch(`http://localhost:5000/api/rooms/${room.roomId}`);
       
       if (!response.ok) {
         if (response.status === 404) {
