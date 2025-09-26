@@ -1,0 +1,103 @@
+/* Inherit variables from the main MindMapView CSS */
+@import '../mindmap/MindMapView.css';
+
+.mindmap-study-view {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--mindmap-bg);
+  color: var(--mindmap-text);
+  transition: background-color 1s ease;
+  animation: studyFadeIn 0.5s ease;
+}
+
+@keyframes studyFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.mindmap-study-view.morning {
+  background: linear-gradient(to top, #d2e3f1 0%, #a6c1ee 100%);
+}
+
+.study-svg-canvas {
+  width: 100%;
+  height: 100%;
+  flex-grow: 1;
+}
+
+.study-controls {
+  position: absolute;
+  bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background-color: var(--mindmap-control-bg);
+  border: 1px solid var(--mindmap-control-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+}
+
+.study-controls button {
+  background: transparent;
+  border: none;
+  color: var(--mindmap-control-text);
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  transition: all 0.2s ease;
+}
+.study-controls button:hover:not(:disabled) {
+  background-color: var(--c-primary);
+  color: var(--c-white);
+}
+.study-controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.progress-indicator {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--mindmap-control-text);
+  min-width: 120px;
+  text-align: center;
+}
+
+.finish-session-button {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  background-color: var(--c-success);
+  color: var(--c-white);
+  border: none;
+  border-radius: 50px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+  transition: all 0.2s ease;
+}
+.finish-session-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(46, 204, 113, 0.5);
+}

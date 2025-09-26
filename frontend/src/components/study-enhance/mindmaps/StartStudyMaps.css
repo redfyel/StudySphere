@@ -1,0 +1,138 @@
+.page-container {
+  padding: 2rem 2.5rem;
+  height: 100%;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.page-header h1 {
+  font-size: 2.2rem;
+  color: var(--c-text-dark);
+  margin: 0;
+}
+
+.study-session-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.study-session-header h1 {
+  color: #5d757e;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.study-session-header p {
+  font-size: 1.1rem;
+  color: #89A8B2;
+}
+.header-action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1.5rem;
+  background-color: var(--c-primary);
+  color: var(--c-white);
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+.header-action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background-color: var(--c-text-dark);
+}
+
+.maps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.map-card {
+  background-color: var(--c-white);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--c-border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  transition: all 0.2s ease;
+}
+.map-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--c-primary-light);
+}
+
+.map-card-icon {
+  font-size: 2rem;
+  color: var(--c-primary);
+  background-color: var(--c-bg-light);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.map-card-info h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--c-text-dark);
+  margin: 0 0 0.25rem 0;
+}
+.map-card-info p {
+  font-size: 0.85rem;
+  color: var(--c-text-light);
+  margin: 0;
+}
+
+.no-content-container {
+  text-align: center;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60%;
+}
+.no-content-icon {
+  font-size: 3.5rem;
+  color: var(--c-primary-light);
+  background-color: var(--c-bg-light);
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+.no-content-container h2 {
+  font-size: 1.8rem;
+  color: var(--c-text-dark);
+  margin-bottom: 1rem;
+}
+.no-content-container p {
+  color: var(--c-text-light);
+  max-width: 400px;
+  margin: 0 auto 2rem auto;
+  line-height: 1.6;
+}

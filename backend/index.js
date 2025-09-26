@@ -15,6 +15,7 @@ const aiRoutes = require("./routes/aiRoutes");
 const authRoutes = require("./routes/authRoutes");
 const flashcardRoutes = require("./routes/flashcardRoutes");
 const wellnessRoutes = require("./routes/wellnessRoutes");
+const mindmapRoutes = require("./routes/mindmapRoutes");
 
 // --- 3. CREATE THE ASYNCHRONOUS STARTUP FUNCTION ---
 const startServer = async () => {
@@ -39,7 +40,9 @@ const startServer = async () => {
     app.use("/api/ai", aiRoutes);
     app.use("/api/auth", authRoutes);
     app.use("/api/flashcards", flashcardRoutes);
-    app.use("/api/wellness", wellnessRoutes); // Your wellness routes will now work!
+    app.use("/api/wellness", wellnessRoutes); 
+    app.use("/api/mindmaps", mindmapRoutes);
+
 
     // --- 8. SEED DATABASE (IF NEEDED) ---
     // This is the logic from your old `initializeRooms` function.

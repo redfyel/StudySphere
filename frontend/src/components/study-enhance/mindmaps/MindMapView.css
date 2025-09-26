@@ -468,8 +468,7 @@
   height: 100vh; /* Make it take the full screen height */
   text-align: center;
   /* Match the background to your theme */
-  background-color: #1a202c; /* Example for a dark theme */
-  color: #e2e8f0;       /* Example for a light text color */
+  /* background-color: #1a202c;  */
 }
 
 .fallback-icon {

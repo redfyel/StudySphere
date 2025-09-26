@@ -1,0 +1,83 @@
+.sessions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+.study-session-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.study-session-header h1 {
+  color: #5d757e;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.study-session-header p {
+  font-size: 1.1rem;
+  color: #89A8B2;
+}
+
+.session-card {
+  background-color: var(--c-white);
+  border-radius: 20px;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--c-border);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+}
+.session-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.session-card-content {
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-grow: 1;
+}
+
+.session-card-icon {
+    font-size: 2rem;
+    color: var(--c-primary);
+    flex-shrink: 0;
+}
+
+.session-map-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--c-text-dark);
+  margin: 0 0 0.25rem 0;
+}
+
+.last-reviewed-date {
+  font-size: 0.85rem;
+  color: var(--c-text-light);
+  margin: 0;
+}
+
+.review-map-button {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  background-color: var(--c-bg-light);
+  color: var(--c-text-dark);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+  border-top: 1px solid var(--c-border);
+  border-radius: 0 0 20px 20px; /* Round bottom corners */
+}
+.review-map-button:hover {
+  background-color: var(--c-primary);
+  color: var(--c-white);
+}

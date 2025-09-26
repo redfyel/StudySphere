@@ -18,6 +18,9 @@ import FlashcardsView from "./components/study-enhance/flashcards/FlashCardsView
 import AllDecksView from "./components/study-enhance/flashcards/AllDecksView";
 import MindMapView from "./components/study-enhance/mindmaps/MindMapView";
 import ReviewMasteredView from "./components/study-enhance/flashcards/ReviewMasteredView";
+import AllMindMapsView from "./components/study-enhance/mindmaps/AllMindMapsView";
+import ReviewMapsView from "./components/study-enhance/mindmaps/ReviewMapsView";
+import StartStudyMap from "./components/study-enhance/mindmaps/StartStudyMap";
 
 // Rooms
 import RoomList from "./components/room/RoomList";
@@ -64,11 +67,12 @@ function App() {
             { path: "generate", element: <AIGenerationScreen /> },
 
             // All Mind Map related routes
-            { path: "mindmaps", element: <MindMapView /> },
-            { path: "mindmaps/session", element: <MindMapView /> },
+            { path: "mindmaps", element: <AllMindMapsView /> },
+            { path: "mindmaps/all", element: <AllMindMapsView /> },
+            { path: "mindmaps/session", element: <StartStudyMap /> },
             { path: "mindmaps/shared", element: <MindMapView /> },
-            { path: "mindmaps/review", element: <MindMapView /> },
-            { path: "mind-maps", element: <MindMapView /> },
+            { path: "mindmaps/review", element: <ReviewMapsView /> },
+            { path: "mindmaps/view", element: <MindMapView /> },
 
             // All Flashcard related routes
             { path: "decks", element: <AllDecksView /> },

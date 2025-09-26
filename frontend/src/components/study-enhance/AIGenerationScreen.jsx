@@ -145,18 +145,35 @@ const AIGenerationScreen = () => {
           state: { generatedFlashcards: generatedData.flashcards },
         });
       } else if (generateType === "mindmap") {
-        if (!generatedData || !generatedData.root) {
-          throw new Error("No mind map could be generated.");
+        // Validation now checks for the new structure
+        if (!generatedData || !generatedData.root || !generatedData.suggestedTitle) {
+          throw new Error("The AI response for the mind map was incomplete.");
         }
-        navigate("/study-enhance/mindmaps", {
-          state: { mindMapData: generatedData },
+        
+        // 1. Get the title directly from the AI response. NO MORE PROMPT!
+        const mapTitle = generatedData.suggestedTitle;
+        
+        // 2. Prepare data for saving
+        const token = localStorage.getItem("token");
+        const config = { headers: { "Content-Type": "application/json", "x-auth-token": token } };
+        // The body now contains the title and the mind map data object { root: ... }
+        const body = { title: mapTitle, mindMapData: generatedData };
+
+        // 3. Save the mind map to the database
+        const savedMapResponse = await axios.post("http://localhost:5000/api/mindmaps/", body, config);
+        const savedMap = savedMapResponse.data;
+
+        // 4. Navigate to the viewer with the saved data
+        navigate("/study-enhance/mindmaps/view", {
+          state: { mindMapData: savedMap },
         });
       }
     } catch (err) {
-       setError({
-      message: "The AI couldn't seem to process this content.",
-      details: err.message || "An unexpected error occurred."
-  });
+      const errorMessage = err.response?.data?.errors?.[0]?.msg || err.response?.data?.error || err.message;
+      setError({
+        message: "Generation Failed.",
+        details: errorMessage || "An unexpected error occurred."
+      });
     } finally {
       setIsGenerating(false);
     }
