@@ -124,7 +124,7 @@ function App() {
                         { path: "upload", element: <UploadPage /> },
                         { path: "library", element: <MyLibrary /> },
                         { path: "groups", element: <GroupResources /> },
-                        { path: "trending", element: <TrendingPage /> },
+                        // { path: "trending", element: <TrendingPage /> },
                         { path: "pdf/:id", element: <PdfReader /> },
                     ],
                 },
