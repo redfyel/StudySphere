@@ -1,66 +1,158 @@
-import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+// frontend/src/components/flashcards/FlashcardView.jsx
+
+import React, { useState, useEffect, useCallback } from "react";
+import { useLocation, Link, useNavigate } from "react-router-dom";
 import {
   FaSyncAlt,
   FaArrowLeft,
-  FaArrowRight,
-  FaEdit,
-  FaFire,
-  FaPlus,
-  FaLayerGroup,
   FaStar,
   FaChartBar,
   FaCog,
+  FaCheck,
+  FaTimes,
+  FaRocket,
+  FaUserFriends,
+  FaLayerGroup,
 } from "react-icons/fa";
-import { GiCardRandom } from "react-icons/gi";
-import { FaRocket } from "react-icons/fa";
-import { IoCreateOutline } from "react-icons/io5";
 import { BsCollectionFill, BsLightningFill } from "react-icons/bs";
-import { FaUserFriends } from "react-icons/fa";
-import Sidebar from "../../sidebar/Sidebar"; // Assuming path to your Sidebar component
-import "./FlashcardView.css"; // Import the dedicated CSS
+import Sidebar from "../../sidebar/Sidebar";
+import axios from "axios";
+import "./FlashcardView.css";
 
-// --- FlashcardsView Component ---
+// --- A Sleeker, More Elegant SessionComplete Component ---
+const SessionComplete = ({ mastered, forgot, onRestart }) => (
+  <div className="session-complete-container">
+    <div className="completion-card">
+      <div className="completion-star-pulse">
+        <FaStar />
+      </div>
+      <h1>Session Complete</h1>
+      <p>Great work! Consistency is the key to mastery.</p>
+      <div className="session-stats">
+        <div className="stat-item mastered">
+          <span className="stat-number">{mastered}</span>
+          <span className="stat-label">Mastered</span>
+        </div>
+        <div className="stat-item forgot">
+          <span className="stat-number">{forgot}</span>
+          <span className="stat-label">Needs Review</span>
+        </div>
+      </div>
+      <div className="completion-actions">
+        <button className="restart-session-button" onClick={onRestart}>
+          <FaSyncAlt /> Study Again
+        </button>
+        <Link to="/study-enhance/decks" className="back-to-decks-link">
+          Choose Another Deck
+        </Link>
+      </div>
+    </div>
+  </div>
+);
+
+// --- The Revolutionized FlashcardsView Component ---
 const FlashcardsView = () => {
   const location = useLocation();
-  // Safely destructure, providing an empty object as a fallback
-  const { generatedFlashcards } = location.state || {};
+  const navigate = useNavigate();
+  const { generatedFlashcards, deckTitle = "Study Session" } =
+    location.state || {};
+  const deckId = location.state?.deckId || null; // ✅ NEW: Capture deckId if passed
 
-  // --- STATE MANAGEMENT ---
   const [flashcards, setFlashcards] = useState(generatedFlashcards || []);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
-  const [showAnswer, setShowAnswer] = useState(false);
+  const [isFlipped, setIsFlipped] = useState(false);
   const [masteredCards, setMasteredCards] = useState(new Set());
   const [forgotCards, setForgotCards] = useState(new Set());
-  const [streak, setStreak] = useState(0); // Assuming streak is managed elsewhere in a real app
-  const [isAddingTag, setIsAddingTag] = useState(false);
-  const [newTagInput, setNewTagInput] = useState("");
+  const [isSessionComplete, setIsSessionComplete] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [cardAnimation, setCardAnimation] = useState("enter");
 
   const currentCard =
     flashcards.length > 0 ? flashcards[currentCardIndex] : null;
   const totalCards = flashcards.length;
 
-  // --- EFFECTS ---
-  // Flip the card back to the question when the index changes
-  useEffect(() => {
-    setShowAnswer(false);
-  }, [currentCardIndex]);
+  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-  // Load new flashcards when they are passed via location state
+  const resetSession = useCallback(() => {
+    setCurrentCardIndex(0);
+    setMasteredCards(new Set());
+    setForgotCards(new Set());
+    setIsFlipped(false);
+    setIsSessionComplete(false);
+    setCardAnimation("enter");
+  }, []);
+
   useEffect(() => {
     if (generatedFlashcards && generatedFlashcards.length > 0) {
       setFlashcards(generatedFlashcards);
-      setCurrentCardIndex(0);
-      setMasteredCards(new Set());
-      setForgotCards(new Set());
+      resetSession();
+    } else {
+      setFlashcards([]);
     }
-  }, [generatedFlashcards]);
+  }, [generatedFlashcards, resetSession]);
 
-  // --- COMPONENT LOGIC & HANDLERS ---
-  const toggleSidebar = () => setIsCollapsed(!isCollapsed);
+  // ✅ NEW: Function to log the session to the backend
+  const logStudySession = async (finalMastered, finalForgot) => {
+    // Don't log if there's no deckId
+    // if (!deckId) {
+    //   console.warn(
+    //     "No deckId was provided to the study session. Skipping log."
+    //   );
+    //   return;
+    // }
 
-  // Define the comprehensive sidebar structure
+    const token = localStorage.getItem("token");
+    const config = { headers: { "x-auth-token": token } };
+    const body = {
+      masteredCount: finalMastered.size,
+      forgotCount: finalForgot.size,
+    };
+
+    try {
+      await axios.post(
+        `http://localhost:5000/api/flashcards/decks/${deckId}/sessions`,
+        body,
+        config
+      );
+      console.log("Study session logged successfully!");
+    } catch (err) {
+      console.error("Failed to log study session:", err);
+    }
+  };
+
+  const handleNextCard = (mastered) => {
+    if (!currentCard || cardAnimation.startsWith("exit")) return;
+
+    // We need to create the final sets here before the state updates
+    const finalMastered = new Set(masteredCards);
+    const finalForgot = new Set(forgotCards);
+    const cardId = currentCard.id || currentCard._id;
+
+    if (mastered) {
+      finalMastered.add(cardId);
+    } else {
+      finalForgot.add(cardId);
+    }
+
+    // Update state for the UI
+    setMasteredCards(finalMastered);
+    setForgotCards(finalForgot);
+
+    setCardAnimation(mastered ? "exit-right" : "exit-left");
+
+    setTimeout(() => {
+      setIsFlipped(false);
+      if (currentCardIndex < totalCards - 1) {
+        setCurrentCardIndex((prevIndex) => prevIndex + 1);
+        setCardAnimation("enter");
+      } else {
+        // ✅ SESSION ENDS: Log the results and then show completion screen
+        logStudySession(finalMastered, finalForgot);
+        setIsSessionComplete(true);
+      }
+    }, 500);
+  };
+
   const sidebarItems = [
     {
       section: "Study",
@@ -85,7 +177,6 @@ const FlashcardsView = () => {
           path: "/study-enhance/decks",
           icon: <BsCollectionFill />,
         },
-
         {
           name: "Shared Flashcards",
           path: "/study-enhance/flashcards/shared",
@@ -116,236 +207,134 @@ const FlashcardsView = () => {
           path: "/study-enhance/stats",
           icon: <FaChartBar />,
         },
-        {
-          name: "Settings",
-          path: "/study-enhance/settings",
-          icon: <FaCog />,
-        },
+        { name: "Settings", path: "/study-enhance/settings", icon: <FaCog /> },
       ],
     },
   ];
 
-  const handleNextCard = (mastered) => {
-    if (!currentCard) return;
-
-    // Update mastered/forgot sets based on user feedback
-    if (mastered) {
-      setMasteredCards((prev) => new Set(prev).add(currentCard.id));
-      setForgotCards((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(currentCard.id);
-        return newSet;
-      });
-    } else {
-      setForgotCards((prev) => new Set(prev).add(currentCard.id));
-      setMasteredCards((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(currentCard.id);
-        return newSet;
-      });
-    }
-
-    setShowAnswer(false); // Ensure the next card starts on the question side
-
-    // Move to the next card or end the session
-    if (currentCardIndex < totalCards - 1) {
-      setCurrentCardIndex(currentCardIndex + 1);
-    } else {
-      // Replace alert with a more user-friendly modal in a future update
-      alert(
-        `Deck Completed! Mastered: ${masteredCards.size + 1}, Forgot: ${
-          forgotCards.size
-        }`
-      );
-      // Reset for a new session
-      setCurrentCardIndex(0);
-      setMasteredCards(new Set());
-      setForgotCards(new Set());
-    }
-  };
-
-  const handleAddTag = () => {
-    if (newTagInput.trim() && currentCard) {
-      const updatedFlashcards = flashcards.map((card) =>
-        card.id === currentCard.id
-          ? { ...card, tags: [...(card.tags || []), newTagInput.trim()] }
-          : card
-      );
-      setFlashcards(updatedFlashcards);
-      setNewTagInput("");
-      setIsAddingTag(false);
-    }
-  };
-
-  // Calculate progress for the progress bar
-  const cardsReviewed = masteredCards.size + forgotCards.size;
   const progressPercentage =
-    totalCards > 0 ? ((cardsReviewed + 1) / totalCards) * 100 : 0;
+    totalCards > 0 ? ((currentCardIndex + 1) / totalCards) * 100 : 0;
 
-  // --- RENDER ---
-
-  // Display a message if no flashcards are available
-  if (!flashcards || flashcards.length === 0) {
-    return (
-      <div className="sidebar-page-layout">
-        <Sidebar
-          sectionName="Smart Flashcards"
-          isCollapsed={isCollapsed}
-          toggleSidebar={toggleSidebar}
-          items={sidebarItems}
+  const renderContent = () => {
+    if (!flashcards || flashcards.length === 0) {
+      return (
+        <div className="study-environment no-cards-message">
+          <h2>No Deck Loaded</h2>
+          <p>
+            Create a new deck with AI or choose one from your library to start
+            studying.
+          </p>
+          <Link to="/study-enhance/generate" className="create-deck-button">
+            <FaRocket /> Generate New Deck
+          </Link>
+        </div>
+      );
+    }
+    if (isSessionComplete) {
+      return (
+        <SessionComplete
+          mastered={masteredCards.size}
+          forgot={forgotCards.size}
+          onRestart={resetSession}
         />
-        <div
-          className={`sidebar-page-content ${isCollapsed ? "collapsed" : ""}`}
-        >
-          <div className="flashcard-study-container no-cards-message">
-            <h2>No Flashcards to Display</h2>
-            <p>
-              Go to the <a href="/study-enhance/generate">AI Generation</a>{" "}
-              screen to create a new deck!
-            </p>
-          </div>
+      );
+    }
+    return (
+      <div className="study-environment">
+        <div className="study-deck-container">
+          <header className="study-header">
+            <div className="header-top-row">
+              <button
+                className="back-button"
+                onClick={() => navigate("/study-enhance/decks")}
+              >
+                <FaArrowLeft />
+              </button>
+              <h1 className="deck-title">{deckTitle}</h1>
+              <span className="card-counter">
+                {currentCardIndex + 1}/{totalCards}
+              </span>
+            </div>
+            <div className="progress-bar-container">
+              <div
+                className="progress-bar-fill"
+                style={{ width: `${progressPercentage}%` }}
+              ></div>
+            </div>
+          </header>
+
+          <main className="card-display-area">
+            <div
+              className={`flashcard-card-item animation-${cardAnimation} ${
+                isFlipped ? "is-flipped" : ""
+              }`}
+              // Line in FlashcardsView.jsx
+              onClick={() =>
+                !cardAnimation.startsWith("exit") &&
+                !isFlipped &&
+                setIsFlipped(true)
+              } // Prevent flip during exit animation
+            >
+              <div className="flashcard-card-face card-face-front">
+                <span className="face-label">Question</span>
+                <p className="card-content-text question-text">
+                  {currentCard?.question}
+                </p>
+              </div>
+              <div className="flashcard-card-face card-face-back">
+                <span className="face-label">Answer</span>
+                <p className="card-content-text answer-text">
+                  {currentCard?.answer}
+                </p>
+              </div>
+            </div>
+          </main>
+
+          <footer className={`study-footer ${isFlipped ? "visible" : ""}`}>
+            <button
+              className="confidence-button forgot"
+              onClick={() => handleNextCard(false)}
+            >
+              <FaTimes />
+            </button>
+            <button
+              className="confidence-button got-it"
+              onClick={() => handleNextCard(true)}
+            >
+              <FaCheck />
+            </button>
+          </footer>
         </div>
       </div>
     );
-  }
+  };
 
+  //  if (!deckId || !generatedFlashcards || generatedFlashcards.length === 0) {
+  //   return (
+  //     <div className="sidebar-page-layout">
+  //       <Sidebar isCollapsed={isCollapsed} toggleSidebar={() => setIsCollapsed(!isCollapsed)} items={[]} />
+  //       <div className={`sidebar-page-content ${isCollapsed ? "collapsed" : ""}`}>
+  //          <div className="study-environment no-cards-message">
+  //             <h2>No Study Session Found</h2>
+  //             <p>It looks like there's no deck loaded. Please start a session from your decks library.</p>
+  //             <Link to="/study-enhance/decks" className="create-deck-button">
+  //               <FaArrowLeft /> Back to Decks
+  //             </Link>
+  //           </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
   return (
     <div className="sidebar-page-layout">
       <Sidebar
+        sectionName={"Smart Flashcards"}
         isCollapsed={isCollapsed}
         toggleSidebar={toggleSidebar}
         items={sidebarItems}
       />
-
       <div className={`sidebar-page-content ${isCollapsed ? "collapsed" : ""}`}>
-        <div className="flashcard-study-container">
-          {/* Header with Title and Stats */}
-          <div className="flashcard-header-area">
-            <h2 className="flashcard-header-title">Study Session</h2>
-            <div className="flashcard-header-stats">
-              <span>
-                <FaFire className="streak-icon" /> {streak}-Day Streak
-              </span>
-              <div className="flashcard-progress-bar-wrapper">
-                <div
-                  className="flashcard-progress-fill"
-                  style={{ width: `${progressPercentage}%` }}
-                ></div>
-              </div>
-              <span>
-                {currentCardIndex + 1}/{totalCards}
-              </span>
-            </div>
-          </div>
-
-          {/* Main Card Display Area */}
-          <div className="flashcard-card-display">
-            {currentCard ? (
-              <div
-                className={`flashcard-card-item ${
-                  showAnswer ? "is-flipped" : ""
-                }`}
-                onClick={() => setShowAnswer(!showAnswer)}
-              >
-                {/* --- CARD FRONT --- */}
-                <div className="flashcard-card-face flashcard-card-face-front">
-                  <div className="flashcard-card-content">
-                    <p className="flashcard-card-question">
-                      {currentCard.question}
-                    </p>
-                  </div>
-                  {/* Tags Logic */}
-                  <div className="flashcard-card-tags-container">
-                    {currentCard.tags?.map((tag, index) => (
-                      <span key={index} className="flashcard-tag-pill">
-                        {tag}
-                      </span>
-                    ))}
-                    {isAddingTag ? (
-                      <input
-                        type="text"
-                        value={newTagInput}
-                        onChange={(e) => setNewTagInput(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleAddTag()}
-                        onClick={(e) => e.stopPropagation()} // Prevent card from flipping
-                        placeholder="New tag..."
-                        className="tag-input"
-                        autoFocus
-                      />
-                    ) : (
-                      <button
-                        className="flashcard-tag-add-button"
-                        onClick={(e) => {
-                          e.stopPropagation(); // Prevent card from flipping
-                          setIsAddingTag(true);
-                        }}
-                      >
-                        <FaPlus />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* --- CARD BACK --- */}
-                <div className="flashcard-card-face flashcard-card-face-back">
-                  <div className="flashcard-card-content">
-                    <p className="flashcard-card-answer">
-                      {currentCard.answer}
-                    </p>
-                  </div>
-                  {/* Tags can be repeated on the back for context if desired */}
-                  <div className="flashcard-card-tags-container">
-                    {currentCard.tags?.map((tag, index) => (
-                      <span key={index} className="flashcard-tag-pill">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <p>Loading card...</p> // Fallback message
-            )}
-
-            {/* "Show Answer" button appears before the card is flipped */}
-            {!showAnswer && currentCard && (
-              <button
-                className="flashcard-action-button flashcard-action-show-answer"
-                onClick={() => setShowAnswer(true)}
-              >
-                Show Answer
-              </button>
-            )}
-          </div>
-
-          {/* "Forgot" and "Got It" buttons appear after the card is flipped */}
-          {showAnswer && currentCard && (
-            <div className="flashcard-action-buttons">
-              <button
-                className="flashcard-action-button flashcard-action-forgot"
-                onClick={() => handleNextCard(false)}
-              >
-                <FaArrowLeft /> Forgot
-              </button>
-              <button
-                className="flashcard-action-button flashcard-action-got-it"
-                onClick={() => handleNextCard(true)}
-              >
-                Got It <FaArrowRight />
-              </button>
-            </div>
-          )}
-
-          {/* Footer with future feature buttons */}
-          <div className="flashcard-navigation-footer">
-            <button className="flashcard-footer-button">
-              <FaSyncAlt /> Study Modes
-            </button>
-            <button className="flashcard-footer-button">
-              <FaEdit /> Edit Card
-            </button>
-          </div>
-        </div>
+        {renderContent()}
       </div>
     </div>
   );

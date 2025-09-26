@@ -17,6 +17,7 @@ import AIGenerationScreen from "./components/study-enhance/AIGenerationScreen";
 import FlashcardsView from "./components/study-enhance/flashcards/FlashCardsView";
 import AllDecksView from "./components/study-enhance/flashcards/AllDecksView";
 import MindMapView from "./components/study-enhance/mindmaps/MindMapView";
+import ReviewMasteredView from "./components/study-enhance/flashcards/ReviewMasteredView";
 
 // Rooms
 import RoomList from "./components/room/RoomList";
@@ -73,7 +74,7 @@ function App() {
             { path: "decks", element: <AllDecksView /> },
             { path: "flashcards", element: <FlashcardsView /> },
             { path: "flashcards/session", element: <StartStudyPage /> },
-            { path: "flashcards/review", element: <FlashcardsView /> },
+            { path: "flashcards/review", element: <ReviewMasteredView /> },
             { path: "flashcards/shared", element: <FlashcardsView /> },
 
             // Other Study Enhance routes

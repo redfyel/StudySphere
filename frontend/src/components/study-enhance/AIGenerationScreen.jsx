@@ -32,11 +32,6 @@ const AIGenerationScreen = () => {
 
   const sidebarItems = [
     {
-      name: "Dashboard",
-      path: "/study-enhance/dashboard",
-      icon: <FaTachometerAlt />,
-    },
-    {
       section: "Library",
       items: [
         {
