@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 function FloatingToolbar({
   isMuted,
@@ -22,322 +22,736 @@ function FloatingToolbar({
   isRoomLocked,
   onToggleRoomLock,
 }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [hoveredButton, setHoveredButton] = useState(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.floating-toolbar-container')) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleMenuItemClick = (callback) => {
+    callback();
+    setIsMenuOpen(false);
+  };
+
+  const menuItems = [
+    {
+      id: 'chat',
+      icon: 'forum',
+      title: 'Chat',
+      onClick: () => handleMenuItemClick(onToggleChat),
+      badge: unreadMessages > 0 ? (unreadMessages > 99 ? '99+' : unreadMessages) : null,
+      gradient: 'from-sage-500 to-sage-600'
+    },
+    {
+      id: 'participants',
+      icon: 'people',
+      title: 'Participants',
+      onClick: () => handleMenuItemClick(onToggleParticipants),
+      badge: participantCount,
+      gradient: 'from-teal-500 to-teal-600'
+    },
+    {
+      id: 'music',
+      icon: 'library_music',
+      title: 'Music',
+      onClick: () => handleMenuItemClick(onToggleMusicPlayer),
+      gradient: 'from-lavender-500 to-lavender-600'
+    },
+    {
+      id: 'notes',
+      icon: 'sticky_note_2',
+      title: 'Notes',
+      onClick: () => handleMenuItemClick(onToggleNotes),
+      gradient: 'from-cream-500 to-cream-600'
+    },
+    {
+      id: 'timer',
+      icon: 'schedule',
+      title: 'Timer',
+      onClick: () => handleMenuItemClick(onToggleTimer),
+      gradient: 'from-sage-400 to-sage-500'
+    }
+  ];
+
   return (
-    <div className="floating-toolbar">
-      {/* Media Controls */}
-      <div className="toolbar-section">
-        <button
-          onClick={onToggleMute}
-          className={`toolbar-btn ${isMuted ? 'btn-danger' : 'btn-default'}`}
-          title={isMuted ? 'Unmute' : 'Mute'}
-        >
-          <svg className="icon" viewBox="0 0 24 24" fill="currentColor">
-            {isMuted ? (
-              <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
-            ) : (
-              <path d="M12 2c1.1 0 2 .9 2 2v6c0 1.1-.9 2-2 2s-2-.9-2-2V4c0-1.1.9-2 2-2zm5.3 6c0 3-2.54 5.1-5.3 5.1S6.7 11 6.7 8H5c0 3.41 2.72 6.23 6 6.72V17h-2v2h6v-2h-2v-2.28c3.28-.49 6-3.31 6-6.72h-1.7z" />
-            )}
-          </svg>
-        </button>
+    <>
+      <div className="floating-toolbar-container">
+        <div className={`floating-toolbar ${isMenuOpen ? 'expanded' : ''}`}>
+          {/* Primary Controls */}
+          <div className="primary-controls">
+            <button
+              onClick={onToggleMute}
+              className={`control-btn ${isMuted ? 'danger-state' : 'default-state'}`}
+              title={isMuted ? 'Unmute' : 'Mute'}
+              onMouseEnter={() => setHoveredButton('mute')}
+              onMouseLeave={() => setHoveredButton(null)}
+            >
+              <div className="btn-inner">
+                <span className="material-icons-round">
+                  {isMuted ? 'mic_off' : 'mic'}
+                </span>
+                <div className={`glow-effect ${hoveredButton === 'mute' ? 'active' : ''}`}></div>
+              </div>
+            </button>
 
-        <button
-          onClick={onToggleCamera}
-          className={`toolbar-btn ${isCameraOff ? 'btn-danger' : 'btn-default'}`}
-          title={isCameraOff ? 'Turn Camera On' : 'Turn Camera Off'}
-        >
-          <svg className="icon" viewBox="0 0 24 24" fill="currentColor">
-            {isCameraOff ? (
-              <path d="M21 6.5l-4 4V7c0-.55-.45-1-1-1H9.82L21 17.18V6.5zM3.27 2L2 3.27 4.73 6H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.21 0 .39-.08.54-.18L19.73 21 21 19.73 3.27 2zM5 16V8h1.73l8 8H5z" />
-            ) : (
-              <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z" />
-            )}
-          </svg>
-        </button>
+            <button
+              onClick={onToggleCamera}
+              className={`control-btn ${isCameraOff ? 'danger-state' : 'default-state'}`}
+              title={isCameraOff ? 'Turn Camera On' : 'Turn Camera Off'}
+              onMouseEnter={() => setHoveredButton('camera')}
+              onMouseLeave={() => setHoveredButton(null)}
+            >
+              <div className="btn-inner">
+                <span className="material-icons-round">
+                  {isCameraOff ? 'videocam_off' : 'videocam'}
+                </span>
+                <div className={`glow-effect ${hoveredButton === 'camera' ? 'active' : ''}`}></div>
+              </div>
+            </button>
 
-        <button
-          onClick={onToggleScreenShare}
-          className={`toolbar-btn ${isScreenSharing ? 'btn-active' : 'btn-default'}`}
-          title={isScreenSharing ? 'Stop Sharing Screen' : 'Share Screen'}
-        >
-          <svg className="icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.11-.9-2-2-2H4c-1.11 0-2 .89-2 2v10c0 1.1.89 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z" />
-          </svg>
-        </button>
-      </div>
+            <button
+              onClick={onToggleScreenShare}
+              className={`control-btn ${isScreenSharing ? 'active-state' : 'default-state'}`}
+              title={isScreenSharing ? 'Stop Sharing' : 'Share Screen'}
+              onMouseEnter={() => setHoveredButton('screen')}
+              onMouseLeave={() => setHoveredButton(null)}
+            >
+              <div className="btn-inner">
+                <span className="material-icons-round">present_to_all</span>
+                <div className={`glow-effect ${hoveredButton === 'screen' ? 'active' : ''}`}></div>
+              </div>
+            </button>
+          </div>
 
-      {/* Background Selector */}
-      <div className="toolbar-section">
-        <select
-          value={selectedBackground || 'none'}
-          onChange={(e) => onSelectBackground(e.target.value)}
-          className="background-select"
-        >
-          <option value="none">No Background</option>
-          {(backgroundVideos || []).map((video) => (
-            <option key={video.url} value={video.url}>
-              {video.name}
-            </option>
-          ))}
-        </select>
-      </div>
+          {/* Divider */}
+          <div className="control-divider"></div>
 
-      {/* Panel Toggles */}
-      <div className="toolbar-section">
-        <button
-          onClick={onToggleNotes}
-          className="toolbar-btn btn-default"
-          title="Toggle Notes Panel"
-        >
-          <svg className="icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
-          </svg>
-        </button>
-
-        <button
-          onClick={onToggleTimer}
-          className="toolbar-btn btn-default"
-          title="Toggle Timer Panel"
-        >
-          <svg className="icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M16.2,16.2L11,13V7H12.5V12.2L17,14.9L16.2,16.2Z" />
-          </svg>
-        </button>
-
-        <button
-          onClick={onToggleMusicPlayer}
-          className="toolbar-btn btn-default"
-          title="Toggle Music Panel"
-        >
-          <svg className="icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12,3V13.55C11.41,13.21 10.73,13 10,13A3,3 0 0,0 7,16A3,3 0 0,0 10,19A3,3 0 0,0 13,16V7H17V5H12V3Z" />
-          </svg>
-        </button>
-
-        {/* Chat Button with notification badge */}
-        <button
-          onClick={onToggleChat}
-          className="toolbar-btn btn-default chat-button"
-          title="Toggle Chat Panel"
-        >
-          <svg className="icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20,2H4A2,2 0 0,0 2,4V22L6,18H20A2,2 0 0,0 22,16V4C22,2.89 21.1,2 20,2Z" />
-          </svg>
-          {unreadMessages > 0 && (
-            <span className="notification-badge">{unreadMessages > 99 ? '99+' : unreadMessages}</span>
-          )}
-        </button>
-
-        {/* Participants Button */}
-        <button
-          onClick={onToggleParticipants}
-          className="toolbar-btn btn-default participants-button"
-          title="Toggle Participants Panel"
-        >
-          <svg className="icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M16,4C18.21,4 20,5.79 20,8C20,10.21 18.21,12 16,12C13.79,12 12,10.21 12,8C12,5.79 13.79,4 16,4M16,14C20.42,14 24,15.79 24,18V20H8V18C8,15.79 11.58,14 16,14M6,6V9H4V6H1V4H4V1H6V4H9V6M6,16V19H4V16H1V14H4V11H6V14H9V16" />
-          </svg>
-          <span className="participant-count">{participantCount}</span>
-        </button>
-      </div>
-
-      {/* Room Controls (Only for creators) */}
-      {isCreator && (
-        <div className="toolbar-section">
+          {/* Menu Toggle */}
           <button
-            onClick={onToggleRoomLock}
-            className={`toolbar-btn ${isRoomLocked ? 'btn-active' : 'btn-default'}`}
-            title={isRoomLocked ? 'Unlock Room' : 'Lock Room'}
+            onClick={toggleMenu}
+            className={`control-btn menu-toggle ${isMenuOpen ? 'menu-active' : 'default-state'}`}
+            title="More Options"
+            onMouseEnter={() => setHoveredButton('menu')}
+            onMouseLeave={() => setHoveredButton(null)}
           >
-            <svg className="icon" viewBox="0 0 24 24" fill="currentColor">
-              {isRoomLocked ? (
-                <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" />
-              ) : (
-                <path d="M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10A2,2 0 0,1 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z" />
-              )}
-            </svg>
+            <div className="btn-inner">
+              <span className="material-icons-round menu-icon">
+                {isMenuOpen ? 'close' : 'apps'}
+              </span>
+              <div className={`glow-effect ${hoveredButton === 'menu' ? 'active' : ''}`}></div>
+            </div>
+          </button>
+
+          {/* Divider */}
+          <div className="control-divider"></div>
+
+          {/* End Call */}
+          <button
+            onClick={onLeaveRoom}
+            className="control-btn end-call-state"
+            title="End Call"
+            onMouseEnter={() => setHoveredButton('leave')}
+            onMouseLeave={() => setHoveredButton(null)}
+          >
+            <div className="btn-inner">
+              <span className="material-icons-round">call_end</span>
+              <div className={`glow-effect ${hoveredButton === 'leave' ? 'active' : ''}`}></div>
+            </div>
           </button>
         </div>
-      )}
 
-      {/* Leave Room Button */}
-      <div className="toolbar-section">
-        <button
-          onClick={onLeaveRoom}
-          className="toolbar-btn btn-danger"
-          title="Leave Room"
-        >
-          <svg className="icon" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M14.08,15.59L16.67,13H7V11H16.67L14.08,8.41L15.49,7L20.49,12L15.49,17L14.08,15.59M19,3A2,2 0 0,1 21,5V9.67L19,7.67V5H5V19H19V16.33L21,14.33V19A2,2 0 0,1 19,21H5C3.89,21 3,20.1 3,19V5C3,3.89 3.89,3 5,3H19Z" />
-          </svg>
-        </button>
+        {/* Expanded Menu */}
+        <div className={`expanded-menu ${isMenuOpen ? 'visible' : ''}`}>
+          <div className="menu-header">
+            <span className="material-icons-round">apps</span>
+            <h3>Quick Actions</h3>
+          </div>
+          
+          <div className="menu-grid">
+            {menuItems.map((item, index) => (
+              <button
+                key={item.id}
+                onClick={item.onClick}
+                className={`menu-item ${item.gradient}`}
+                title={item.title}
+                style={{ '--delay': `${index * 80}ms` }}
+                onMouseEnter={() => setHoveredButton(item.id)}
+                onMouseLeave={() => setHoveredButton(null)}
+              >
+                <div className="menu-item-inner">
+                  <span className="material-icons-round">{item.icon}</span>
+                  {item.badge && (
+                    <div className="notification-badge">
+                      {item.badge}
+                    </div>
+                  )}
+                  <div className={`item-glow ${hoveredButton === item.id ? 'active' : ''}`}></div>
+                </div>
+                <span className="item-label">{item.title}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="menu-divider"></div>
+
+          {/* Background Selector */}
+          <div className="background-section">
+            <div className="section-header">
+              <span className="material-icons-round">wallpaper</span>
+              <span>Background</span>
+            </div>
+            <select
+              value={selectedBackground || 'none'}
+              onChange={(e) => onSelectBackground(e.target.value)}
+              className="background-selector"
+            >
+              <option value="none">None</option>
+              {(backgroundVideos || []).map((video) => (
+                <option key={video.url} value={video.url}>
+                  {video.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Room Lock (Creator only) */}
+          {isCreator && (
+            <>
+              <div className="menu-divider"></div>
+              <button
+                onClick={() => handleMenuItemClick(onToggleRoomLock)}
+                className={`lock-button ${isRoomLocked ? 'locked' : 'unlocked'}`}
+                title={isRoomLocked ? 'Unlock Room' : 'Lock Room'}
+                onMouseEnter={() => setHoveredButton('lock')}
+                onMouseLeave={() => setHoveredButton(null)}
+              >
+                <div className="lock-content">
+                  <span className="material-icons-round">
+                    {isRoomLocked ? 'lock' : 'lock_open'}
+                  </span>
+                  <span className="lock-text">
+                    {isRoomLocked ? 'Room Locked' : 'Lock Room'}
+                  </span>
+                </div>
+                <div className={`item-glow ${hoveredButton === 'lock' ? 'active' : ''}`}></div>
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       <style jsx>{`
-        .floating-toolbar {
+        @import url('https://fonts.googleapis.com/icon?family=Material+Icons+Round');
+
+        .floating-toolbar-container {
           position: fixed;
-          bottom: 20px;
+          bottom: 32px;
           left: 50%;
           transform: translateX(-50%);
-          background: #F1F0E8;
-          border: 2px solid #E5E1DA;
-          border-radius: 50px;
-          padding: 4px 12px;
+          z-index: 1000;
           display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 16px;
+        }
+
+        .floating-toolbar {
+          background: linear-gradient(135deg, 
+            rgba(137, 168, 178, 0.95) 0%,
+            rgba(179, 200, 207, 0.95) 100%);
+          backdrop-filter: blur(20px) saturate(180%);
+          border: 1px solid rgba(229, 225, 218, 0.3);
+          border-radius: 28px;
+          padding: 12px 20px;
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          box-shadow: 
+            0 20px 25px -5px rgba(137, 168, 178, 0.3),
+            0 10px 10px -5px rgba(137, 168, 178, 0.2),
+            inset 0 1px 0 rgba(241, 240, 232, 0.2);
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          min-height: 64px;
+        }
+
+        .floating-toolbar.expanded {
+          box-shadow: 
+            0 25px 50px -12px rgba(137, 168, 178, 0.4),
+            0 0 0 1px rgba(179, 200, 207, 0.5);
+        }
+
+        .primary-controls {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .control-btn {
+          position: relative;
+          width: 52px;
+          height: 52px;
+          border: none;
+          border-radius: 16px;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          overflow: hidden;
+        }
+
+        .btn-inner {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1;
+        }
+
+        .control-btn.default-state {
+          background: linear-gradient(135deg, #89a8b2, #b3c8cf);
+          color: #2c3e50;
+        }
+
+        .control-btn.default-state:hover {
+          background: linear-gradient(135deg, #b3c8cf, #e5e1da);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(137, 168, 178, 0.4);
+        }
+
+        .control-btn.danger-state {
+          background: linear-gradient(135deg, #e74c3c, #c0392b);
+          color: #f1f0e8;
+          animation: pulse-red 2s infinite;
+        }
+
+        .control-btn.danger-state:hover {
+          background: linear-gradient(135deg, #ec7063, #e74c3c);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(231, 76, 60, 0.5);
+        }
+
+        .control-btn.active-state {
+          background: linear-gradient(135deg, #27ae60, #229954);
+          color: #f1f0e8;
+        }
+
+        .control-btn.active-state:hover {
+          background: linear-gradient(135deg, #58d68d, #27ae60);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(39, 174, 96, 0.5);
+        }
+
+        .control-btn.menu-active {
+          background: linear-gradient(135deg, #89a8b2, #7d9ba6);
+          color: #2c3e50;
+        }
+
+        .control-btn.menu-active:hover {
+          background: linear-gradient(135deg, #b3c8cf, #89a8b2);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(137, 168, 178, 0.5);
+        }
+
+        .control-btn.end-call-state {
+          background: linear-gradient(135deg, #e74c3c, #c0392b);
+          color: #f1f0e8;
+        }
+
+        .control-btn.end-call-state:hover {
+          background: linear-gradient(135deg, #ec7063, #e74c3c);
+          transform: translateY(-2px) scale(1.05);
+          box-shadow: 0 12px 30px rgba(231, 76, 60, 0.6);
+        }
+
+        .menu-icon {
+          transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .menu-active .menu-icon {
+          transform: rotate(180deg);
+        }
+
+        .control-divider {
+          width: 1px;
+          height: 32px;
+          background: linear-gradient(to bottom, transparent, rgba(229, 225, 218, 0.4), transparent);
+        }
+
+        .material-icons-round {
+          font-size: 24px;
+          font-weight: 400;
+          transition: all 0.3s ease;
+        }
+
+        .glow-effect {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          border-radius: inherit;
+          background: radial-gradient(circle, rgba(241, 240, 232, 0.2) 0%, transparent 70%);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .glow-effect.active {
+          opacity: 1;
+        }
+
+        .expanded-menu {
+          background: linear-gradient(135deg, 
+            rgba(229, 225, 218, 0.98) 0%,
+            rgba(241, 240, 232, 0.98) 100%);
+          backdrop-filter: blur(20px) saturate(180%);
+          border: 1px solid rgba(179, 200, 207, 0.3);
+          border-radius: 24px;
+          padding: 24px;
+          opacity: 0;
+          visibility: hidden;
+          transform: translateY(-20px) scale(0.95);
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 
+            0 20px 25px -5px rgba(137, 168, 178, 0.3),
+            0 10px 10px -5px rgba(137, 168, 178, 0.2);
+          min-width: 360px;
+          max-width: 400px;
+          max-height: 480px;
+          overflow-y: auto;
+        }
+
+        .expanded-menu.visible {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0) scale(1);
+        }
+
+        .menu-header {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 20px;
+          padding-bottom: 16px;
+          border-bottom: 1px solid rgba(137, 168, 178, 0.2);
+        }
+
+        .menu-header h3 {
+          margin: 0;
+          font-size: 18px;
+          font-weight: 600;
+          color: #2c3e50;
+        }
+
+        .menu-header .material-icons-round {
+          color: #89a8b2;
+          font-size: 20px;
+        }
+
+        .menu-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+          margin-bottom: 20px;
+        }
+
+        .menu-item {
+          position: relative;
+          display: flex;
+          flex-direction: column;
           align-items: center;
           gap: 8px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-          backdrop-filter: blur(10px);
-          z-index: 1000;
-          height: 48px;
-          max-width: 90vw;
-          overflow-x: auto;
-        }
-        .toolbar-section {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          flex-shrink: 0;
-        }
-        .toolbar-section:not(:last-child) {
-          border-right: 1px solid #E5E1DA;
-          padding-right: 8px;
-        }
-        .toolbar-btn {
-          width: 40px;
-          height: 40px;
+          padding: 18px 12px;
           border: none;
-          border-radius: 50%;
+          border-radius: 16px;
           cursor: pointer;
+          background: linear-gradient(135deg, var(--tw-gradient-from), var(--tw-gradient-to));
+          color: #2c3e50;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          overflow: hidden;
+          opacity: 0;
+          transform: translateY(20px);
+          animation: menuItemIn 0.5s ease-out forwards;
+          animation-delay: var(--delay);
+          box-shadow: 0 4px 12px rgba(137, 168, 178, 0.2);
+        }
+
+        .menu-item:hover {
+          transform: translateY(-4px) scale(1.05);
+          box-shadow: 0 12px 30px rgba(137, 168, 178, 0.3);
+        }
+
+        .menu-item-inner {
+          position: relative;
           display: flex;
           align-items: center;
           justify-content: center;
-          transition: all 0.2s ease;
-          font-size: 14px;
-          font-weight: 500;
-          padding: 0;
-          position: relative;
         }
-        .toolbar-btn.btn-default {
-          background: #89A8B2;
-          color: white;
+
+        .item-label {
+          font-size: 12px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          color: #2c3e50;
         }
-        .toolbar-btn.btn-default:hover {
-          background: #B3C8CF;
-          transform: scale(1.05);
-        }
-        .toolbar-btn.btn-danger {
-          background: #dc3545;
-          color: white;
-        }
-        .toolbar-btn.btn-danger:hover {
-          background: #c82333;
-          transform: scale(1.05);
-        }
-        .toolbar-btn.btn-active {
-          background: #28a745;
-          color: white;
-        }
-        .toolbar-btn.btn-active:hover {
-          background: #218838;
-          transform: scale(1.05);
-        }
-        .chat-button {
-          position: relative;
-        }
+
         .notification-badge {
           position: absolute;
-          top: -4px;
-          right: -4px;
-          background: #dc3545;
-          color: white;
+          top: -8px;
+          right: -8px;
+          background: linear-gradient(135deg, #e74c3c, #c0392b);
+          color: #f1f0e8;
           border-radius: 50%;
-          width: 18px;
-          height: 18px;
+          min-width: 20px;
+          height: 20px;
           font-size: 10px;
-          font-weight: bold;
+          font-weight: 700;
           display: flex;
           align-items: center;
           justify-content: center;
-          border: 2px solid #F1F0E8;
+          border: 2px solid rgba(241, 240, 232, 0.8);
+          animation: bounce 2s infinite;
         }
-        .participants-button {
-          position: relative;
-        }
-        .participant-count {
+
+        .item-glow {
           position: absolute;
-          top: -4px;
-          right: -4px;
-          background: #89A8B2;
-          color: white;
-          border-radius: 50%;
-          width: 18px;
-          height: 18px;
-          font-size: 10px;
-          font-weight: bold;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          border-radius: inherit;
+          background: radial-gradient(circle, rgba(241, 240, 232, 0.3) 0%, transparent 70%);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+
+        .item-glow.active {
+          opacity: 1;
+        }
+
+        .menu-divider {
+          width: 100%;
+          height: 1px;
+          background: linear-gradient(to right, transparent, rgba(137, 168, 178, 0.3), transparent);
+          margin: 16px 0;
+        }
+
+        .background-section {
+          padding: 16px;
+          border-radius: 12px;
+          background: rgba(179, 200, 207, 0.3);
+          border: 1px solid rgba(137, 168, 178, 0.2);
+        }
+
+        .section-header {
           display: flex;
           align-items: center;
-          justify-content: center;
-          border: 2px solid #F1F0E8;
+          gap: 12px;
+          color: #2c3e50;
+          font-size: 14px;
+          font-weight: 600;
+          margin-bottom: 12px;
         }
-        .background-select {
-          background: #89A8B2;
-          border: 1px solid #B3C8CF;
-          border-radius: 20px;
-          padding: 8px 12px;
-          font-size: 13px;
-          color: white;
+
+        .background-selector {
+          width: 100%;
+          background: linear-gradient(135deg, #89a8b2, #b3c8cf);
+          border: 1px solid rgba(137, 168, 178, 0.3);
+          border-radius: 8px;
+          padding: 12px 16px;
+          color: #2c3e50;
+          font-size: 14px;
           cursor: pointer;
-          outline: none;
-          min-width: 120px;
+          transition: all 0.3s ease;
         }
-        .background-select:hover {
-          background: #B3C8CF;
+
+        .background-selector:hover {
+          background: linear-gradient(135deg, #b3c8cf, #e5e1da);
+          border-color: rgba(137, 168, 178, 0.5);
         }
-        .background-select:focus {
-          border-color: #E5E1DA;
+
+        .background-selector option {
+          background: #e5e1da;
+          color: #2c3e50;
+          padding: 12px;
         }
-        .icon {
-          width: 24px;
-          height: 24px;
+
+        .lock-button {
+          position: relative;
+          width: 100%;
           display: flex;
           align-items: center;
           justify-content: center;
+          padding: 16px;
+          border: none;
+          border-radius: 12px;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          overflow: hidden;
+          font-weight: 600;
         }
+
+        .lock-button.locked {
+          background: linear-gradient(135deg, #e74c3c, #c0392b);
+          color: #f1f0e8;
+        }
+
+        .lock-button.unlocked {
+          background: linear-gradient(135deg, #27ae60, #229954);
+          color: #f1f0e8;
+        }
+
+        .lock-button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(137, 168, 178, 0.4);
+        }
+
+        .lock-content {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .lock-text {
+          font-size: 14px;
+          font-weight: 600;
+        }
+
+        @keyframes menuItemIn {
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes pulse-red {
+          0%, 100% {
+            box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4);
+          }
+          50% {
+            box-shadow: 0 0 0 8px rgba(231, 76, 60, 0);
+          }
+        }
+
+        @keyframes bounce {
+          0%, 20%, 53%, 80%, 100% {
+            transform: scale(1);
+          }
+          40%, 43% {
+            transform: scale(1.1);
+          }
+          70% {
+            transform: scale(1.05);
+          }
+          90% {
+            transform: scale(1.02);
+          }
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
+          .floating-toolbar-container {
+            bottom: 20px;
+          }
+
           .floating-toolbar {
-            padding: 3px 8px;
-            gap: 6px;
-            height: 42px;
-            bottom: 10px;
+            padding: 10px 16px;
+            gap: 12px;
+            min-height: 56px;
           }
-          .toolbar-btn {
-            width: 36px;
-            height: 36px;
+
+          .control-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
           }
-          .toolbar-section {
-            gap: 4px;
+
+          .primary-controls {
+            gap: 10px;
           }
-          .toolbar-section:not(:last-child) {
-            padding-right: 6px;
+
+          .material-icons-round {
+            font-size: 22px;
           }
-          .background-select {
-            min-width: 100px;
-            font-size: 12px;
-            padding: 6px 10px;
+
+          .expanded-menu {
+            min-width: 320px;
+            max-width: 360px;
+            padding: 20px;
           }
-          .icon {
-            width: 22px;
-            height: 22px;
+
+          .menu-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
           }
-          .notification-badge,
-          .participant-count {
-            width: 16px;
-            height: 16px;
-            font-size: 9px;
+
+          .menu-item {
+            padding: 16px 10px;
           }
         }
+
+        @media (max-width: 480px) {
+          .floating-toolbar {
+            padding: 8px 12px;
+            gap: 8px;
+            min-height: 52px;
+          }
+
+          .control-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+          }
+
+          .material-icons-round {
+            font-size: 20px;
+          }
+
+          .expanded-menu {
+            min-width: 280px;
+            max-width: 320px;
+            padding: 16px;
+          }
+
+          .menu-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+          }
+
+          .menu-item {
+            padding: 14px 8px;
+          }
+
+          .item-label {
+            font-size: 11px;
+          }
+        }
+
+        /* Color palette gradient classes */
+        .from-sage-400 { --tw-gradient-from: #a5bac0; }
+        .to-sage-500 { --tw-gradient-to: #89a8b2; }
+        .from-sage-500 { --tw-gradient-from: #89a8b2; }
+        .to-sage-600 { --tw-gradient-to: #7d9ba6; }
+        .from-teal-500 { --tw-gradient-from: #b3c8cf; }
+        .to-teal-600 { --tw-gradient-to: #9fb8c1; }
+        .from-lavender-500 { --tw-gradient-from: #c8b3cf; }
+        .to-lavender-600 { --tw-gradient-to: #b89fc7; }
+        .from-cream-500 { --tw-gradient-from: #e5e1da; }
+        .to-cream-600 { --tw-gradient-to: #ddd9d0; }
       `}</style>
-    </div>
+    </>
   );
 }
 

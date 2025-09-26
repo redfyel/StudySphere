@@ -34,7 +34,7 @@ function Header() {
 
       {/* Center: Nav Pills */}
       <nav className="header-nav-container">
-        <NavLink to="/rooms" className={({ isActive }) => (isActive ? "header-nav-link active" : "header-nav-link")}>
+        <NavLink to="/room" className={({ isActive }) => (isActive ? "header-nav-link active" : "header-nav-link")}>
           Collab Rooms
         </NavLink>
         <NavLink to="/resources" className={({ isActive }) => (isActive ? "header-nav-link active" : "header-nav-link")}>

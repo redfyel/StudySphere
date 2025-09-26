@@ -14,7 +14,7 @@ const Footer = () => {
         <nav className="footer-nav">
           <NavLink to="/mood-tracker">Mood Tracker</NavLink>
           <NavLink to="/study-enhance">Study Enhance</NavLink>
-          <NavLink to="/rooms">Rooms</NavLink>
+          <NavLink to="/room">Rooms</NavLink>
           <NavLink to="/resources">Resource Hub</NavLink>
         </nav>
         <div className="footer-socials">

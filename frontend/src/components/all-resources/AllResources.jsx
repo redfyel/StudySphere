@@ -20,40 +20,40 @@ import axios from "axios";
 import { UserLoginContext } from "../../contexts/UserLoginContext";
 
 const CommentModal = ({ resource, comments, onClose, onSubmit, newComment, setNewComment }) => {
-    if (!resource) return null;
-    return (
-        <div className="modal-overlay">
-            <div className="modal-content">
-                <div className="modal-header">
-                    <h3>Comments for "{resource.title}"</h3>
-                    <button onClick={onClose}>&times;</button>
-                </div>
-                <div className="modal-body">
-                    <div className="comments-list">
-                        {comments && comments.length > 0 ? (
-                            comments.map((comment, index) => (
-                                <div key={index} className="comment">
-                                    <p><strong>{comment.username}</strong>: {comment.text}</p>
-                                    <span className="comment-date">{new Date(comment.createdAt).toLocaleString()}</span>
-                                </div>
-                            ))
-                        ) : (
-                            <p className="no-comments-message">No comments yet.</p>
-                        )}
-                    </div>
-                    <form onSubmit={onSubmit} className="comment-form">
-                        <textarea
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            placeholder="Add a comment..."
-                            required
-                        />
-                        <button type="submit">Submit Comment</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    );
+    if (!resource) return null;
+    return (
+        <div className="modal-overlay">
+            <div className="modal-content">
+                <div className="modal-header">
+                    <h3>Comments for "{resource.title}"</h3>
+                    <button onClick={onClose}>&times;</button>
+                </div>
+                <div className="modal-body">
+                    <div className="comments-list">
+                        {comments && comments.length > 0 ? (
+                            comments.map((comment, index) => (
+                                <div key={index} className="comment">
+                                    <p><strong>{comment.username}</strong>: {comment.text}</p>
+                                    <span className="comment-date">{new Date(comment.createdAt).toLocaleString()}</span>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="no-comments-message">No comments yet.</p>
+                        )}
+                    </div>
+                    <form onSubmit={onSubmit} className="comment-form">
+                        <textarea
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            placeholder="Add a comment..."
+                            required
+                        />
+                        <button type="submit">Submit Comment</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 
@@ -73,7 +73,7 @@ export default function AllResources() {
   const [newComment, setNewComment] = useState("");
 
 
-  const { token, isAuthenticated, isAuthLoading } = useContext(UserLoginContext);
+  const { token, isAuthenticated, isAuthLoading, user } = useContext(UserLoginContext);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
@@ -86,7 +86,7 @@ export default function AllResources() {
     },
     {
       name: "My Library",
-      path: "/resources/my-library",
+      path: "/resources/library",
       icon: <IoBookmarkOutline />,
     },
     {
@@ -94,38 +94,27 @@ export default function AllResources() {
       path: "/resources/groups",
       icon: <IoPeopleOutline />,
     },
-    {
-      name: "Trending",
-      path: "/resources/trending",
-      icon: <IoStatsChartOutline />,
-    },
   ];
 
 
   useEffect(() => {
-    if (!isAuthLoading) {
+    if (!isAuthLoading && isAuthenticated && user) {
       const fetchResources = async () => {
-        if (!isAuthenticated) {
-          setError("You must be logged in to view resources.");
-          setIsLoading(false);
-          return;
-        }
-
         try {
           const config = { headers: { "x-auth-token": token } };
-          const res = await axios.get("http://localhost:5000/api/resources", config);
-          setResources(res.data);
-          setIsLoading(false);
-          
-          const savedResources = res.data.filter(r => r.savedBy?.includes(r.uploadedBy.toString())).map(r => r._id);
-          setUserLibrary(new Set(savedResources));
-          
-          const likedResources = res.data.filter(r => r.likes?.includes(r.uploadedBy.toString())).map(r => r._id);
-          setUserLikes(new Set(likedResources));
+          const resourcesRes = await axios.get("http://localhost:5000/api/resources", config);
+          const userRes = await axios.get("http://localhost:5000/api/auth/me", config);
 
+          setResources(resourcesRes.data);
+          
+          // ✅ FIX: Use optional chaining and nullish coalescing to ensure savedResources and likedResources are arrays.
+          setUserLibrary(new Set(userRes.data.savedResources?.map(id => id.toString()) ?? []));
+          setUserLikes(new Set(userRes.data.likedResources?.map(id => id.toString()) ?? []));
+          
+          setIsLoading(false);
         } catch (err) {
-          console.error("Error fetching resources:", err);
-          setError("Failed to load resources. Please try again later.");
+          console.error("Error fetching resources or user data:", err);
+          setError("Failed to load data. Please try again later.");
           setIsLoading(false);
         }
       };
@@ -135,7 +124,7 @@ export default function AllResources() {
       setError("You must be logged in to view resources.");
       setIsLoading(false);
     }
-  }, [token, isAuthenticated, isAuthLoading]);
+  }, [token, isAuthenticated, isAuthLoading, user]);
 
 
   const handleCommentClick = async (e, resourceId) => {
@@ -150,7 +139,7 @@ export default function AllResources() {
         const res = await axios.get(`http://localhost:5000/api/resources/${resourceId}/comments`, config);
         const resourceToComment = resources.find(r => r._id === resourceId);
         setSelectedResource(resourceToComment);
-        setComments(res.data.comments || []); // ✅ FIXED: Ensure comments is an array
+        setComments(res.data.comments || []);
         setShowCommentModal(true);
     } catch (err) {
         console.error("Error fetching comments:", err);
@@ -168,7 +157,6 @@ export default function AllResources() {
             { resourceId: selectedResource._id, comment: newComment },
             config
         );
-        // ✅ FIXED: Use a functional update to safely append the new comment
         setComments(prevComments => [...(prevComments || []), res.data.newComment]); 
         setNewComment("");
     } catch (err) {
@@ -189,7 +177,7 @@ export default function AllResources() {
         const config = { headers: { 'x-auth-token': token } };
         
         await axios.post(
-            `http://localhost:5000/api/resources/action`,
+            `http://localhost:5000/api/auth/action`, // Action endpoint now updates the user's document
             { resourceId, actionType },
             config
         );

@@ -1,0 +1,238 @@
+/* Color Palette Variables */
+:root {
+  --primary-dark: #89A8B2;       /* Main blue-gray */
+  --primary-medium: #B3C8CF;     /* Medium blue-gray (Accent/Border) */
+  --primary-light: #E5E1DA;      /* Light beige (Input/Button Off) */
+  --primary-lightest: #F1F0E8;   /* Lightest cream (Page Background) */
+
+  --text-dark: #333333;
+  --text-medium: #64748B;
+
+  /* Status Colors */
+  --success: #10B981;            /* Used for ON state */
+  --danger: #EF4444;             /* Used for OFF state icon */
+
+  /* Shadows and Effects */
+  --shadow-md: 0 4px 12px rgba(137, 168, 178, 0.1);
+  --shadow-lg: 0 8px 20px rgba(137, 168, 178, 0.15);
+
+  /* Transitions */
+  --transition-normal: 0.2s ease-in-out;
+}
+
+/* --- Page Layout --- */
+.lobby-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--primary-lightest);
+  padding: 20px;
+}
+
+.lobby-card {
+  background: white;
+  border: 1px solid var(--primary-medium);
+  border-radius: 16px;
+  padding: 30px;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: var(--shadow-lg);
+  text-align: center;
+  transition: transform var(--transition-normal);
+}
+
+.lobby-card h2 {
+  color: var(--primary-dark);
+  font-size: 24px;
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.lobby-card p {
+  color: var(--text-medium);
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+/* --- Video Preview --- */
+.video-preview-box {
+  width: 100%;
+  height: 250px;
+  margin-bottom: 24px;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: var(--primary-light);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid var(--primary-medium);
+  position: relative;
+}
+
+.local-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* Mirror the video for typical webcam view */
+}
+
+.video-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text-medium);
+  font-weight: 600;
+}
+
+.video-placeholder .material-icons {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+/* --- Form Group --- */
+.form-group {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid var(--primary-medium);
+  border-radius: 8px;
+  font-size: 16px;
+  color: var(--text-dark);
+  background-color: var(--primary-lightest);
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-dark);
+  box-shadow: 0 0 0 3px rgba(137, 168, 178, 0.2);
+}
+
+/* --- Media Controls (Toggle Tools) --- */
+.media-controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.media-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  min-width: 120px;
+}
+
+/* OFF State (Default/Muted) */
+.media-toggle-btn.off {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  border: 1px solid var(--primary-medium);
+}
+
+.media-toggle-btn.off .material-icons {
+  color: var(--danger);
+  font-size: 20px;
+}
+
+.media-toggle-btn.off:hover {
+  background-color: var(--primary-medium);
+  color: white;
+}
+
+/* ON State (Active/Unmuted) */
+.media-toggle-btn.on {
+  background-color: var(--success);
+  color: white;
+  border: 1px solid var(--success);
+  box-shadow: var(--shadow-sm);
+}
+
+.media-toggle-btn.on .material-icons {
+  color: white;
+  font-size: 20px;
+}
+
+.media-toggle-btn.on:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* --- Join Button --- */
+.join-session-btn {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  
+  /* Primary Dark Color Gradient */
+  background: linear-gradient(135deg, var(--primary-dark) 0%, #6e8b94 100%);
+  color: white;
+  box-shadow: 0 4px 6px rgba(137, 168, 178, 0.4);
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.join-session-btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+  box-shadow: var(--shadow-lg);
+}
+
+.join-session-btn .material-icons {
+  font-size: 20px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 500px) {
+  .lobby-card {
+    padding: 20px;
+    margin: 10px;
+  }
+  
+  .lobby-card h2 {
+    font-size: 20px;
+  }
+
+  .video-preview-box {
+    height: 180px;
+  }
+
+  .media-controls {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .media-toggle-btn {
+    width: 100%;
+  }
+}

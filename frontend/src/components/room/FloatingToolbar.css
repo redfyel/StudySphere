@@ -1,0 +1,195 @@
+/* Color Variables */
+:root {
+  --color-primary: #89A8B2; /* Muted Blue-Gray (Main Accent) */
+  --color-secondary: #B3C8CF; /* Light Blue-Gray (Borders/Secondary BG) */
+  --color-tertiary: #E5E1DA; /* Off-White (Tool Panel BG) */
+  --color-main-bg: #F1F0E8; /* Near-White */
+  --color-text-dark: #333333;
+  --color-text-light: #FFFFFF;
+  
+  /* Status Colors */
+  --color-status-success: #5CB85C; 
+  --color-status-warning: #F0AD4E; 
+  --color-status-danger: #D9534F; 
+  
+  /* Glass Base Colors */
+  --glass-white: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-text: rgba(255, 255, 255, 0.95);
+  --glass-accent-dark: rgba(137, 168, 178, 0.5);
+}
+
+/* ---------------------------------------------------- */
+/* NEW: Floating Toolbar Design */
+/* ---------------------------------------------------- */
+
+.floating-toolbar {
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  
+  /* Glass Morphism styling */
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  border-radius: 999px; /* Pill shape */
+  
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  
+  /* Hide background selector - not in new design */
+  .background-select {
+    display: none;
+  }
+}
+
+.toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 36px;
+  background-color: rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.toolbar-btn {
+  /* Pill-shaped button styling */
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  padding: 8px 16px;
+  
+  color: var(--glass-text);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  
+  transition: all 0.2s ease;
+}
+
+/* Button States */
+.toolbar-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.toolbar-btn:active {
+  transform: translateY(0);
+}
+
+/* Active Button (e.g., when screen sharing is on) */
+.toolbar-btn.btn-active {
+  background: rgba(92, 184, 92, 0.2); /* 5CB85C */
+  border-color: rgba(92, 184, 92, 0.4);
+  color: rgba(92, 184, 92, 0.9);
+}
+.toolbar-btn.btn-active:hover {
+  background: rgba(92, 184, 92, 0.3);
+}
+
+/* Danger Button (e.g., Mute, Leave) */
+.toolbar-btn.btn-danger {
+  background: rgba(217, 83, 79, 0.2); /* D9534F */
+  border-color: rgba(217, 83, 79, 0.4);
+  color: rgba(217, 83, 79, 0.9);
+}
+.toolbar-btn.btn-danger:hover {
+  background: rgba(217, 83, 79, 0.3);
+}
+
+/* Text and Icon within buttons */
+.toolbar-btn .material-icons {
+  font-size: 1.2rem;
+}
+
+.toolbar-btn span:last-child {
+  white-space: nowrap;
+}
+
+/* Badges for chat and participants */
+.toolbar-btn.has-badge {
+  position: relative;
+  padding-right: 28px; /* Make space for the badge */
+}
+
+.badge-pill {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--color-status-danger);
+  color: white;
+  min-width: 20px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* ---------------------------------------------------- */
+/* Responsive Design for Floating Toolbar */
+/* ---------------------------------------------------- */
+@media (max-width: 992px) {
+  .floating-toolbar {
+    padding: 8px 12px;
+    gap: 6px;
+    max-width: calc(100vw - 40px);
+  }
+  .toolbar-btn {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    gap: 4px;
+  }
+  .toolbar-btn .material-icons {
+    font-size: 1rem;
+  }
+  .toolbar-separator {
+    height: 32px;
+  }
+  .badge-pill {
+    font-size: 0.6rem;
+    padding: 1px 4px;
+    min-width: 18px;
+    top: -4px;
+    right: -4px;
+  }
+}
+
+@media (max-width: 768px) {
+  .floating-toolbar {
+    bottom: 15px;
+    max-width: 95vw;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none; /* Firefox */
+  }
+  /* Hide the scrollbar in Chrome/Safari */
+  .floating-toolbar::-webkit-scrollbar {
+    display: none;
+  }
+  .toolbar-btn {
+    flex-shrink: 0;
+  }
+  .toolbar-section {
+    flex-shrink: 0;
+  }
+  .toolbar-separator {
+    display: none;
+  }
+}

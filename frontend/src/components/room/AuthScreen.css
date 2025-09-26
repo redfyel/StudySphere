@@ -1,0 +1,220 @@
+/* Color Variables based on the palette */
+:root {
+  --color-primary: #89A8B2; /* Muted Blue-Gray */
+  --color-secondary: #B3C8CF; /* Light Blue-Gray */
+  --color-card-bg: #E5E1DA; /* Off-White/Very Light Gray */
+  --color-main-bg: #F1F0E8; /* Near-White */
+  --color-text-dark: #333333;
+  --color-text-light: #FFFFFF;
+  --color-error: #D9534F; /* A standard soft red for errors */
+}
+
+/* ---------------------------------------------------- */
+/* Global/Container Styles */
+/* ---------------------------------------------------- */
+
+.auth-screen-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--color-main-bg); /* Near-White background for the whole page */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+}
+
+/* ---------------------------------------------------- */
+/* The Main Card */
+/* ---------------------------------------------------- */
+
+.auth-card {
+  background-color: var(--color-card-bg); /* Off-White card background */
+  border-radius: 15px; /* Softer, rounded edges */
+  box-shadow: 0 10px 30px rgba(137, 168, 178, 0.3); /* Subtle shadow using the primary color */
+  width: 100%;
+  max-width: 420px; /* Comfortable width for a form */
+  overflow: hidden; /* Ensures header background respects border-radius */
+  color: var(--color-text-dark);
+}
+
+/* ---------------------------------------------------- */
+/* Header Styles */
+/* ---------------------------------------------------- */
+
+.auth-header {
+  background-color: var(--color-primary); /* Muted Blue-Gray header background */
+  color: var(--color-text-light);
+  padding: 30px 40px;
+  text-align: center;
+}
+
+.auth-header h1 {
+  font-size: 2.2em;
+  margin-bottom: 5px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.auth-header h2 {
+  font-size: 1.5em;
+  font-weight: 300;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.auth-header p {
+  font-size: 0.9em;
+  margin-bottom: 0;
+  opacity: 0.85;
+}
+
+/* ---------------------------------------------------- */
+/* Form Styles */
+/* ---------------------------------------------------- */
+
+.auth-form {
+  padding: 30px 40px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 8px;
+  font-size: 0.95em;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid var(--color-secondary); /* Light Blue-Gray border */
+  border-radius: 8px;
+  background-color: #FFFFFF; /* Pure white input background for contrast */
+  font-size: 1em;
+  color: var(--color-text-dark);
+  transition: border-color 0.3s, box-shadow 0.3s;
+  box-sizing: border-box; /* Important for padding and border to be inside the width */
+}
+
+.form-group input:focus {
+  border-color: var(--color-primary); /* Primary accent on focus */
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(137, 168, 178, 0.2); /* Soft glow */
+}
+
+.form-group input::placeholder {
+  color: #AAAAAA;
+  font-style: italic;
+}
+
+/* ---------------------------------------------------- */
+/* Button and Message Styles */
+/* ---------------------------------------------------- */
+
+.auth-button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  background-color: var(--color-primary); /* Primary color for the main action */
+  color: var(--color-text-light);
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.auth-button:hover:not(:disabled) {
+  background-color: #71939E; /* Slightly darker shade of primary on hover */
+}
+
+.auth-button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.auth-button:disabled {
+  background-color: var(--color-secondary);
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.error-message {
+  color: var(--color-error);
+  background-color: #F8D7DA;
+  border: 1px solid var(--color-error);
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 0.9em;
+}
+
+/* ---------------------------------------------------- */
+/* Loading Spinner */
+/* ---------------------------------------------------- */
+
+/* Simple animation for the loading spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+  border: 3px solid var(--color-text-light);
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 1s linear infinite;
+}
+
+/* ---------------------------------------------------- */
+/* Footer Styles */
+/* ---------------------------------------------------- */
+
+.auth-footer {
+  padding: 15px 40px;
+  border-top: 1px solid var(--color-secondary); /* Separator line */
+  text-align: center;
+  font-size: 0.85em;
+  color: #666;
+}
+
+.auth-footer strong {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.auth-footer p {
+  line-height: 1.4;
+  margin: 0;
+}
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 10px; /* Space between logo and 'Welcome!' header */
+}
+
+.logo-icon {
+  width: 40px; /* Adjust size as needed */
+  height: 40px;
+  margin-right: 10px; /* Space between icon and text */
+  /* Optional: Add a subtle filter if the icon needs to stand out against the blue */
+  /* filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2)); */
+}
+
+.auth-header h1 {
+  font-size: 2.2em;
+  margin: 0; /* Remove default h1 margin for better alignment */
+  font-weight: 600;
+  letter-spacing: 1px;
+}

@@ -13,7 +13,6 @@ const navItems = [
   { name: "Upload Resource", path: "/resources/upload", icon: <IoCloudUploadOutline /> },
   { name: "My Library", path: "/resources/library", icon: <IoBookmarkOutline /> },
   { name: "Group Resources", path: "/resources/groups", icon: <IoPeopleOutline /> },
-  { name: "Trending", path: "/resources/trending", icon: <IoStatsChartOutline /> },
 ];
 
 
