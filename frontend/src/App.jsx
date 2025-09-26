@@ -37,7 +37,6 @@ import PdfReader from "./components/pdf-reader/PdfReader";
 import UploadPage from "./components/upload-page/UploadPage";
 import MyLibrary from "./components/myLibrary/MyLibrary";
 import GroupResources from "./components/group-resources/GroupResources";
-import TrendingPage from "./components/trending-page/TrendingPage";
 
 // --- TASKS COMPONENTS (Prioritizing first file's detail) ---
 import Tasks from "./components/tasks/Tasks";
