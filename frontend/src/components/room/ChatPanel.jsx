@@ -1,18 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, X, Smile, MoreVertical } from 'lucide-react';
+import { Send, X, Smile, MoreVertical, Trash2 } from 'lucide-react';
 
 const ChatPanel = ({ 
   messages = [], 
   onSendMessage, 
+  onDeleteMessage, // NEW prop
   currentUserId, 
+  creatorId, // NEW prop
   onClose,
   typingUsers = [],
   embedded = true,
 }) => {
   const [inputMessage, setInputMessage] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [menuMessageId, setMenuMessageId] = useState(null); // State for context menu
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const menuRef = useRef(null);
 
   const commonEmojis = ['😊', '😂', '👍', '❤️', '😢', '😮', '😡', '🎉', '👏', '🔥', '💯', '🤔', '😴', '🙄', '💪', '🎯', '✨', '👀', '🥳', '😎', '🤩', '👋', '✌️', '🙌', '🙏', '🤯', '😬', '🫠', '🤖', '👾', '🚀', '⭐'];
 
@@ -24,6 +28,17 @@ const ChatPanel = ({
   // Focus input on mount
   useEffect(() => {
     inputRef.current?.focus();
+  }, []);
+
+  // Close context menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuMessageId(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleSendMessage = (e) => {
@@ -55,46 +70,88 @@ const ChatPanel = ({
     return message.userId === currentUserId;
   };
 
+  const canDelete = (message) => {
+    return !!message.id && (message.userId === currentUserId || currentUserId === creatorId);
+  };
+
+  const handleDeleteClick = (messageId) => {
+    onDeleteMessage(messageId);
+    setMenuMessageId(null);
+  };
+
   return (
     <div className={`chat-panel-container ${embedded ? 'embedded' : ''}`}>
       <style>
         {`
         /* --- Color Palette --- */
-        /* #89a8b2 (Dark Blue-Gray) - Primary */
-        /* #b3c8cf (Light Blue-Gray) - Accent */
-        /* #e5e1da (Light Beige) - Background */
-        /* #f1f0e8 (Off-White) - Message/Input background */
+        :root {
+            --primary-dark: #89a8b2; /* Header/Accent */
+            --primary-medium: #b3c8cf; /* Own Message/Hover */
+            --primary-light: #e5e1da; /* Panel Background */
+            --primary-lightest: #f1f0e8; /* Other Message/Input BG */
+            --text-dark: #1a1a1a;
+            --danger: #EF4444;
+            --mobile-breakpoint: 768px;
+        }
 
+        /* DEFAULT (Desktop Sidebar) STYLES */
         .chat-panel-container {
           position: fixed;
           right: 0;
-          top: 20px;
+          top: 0; 
           bottom: 0;
           width: 350px;
           display: flex;
           flex-direction: column;
-          background-color: #e5e1da;
-          color: #1a1a1a;
+          background-color: var(--primary-light);
+          color: var(--text-dark);
           border-left: 1px solid #dcdcdc;
           font-family: 'Inter', sans-serif;
-          transition: transform 0.3s ease-in-out;
+          transition: all 0.3s ease-in-out;
           z-index: 1000;
           box-shadow: -4px 0 12px rgba(0,0,0,0.1);
           border-top-left-radius: 12px;
           border-bottom-left-radius: 12px;
-          border-bottom-right-radius: 12px;
         }
 
+        /* --------------------------------------
+        // MOBILE RESPONSIVENESS (Full Screen)
+        // -------------------------------------- */
+        @media (max-width: var(--mobile-breakpoint)) {
+            .chat-panel-container {
+                /* Full Screen Coverage */
+                top: 0;
+                right: 0; 
+                bottom: 0;
+                left: 0; /* Extends to the full left edge */
+                transform: none; /* Remove vertical centering transform */
+                
+                /* Full Dimensions */
+                width: 100%; 
+                max-width: 100vw;
+                height: 100%;
+                max-height: 100vh;
+                
+                /* Appearance */
+                border-radius: 0; /* Seamless transition */
+                border: none;
+                box-shadow: none;
+            }
+            
+            .chat-header {
+                border-radius: 0;
+            }
+        }
+        
         .chat-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
           padding: 1rem;
-          background-color: #89a8b2;
-          color: #f1f0e8;
+          background-color: var(--primary-dark);
+          color: var(--primary-lightest);
           border-bottom: 1px solid #7a94a2;
           border-top-left-radius: 12px;
-          border-bottom-left-radius: 0px;
         }
 
         .chat-header h3 {
@@ -105,7 +162,7 @@ const ChatPanel = ({
         .close-button {
           background: none;
           border: none;
-          color: #f1f0e8;
+          color: var(--primary-lightest);
           cursor: pointer;
           padding: 0.5rem;
           display: flex;
@@ -128,6 +185,20 @@ const ChatPanel = ({
           gap: 0.75rem;
         }
 
+        .message-wrapper {
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+        }
+
+        .message-wrapper.own-message {
+            flex-direction: row-reverse;
+            /* Added to make the whole wrapper align to the right */
+            align-self: flex-end; 
+            max-width: 100%;
+        }
+
         .message {
           max-width: 85%;
           padding: 0.75rem 1rem;
@@ -136,20 +207,26 @@ const ChatPanel = ({
           word-wrap: break-word;
           box-shadow: 0 1px 2px rgba(0,0,0,0.08);
           position: relative;
-          color: #1a1a1a;
+          color: var(--text-dark);
+        }
+        
+        /* New: Pending message style */
+        .message.is-pending {
+            opacity: 0.7;
+            font-style: italic;
         }
 
         .message.own-message {
           align-self: flex-end;
-          background-color: #b3c8cf;
-          color: #1a1a1a;
+          background-color: var(--primary-medium);
+          color: var(--text-dark);
           border-bottom-right-radius: 4px;
         }
 
         .message.other-message {
           align-self: flex-start;
-          background-color: #f1f0e8;
-          color: #1a1a1a;
+          background-color: var(--primary-lightest);
+          color: var(--text-dark);
           border-bottom-left-radius: 4px;
         }
 
@@ -166,6 +243,65 @@ const ChatPanel = ({
         .message-header .timestamp {
           float: right;
         }
+        
+        /* Message Options Button */
+        .message-options-btn {
+            background: none;
+            border: none;
+            color: #5a5a5a;
+            cursor: pointer;
+            padding: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .message-wrapper:hover .message-options-btn, .message-options-btn.active {
+            opacity: 1;
+        }
+
+        /* Message Context Menu */
+        .message-context-menu {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1010;
+            background: var(--primary-lightest);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 150px;
+            white-space: nowrap;
+        }
+        
+        .message-wrapper.other-message .message-context-menu {
+            left: calc(100% + 5px);
+        }
+
+        .message-wrapper.own-message .message-context-menu {
+            right: calc(100% + 5px);
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            transition: background-color 0.2s;
+        }
+
+        .menu-item:hover {
+            background-color: var(--primary-light);
+        }
+
+        .menu-item.delete-option {
+            color: var(--danger); /* Red color for delete action */
+        }
+        
+        .menu-item svg {
+            margin-right: 8px;
+        }
+
 
         .no-messages {
           text-align: center;
@@ -183,14 +319,14 @@ const ChatPanel = ({
 
         .chat-input-form {
           padding: 1rem;
-          background-color: #e5e1da;
+          background-color: var(--primary-light);
           border-top: 1px solid #dcdcdc;
         }
 
         .input-container {
           display: flex;
           align-items: center;
-          background-color: #f1f0e8;
+          background-color: var(--primary-lightest);
           border-radius: 20px;
           padding: 0.25rem;
           border: 1px solid #dcdcdc;
@@ -203,7 +339,7 @@ const ChatPanel = ({
           background: transparent;
           outline: none;
           font-size: 1rem;
-          color: #1a1a1a;
+          color: var(--text-dark);
         }
         
         .message-input::placeholder {
@@ -214,13 +350,13 @@ const ChatPanel = ({
           background-color: transparent;
           border: none;
           cursor: pointer;
-          color: #89a8b2;
+          color: var(--primary-dark);
           padding: 0.5rem;
           transition: color 0.2s, transform 0.2s;
         }
 
         .send-button:disabled {
-          color: #b3c8cf;
+          color: var(--primary-medium);
           cursor: not-allowed;
         }
         
@@ -237,7 +373,7 @@ const ChatPanel = ({
         }
 
         .emoji-option {
-          background: #f1f0e8;
+          background: var(--primary-lightest);
           border: none;
           font-size: 1.25rem;
           cursor: pointer;
@@ -247,43 +383,78 @@ const ChatPanel = ({
         }
 
         .emoji-option:hover {
-          background-color: #b3c8cf;
+          background-color: var(--primary-medium);
         }
         `}
       </style>
 
-      {/* The onClose button will only be visible if you pass the prop 'embedded=false' or use this component outside the tab structure */}
+      {/* The onClose button is crucial for mobile full-screen view */}
       <div className="chat-header"> 
-        <h3>Chat</h3>
+        <h3>Room Chat</h3>
         
-          <button className="close-button" onClick={onClose} aria-label="Close chat">
-            <X size={18} />
-          </button>
-        
+        {/* Only show close button if it's a floating panel (i.e., onClose is provided) */}
+        {onClose && (
+            <button className="close-button" onClick={onClose} aria-label="Close chat">
+                <X size={18} />
+            </button>
+        )}
       </div>
 
       <div className="chat-messages">
         {messages.length === 0 ? (
           <div className="no-messages">
-            <p>No messages yet. Start the conversation!</p>
+            <p>No messages yet. Start the conversation! 👋</p>
           </div>
         ) : (
           messages.map((message) => (
             <div
               key={message.id}
-              className={`message ${isOwnMessage(message) ? 'own-message' : 'other-message'}`}
+              className={`message-wrapper ${isOwnMessage(message) ? 'own-message' : 'other-message'}`}
             >
-              <div className="message-header">
-                <span className="username">
-                  {isOwnMessage(message) ? 'You' : message.username}
-                </span>
-                <span className="timestamp">
-                  {formatTimestamp(message.timestamp)}
-                </span>
+              <div
+                className={`message ${isOwnMessage(message) ? 'own-message' : 'other-message'} ${message.isPending ? 'is-pending' : ''}`}
+              >
+                <div className="message-header">
+                  <span className="username">
+                    {isOwnMessage(message) ? 'You' : message.username}
+                  </span>
+                  <span className="timestamp">
+                    {formatTimestamp(message.timestamp)}
+                  </span>
+                </div>
+                <div className="message-content">
+                  {message.message}
+                </div>
+                {message.isPending && <small className='is-pending-label' style={{fontSize: '0.65rem', color: '#5a5a5a'}}> (Sending...)</small>}
               </div>
-              <div className="message-content">
-                {message.message}
-              </div>
+
+              {/* Message Options Button */}
+              {canDelete(message) && (
+                  <button
+                      className={`message-options-btn ${menuMessageId === message.id ? 'active' : ''}`}
+                      onClick={(e) => {
+                          e.stopPropagation();
+                          setMenuMessageId(menuMessageId === message.id ? null : message.id);
+                      }}
+                      aria-label="Message options"
+                  >
+                      <MoreVertical size={16} />
+                  </button>
+              )}
+
+              {/* Context Menu */}
+              {menuMessageId === message.id && (
+                  <div className={`message-context-menu`} ref={menuRef}>
+                      <div
+                          className="menu-item delete-option"
+                          onClick={() => handleDeleteClick(message.id)}
+                      >
+                          <Trash2 size={16} />
+                          <span>Delete Message</span>
+                      </div>
+                  </div>
+              )}
+
             </div>
           ))
         )}

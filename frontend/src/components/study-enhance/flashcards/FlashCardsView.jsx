@@ -110,7 +110,7 @@ const FlashcardsView = () => {
 
     try {
       await axios.post(
-        `https://studysphere-n4up.onrender.com//api/flashcards/decks/${deckId}/sessions`,
+        `https://studysphere-n4up.onrender.com/api/flashcards/decks/${deckId}/sessions`,
         body,
         config
       );

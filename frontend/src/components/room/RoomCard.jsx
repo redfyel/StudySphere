@@ -34,7 +34,8 @@ function RoomCard({ room, userId, onDelete }) {
     try {
       console.log('Joining room:', room.roomId, 'Room data:', room);
       
-      const response = await fetch(`https://studysphere-n4up.onrender.com//api/rooms/${room.roomId}`);
+      // Verification logic remains the same...
+      const response = await fetch(`https://studysphere-n4up.onrender.com/api/rooms/${room.roomId}`);
       
       if (!response.ok) {
         if (response.status === 404) {
@@ -167,17 +168,6 @@ function RoomCard({ room, userId, onDelete }) {
             )}
           </div>
         </div>
-        
-        {isOwner && (
-          <button
-            className="delete-button"
-            onClick={handleDeleteRoom}
-            title="Delete room"
-            aria-label="Delete room"
-          >
-            <span className="material-icons">delete</span>
-          </button>
-        )}
       </div>
 
       {/* Room Topic */}
@@ -218,7 +208,7 @@ function RoomCard({ room, userId, onDelete }) {
         </div>
       </div>
 
-      {/* Room Settings Info */}
+      {/* Room Settings Info - DELETE BUTTON IS MOVED HERE */}
       <div className="room-settings">
         {roomType === 'private' && room.requiresApproval && (
           <div className="setting-item">
@@ -231,6 +221,18 @@ function RoomCard({ room, userId, onDelete }) {
             <span className="material-icons setting-icon">meeting_room</span>
             <span className="setting-text">Open Access</span>
           </div>
+        )}
+        
+        {/* New Delete Button Position */}
+        {isOwner && (
+          <button
+            className="delete-button-setting" /* New class for styling */
+            onClick={handleDeleteRoom}
+            title="Delete room"
+            aria-label="Delete room"
+          >
+            <span className="material-icons delete-icon-setting">delete</span> {/* New class for icon size */}
+          </button>
         )}
       </div>
 
@@ -269,7 +271,7 @@ function RoomCard({ room, userId, onDelete }) {
               <>
                 <span className="material-icons button-icon">
                   {participantCount >= maxParticipants ? 'block' : 
-                   participantCount === 0 ? 'play_arrow' : 'meeting_room'}
+                    participantCount === 0 ? 'play_arrow' : 'meeting_room'}
                 </span>
                 {getRoomStatusText()}
               </>
@@ -278,13 +280,8 @@ function RoomCard({ room, userId, onDelete }) {
         </button>
       </div>
 
-      {/* Development Debug Info */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="debug-info">
-          ID: {room.roomId || 'undefined'} | Type: {roomType}
-        </div>
-      )}
-
+      {/* REMOVED: Old Delete Button (Bottom Right) code block */}
+      
       {/* Full Room Overlay */}
       {participantCount >= maxParticipants && (
         <div className="full-room-overlay">

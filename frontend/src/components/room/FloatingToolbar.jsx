@@ -27,6 +27,7 @@ function FloatingToolbar({
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Close the menu if the click is outside the toolbar container
       if (!event.target.closest('.floating-toolbar-container')) {
         setIsMenuOpen(false);
       }
@@ -42,7 +43,8 @@ function FloatingToolbar({
 
   const handleMenuItemClick = (callback) => {
     callback();
-    setIsMenuOpen(false);
+    // Keep menu open for multi-toggle tools (like Notes, Chat) if they are modals/sidebars
+    // setIsMenuOpen(false); 
   };
 
   const menuItems = [
@@ -172,7 +174,7 @@ function FloatingToolbar({
           </button>
         </div>
 
-        {/* Expanded Menu */}
+        {/* Expanded Menu - Positioned relatively to the container */}
         <div className={`expanded-menu ${isMenuOpen ? 'visible' : ''}`}>
           <div className="menu-header">
             <span className="material-icons-round">apps</span>
@@ -254,13 +256,19 @@ function FloatingToolbar({
 
       <style jsx>{`
         @import url('https://fonts.googleapis.com/icon?family=Material+Icons+Round');
+        
+        /* Define Mobile Breakpoint */
+        :root {
+            --mobile-breakpoint: 768px;
+        }
 
         .floating-toolbar-container {
           position: fixed;
           bottom: 32px;
           left: 50%;
           transform: translateX(-50%);
-          z-index: 1000;
+          /* Lower Z-index to allow other full-screen modals (like Notes) to cover it */
+          z-index: 10; 
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -286,6 +294,115 @@ function FloatingToolbar({
           min-height: 64px;
         }
 
+        /* Expanded Menu Positioning */
+        .expanded-menu {
+          /* Position menu relative to its container (toolbar-container) */
+          position: absolute; 
+          bottom: 100%; /* Position it above the main toolbar */
+          margin-bottom: 16px; /* Spacing above toolbar */
+          
+          background: linear-gradient(135deg, 
+            rgba(229, 225, 218, 0.98) 0%,
+            rgba(241, 240, 232, 0.98) 100%);
+          backdrop-filter: blur(20px) saturate(180%);
+          border: 1px solid rgba(179, 200, 207, 0.3);
+          border-radius: 24px;
+          padding: 24px;
+          opacity: 0;
+          visibility: hidden;
+          transform: translateY(-20px) scale(0.95);
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 
+            0 20px 25px -5px rgba(137, 168, 178, 0.3),
+            0 10px 10px -5px rgba(137, 168, 178, 0.2);
+          min-width: 360px;
+          max-width: 400px;
+          max-height: 480px;
+          overflow-y: auto;
+          /* Ensure it's centered relative to the toolbar */
+          left: 50%;
+          transform: translateX(-50%) translateY(-20px) scale(0.95);
+        }
+
+        .expanded-menu.visible {
+          opacity: 1;
+          visibility: visible;
+          /* Recenter and move up from the bottom */
+          transform: translateX(-50%) translateY(0) scale(1);
+          margin-bottom: 75px;
+        }
+
+        /* --------------------------
+        // Mobile Adjustments
+        // -------------------------- */
+        @media (max-width: 768px) {
+            .floating-toolbar-container {
+                bottom: 20px;
+                /* INCREASE Z-INDEX SLIGHTLY HERE to ensure it's above the video and background */
+                z-index: 50; 
+            }
+
+            .floating-toolbar {
+                padding: 10px 16px;
+                gap: 12px;
+                min-height: 56px;
+            }
+
+            .control-divider {
+                height: 28px;
+            }
+
+            .control-btn {
+                width: 48px;
+                height: 48px;
+                border-radius: 14px;
+            }
+
+            .expanded-menu {
+                /* New Mobile Menu Positioning */
+                left: 50%;
+                right: auto;
+                bottom: 100%;
+                margin-bottom: 12px;
+                transform: translateX(-50%) translateY(-10px) scale(0.95);
+
+                /* Smaller mobile menu size */
+                min-width: 90vw;
+                max-width: 90vw; 
+                max-height: 400px;
+                padding: 16px;
+                border-radius: 16px;
+            }
+            
+            .expanded-menu.visible {
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+
+            .menu-grid {
+                grid-template-columns: repeat(3, 1fr); /* 3 items wide on mobile for better density */
+                gap: 10px;
+            }
+            
+            .menu-item {
+                padding: 12px 6px;
+                gap: 6px;
+            }
+            
+            .item-label {
+                font-size: 10px;
+            }
+            
+            .material-icons-round {
+                font-size: 20px;
+            }
+        }
+        
+        /* --------------------------
+        // END Mobile Adjustments
+        // -------------------------- */
+        
+        /* ... (rest of the detailed styles, mostly unchanged) ... */
+        
         .floating-toolbar.expanded {
           box-shadow: 
             0 25px 50px -12px rgba(137, 168, 178, 0.4),
@@ -409,33 +526,6 @@ function FloatingToolbar({
 
         .glow-effect.active {
           opacity: 1;
-        }
-
-        .expanded-menu {
-          background: linear-gradient(135deg, 
-            rgba(229, 225, 218, 0.98) 0%,
-            rgba(241, 240, 232, 0.98) 100%);
-          backdrop-filter: blur(20px) saturate(180%);
-          border: 1px solid rgba(179, 200, 207, 0.3);
-          border-radius: 24px;
-          padding: 24px;
-          opacity: 0;
-          visibility: hidden;
-          transform: translateY(-20px) scale(0.95);
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: 
-            0 20px 25px -5px rgba(137, 168, 178, 0.3),
-            0 10px 10px -5px rgba(137, 168, 178, 0.2);
-          min-width: 360px;
-          max-width: 400px;
-          max-height: 480px;
-          overflow-y: auto;
-        }
-
-        .expanded-menu.visible {
-          opacity: 1;
-          visibility: visible;
-          transform: translateY(0) scale(1);
         }
 
         .menu-header {
@@ -657,85 +747,6 @@ function FloatingToolbar({
           }
           90% {
             transform: scale(1.02);
-          }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-          .floating-toolbar-container {
-            bottom: 20px;
-          }
-
-          .floating-toolbar {
-            padding: 10px 16px;
-            gap: 12px;
-            min-height: 56px;
-          }
-
-          .control-btn {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
-          }
-
-          .primary-controls {
-            gap: 10px;
-          }
-
-          .material-icons-round {
-            font-size: 22px;
-          }
-
-          .expanded-menu {
-            min-width: 320px;
-            max-width: 360px;
-            padding: 20px;
-          }
-
-          .menu-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-          }
-
-          .menu-item {
-            padding: 16px 10px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .floating-toolbar {
-            padding: 8px 12px;
-            gap: 8px;
-            min-height: 52px;
-          }
-
-          .control-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-          }
-
-          .material-icons-round {
-            font-size: 20px;
-          }
-
-          .expanded-menu {
-            min-width: 280px;
-            max-width: 320px;
-            padding: 16px;
-          }
-
-          .menu-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-          }
-
-          .menu-item {
-            padding: 14px 8px;
-          }
-
-          .item-label {
-            font-size: 11px;
           }
         }
 
