@@ -69,7 +69,7 @@ export const UserLoginStore = ({ children }) => {
 
     try {
       // Use your backend's endpoint to fetch user details (validating the token)
-      const res = await axios.get('http://localhost:5000/api/auth');
+      const res = await axios.get('https://studysphere-n4up.onrender.com/api/auth');
 
       const { userId, username, email } = res.data;
 
