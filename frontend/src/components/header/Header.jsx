@@ -1,14 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink, Link } from "react-router-dom";
 import "./Header.css";
 import logo from "/logo.png";
 
 // Correctly import the useAuth hook from your context file
-import { useAuth } from './../../contexts/UserLoginContext';
+import { useAuth } from "./../../contexts/UserLoginContext";
 
 function Header() {
-  
   const { isAuthenticated, isLoading, user } = useAuth();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   return (
     <header className="header">
@@ -21,20 +25,40 @@ function Header() {
       </Link>
 
       {/* Center: Nav Pills */}
-      <nav className="nav-container">
-        <NavLink to="/room" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+      <nav className={`nav-container ${isMenuOpen ? "active" : ""}`}>
+        <NavLink
+          to="/room"
+          className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
+          onClick={() => setIsMenuOpen(false)}
+        >
           Collab Rooms
         </NavLink>
-        <NavLink to="/resources" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+        <NavLink
+          to="/resources"
+          className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
+          onClick={() => setIsMenuOpen(false)}
+        >
           Resource Hub
         </NavLink>
-        <NavLink to="/mood-tracker" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+        <NavLink
+          to="/mood-tracker"
+          className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
+          onClick={() => setIsMenuOpen(false)}
+        >
           Wellness
         </NavLink>
-        <NavLink to="/study-enhance" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+        <NavLink
+          to="/study-enhance"
+          className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
+          onClick={() => setIsMenuOpen(false)}
+        >
           Smart Learn
         </NavLink>
-        <NavLink to="/leaderboard" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+        <NavLink
+          to="/leaderboard"
+          className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}
+          onClick={() => setIsMenuOpen(false)}
+        >
           Leaderboard
         </NavLink>
       </nav>
@@ -51,20 +75,25 @@ function Header() {
                 className="profile-link"
                 title={`View Profile for ${user?.username}`} // Use user data for better UX
               >
-                <span className="material-icons profile-icon">
-                  account_circle
-                </span>
+                <span className="material-icons profile-icon">account_circle</span>
               </NavLink>
             ) : (
-              <NavLink
-                to="/login"
-                className="rbtn join"
-              >
+              <NavLink to="/login" className="rbtn join">
                 Join Now
               </NavLink>
             )}
           </>
         )}
+      </div>
+
+      {/* Hamburger Menu Icon */}
+      <div
+        className={`hamburger-menu ${isMenuOpen ? "active" : ""}`}
+        onClick={toggleMenu}
+      >
+        <div className="bar"></div>
+        <div className="bar"></div>
+        <div className="bar"></div>
       </div>
     </header>
   );
