@@ -1,0 +1,100 @@
+.leaderboard-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 2rem auto;
+  background-color: #F1F0E8;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(137, 168, 178, 0.2);
+  padding: 1.5rem;
+  border: 1px solid #E5E1DA;
+}
+
+.leaderboard-title {
+  text-align: center;
+  color: #89A8B2;
+  font-size: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.leaderboard-tabs {
+  display: flex;
+  background-color: #E5E1DA;
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 0.75rem 0.5rem;
+  border: none;
+  background-color: transparent;
+  color: #8FA5AF;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab-btn.active {
+  background-color: #F1F0E8;
+  color: #89A8B2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.leaderboard-list ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.5rem;
+  background-color: #E5E1DA;
+  border-radius: 10px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.leaderboard-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(137, 168, 178, 0.2);
+}
+
+.leaderboard-rank {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #89A8B2;
+  width: 2rem;
+}
+
+.leaderboard-name {
+  flex-grow: 1;
+  font-weight: 600;
+  color: #6B8A94;
+  margin-left: 0.5rem;
+}
+
+.leaderboard-score {
+  font-weight: 700;
+  color: #89A8B2;
+}
+
+/* --- Badge Colors for Top 3 --- */
+.leaderboard-item.rank-1 .leaderboard-rank { color: #D4AF37; /* Gold */ }
+.leaderboard-item.rank-2 .leaderboard-rank { color: #C0C0C0; /* Silver */ }
+.leaderboard-item.rank-3 .leaderboard-rank { color: #CD7F32; /* Bronze */ }
+
+.leaderboard-item.rank-1 { border-left: 4px solid #D4AF37; }
+.leaderboard-item.rank-2 { border-left: 4px solid #C0C0C0; }
+.leaderboard-item.rank-3 { border-left: 4px solid #CD7F32; }
+
+.no-data-message {
+  text-align: center;
+  color: #8FA5AF;
+  padding: 2rem 0;
+}

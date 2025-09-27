@@ -51,6 +51,7 @@ const wellnessRoutes = require("./routes/wellnessRoutes");
 const mindmapRoutes = require("./routes/mindmapRoutes");
 const resourceRoutes= require("./routes/resourceRoutes");
 const studyRoutes = require("./routes/studyRoutes");
+const leaderboardRoutes = require('./routes/leaderboardRoutes')
 
 
 // --- 4. CREATE THE ASYNCHRONOUS STARTUP FUNCTION ---
@@ -101,6 +102,8 @@ const startServer = async () => {
     app.use('/api/mindmaps', mindmapRoutes)
     app.use('/api/resources', resourceRoutes)
     app.use('/api/study', studyRoutes)
+    app.use('/api/leaderboard', leaderboardRoutes)
+
 
 
 

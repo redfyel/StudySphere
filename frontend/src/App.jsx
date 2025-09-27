@@ -50,6 +50,8 @@ import Login from "./components/login/Login";
 import Register from "./components/register/Register";
 import Dashboard from "./components/dashboard/Dashboard";
 
+import Leaderboard from "./components/leaderboard/Leaderboard";
+
 function App() {
   const router = createBrowserRouter([
     {
@@ -131,9 +133,11 @@ function App() {
 
                 // 🗓️ Tasks 
                 { path: "tasksu", element: <Tasks /> }, // Duplicated route kept
-                { path: "tasks", element: <CalendarView /> },
+                { path: "tasks", element: <CalendarView /> }
             ],
         },
+
+         { path: "leaderboard", element: <Leaderboard />}
       ],
     },
   ]);
