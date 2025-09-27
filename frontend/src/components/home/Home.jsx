@@ -1,71 +1,121 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import bg from '../../assets/studysphere-bg.png';
+// --- CHANGE #1: Import the useNavigate hook ---
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight, Users, Library, HeartPulse, Sparkles } from 'lucide-react';
+import './Home.css';
 
-const styles = {
-  heroImg : {
-    width: '100%',
-    objectFit: 'cover',
-    maxHeight: '100vh',
-  }
-}
+const Home = () => {
+  // --- CHANGE #2: Initialize the navigate function ---
+  const navigate = useNavigate();
 
-function Home() {
+  // --- CHANGE #3: Create a handler function to go to the register page ---
+  const handleNavigateToRegister = () => {
+    navigate('/register'); // Make sure '/register' is the correct path in your router setup
+  };
+
   return (
-    <section className="relative w-full h-screen overflow-hidden">
-      {/* Background */}
-      <img
-        src={bg}
-        alt="Background"
-        style={styles.heroImg}
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/80 z-10" />
+    <div className="home-page">
+      {/* Hero Section */}
+      <header className="hero-section">
+        <div className="hero-content-left">
+          <h1 className="hero-title">
+            Focus. Collaborate. Thrive.
+          </h1>
+          <p className="hero-subtitle">
+            Unite AI-powered learning tools, shared resources, and collaborative study rooms—all while keeping your wellbeing in check.
+          </p>
+          {/* --- CHANGE #4: Attach the onClick handler to the button --- */}
+          <button className="hero-cta-button" onClick={handleNavigateToRegister}>
+            Join StudySphere <ArrowRight size={20} />
+          </button>
+        </div>
+        <div className="hero-visual-right">
+          <div className="visual-card card-3"></div>
+          <div className="visual-card card-2"></div>
+          <div className="visual-card card-1">
+            <div className="card-ui-element"></div>
+            <div className="card-ui-text long"></div>
+            <div className="card-ui-text short"></div>
+          </div>
+        </div>
+      </header>
 
-      {/* Content */}
-      <div className="relative z-20 flex flex-col items-center justify-center h-full text-center px-6">
-        <motion.h1
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          className="text-5xl md:text-7xl font-extrabold text-white drop-shadow-lg"
-        >
-          StudySphere
-        </motion.h1>
+      {/* --- Redesigned Features Section --- */}
+      <section className="features-showcase-section" id="features">
+        {/* Card 1: Collab Rooms */}
+        <div className="feature-showcase-card">
+          <div className="card-content">
+            <div className="feature-icon-wrapper"><Users size={28} /></div>
+            <h3 className="feature-title">Collaborative Rooms</h3>
+            <p className="feature-description">Join focused study sessions with group timers, shared task lists, and ambient backgrounds. Beat procrastination, together.</p>
+          </div>
+          <div className="card-visual visual-collab">
+            <div className="collab-avatar" style={{ top: '20%', left: '25%' }}></div>
+            <div className="collab-avatar" style={{ top: '55%', left: '15%' }}></div>
+            <div className="collab-avatar" style={{ top: '35%', left: '60%' }}></div>
+            <div className="collab-avatar" style={{ top: '65%', left: '70%' }}></div>
+          </div>
+        </div>
+        
+        {/* Card 2: Smart Learn (AI) */}
+        <div className="feature-showcase-card">
+          <div className="card-content">
+            <div className="feature-icon-wrapper"><Sparkles size={28} /></div>
+            <h3 className="feature-title">Smart Learning Tools</h3>
+            <p className="feature-description">Enhance your study with AI. Instantly generate interactive flashcards and structured mind maps from your notes.</p>
+          </div>
+          <div className="card-visual visual-ai">
+            <div className="ai-node root"></div>
+            <div className="ai-node child-1"></div>
+            <div className="ai-node child-2"></div>
+            <div className="ai-line line-1"></div>
+            <div className="ai-line line-2"></div>
+          </div>
+        </div>
 
-        <motion.p
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 1 }}
-          className="mt-6 max-w-2xl text-lg md:text-xl text-gray-200"
-        >
-          Your personalized hub for smarter learning, mood tracking, and study insights.
-        </motion.p>
+        {/* Card 3: Resource Hub */}
+        <div className="feature-showcase-card">
+          <div className="card-content">
+            <div className="feature-icon-wrapper"><Library size={28} /></div>
+            <h3 className="feature-title">Shared Resource Hub</h3>
+            <p className="feature-description">Access a community-driven library of notes and links. Contribute and climb the leaderboard.</p>
+          </div>
+          <div className="card-visual visual-resources">
+            <div className="resource-item item-1">File.pdf</div>
+            <div className="resource-item item-2">Notes.docx</div>
+            <div className="resource-item item-3">Link</div>
+          </div>
+        </div>
 
-        <motion.a
-          href="/dashboard"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6, duration: 0.6 }}
-          className="mt-10 inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition"
-        >
-          Explore <ArrowRight size={20} />
-        </motion.a>
-      </div>
-
-      {/* Floating Gradient Orbs */}
-      {/* <motion.div
-        className="absolute w-72 h-72 bg-purple-500/30 rounded-full blur-3xl top-20 left-10 z-0"
-        animate={{ y: [0, -30, 0], x: [0, 30, 0] }}
-        transition={{ repeat: Infinity, duration: 8 }}
-      />
-      <motion.div
-        className="absolute w-96 h-96 bg-blue-500/20 rounded-full blur-3xl bottom-20 right-10 z-0"
-        animate={{ y: [0, 40, 0], x: [0, -40, 0] }}
-        transition={{ repeat: Infinity, duration: 10 }}
-      /> */}
-    </section>
+        {/* Card 4: Track & Compete */}
+        <div className="feature-showcase-card">
+          <div className="card-content">
+            <div className="feature-icon-wrapper"><HeartPulse size={28} /></div>
+            <h3 className="feature-title">Track & Compete</h3>
+            <p className="feature-description">Log your study moods to prevent burnout while building your study streak to compete on the weekly leaderboard.</p>
+          </div>
+          <div className="card-visual visual-gamify">
+            <div className="gamify-streak">
+              <span className="streak-fire">🔥</span>
+              <span className="streak-number">7</span> Day Streak
+            </div>
+            <div className="gamify-leaderboard">
+              <span className="leaderboard-icon">🏆</span> Top 10
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Final CTA Section */}
+      <section className="final-cta-section">
+        <h2 className="final-cta-title">Ready to Transform Your Study Habits?</h2>
+        {/* --- CHANGE #5: Attach the same handler to this button --- */}
+        <button className="hero-cta-button" onClick={handleNavigateToRegister}>
+          Join StudySphere <ArrowRight size={20} />
+        </button>
+      </section>
+    </div>
   );
-}
+};
 
 export default Home;
