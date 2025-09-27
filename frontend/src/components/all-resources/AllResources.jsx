@@ -103,13 +103,8 @@ export default function AllResources() {
       const fetchResources = async () => {
         try {
           const config = { headers: { "x-auth-token": token } };
-<<<<<<< HEAD
-          const resourcesRes = await axios.get("http://localhost:5000/api/resources", config);
-          const userRes = await axios.get("http://localhost:5000/api/auth/me", config);
-=======
           const resourcesRes = await axios.get("https://studysphere-n4up.onrender.com/api/resources", config);
           const userRes = await axios.get("https://studysphere-n4up.onrender.com/api/auth/me", config);
->>>>>>> 6a055587982790bb7a24b992b251616b9378f30f
 
           setResources(resourcesRes.data);
           
@@ -142,11 +137,7 @@ export default function AllResources() {
     
     try {
         const config = { headers: { 'x-auth-token': token } };
-<<<<<<< HEAD
-        const res = await axios.get(`http://localhost:5000/api/resources/${resourceId}/comments`, config);
-=======
         const res = await axios.get(`https://studysphere-n4up.onrender.com/api/resources/${resourceId}/comments`, config);
->>>>>>> 6a055587982790bb7a24b992b251616b9378f30f
         const resourceToComment = resources.find(r => r._id === resourceId);
         setSelectedResource(resourceToComment);
         setComments(res.data.comments || []);
