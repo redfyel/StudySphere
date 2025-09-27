@@ -1,5 +1,5 @@
 import React from 'react';
-import './loading.css';
+import './Loading.css';
 
 const loadingMessages = [
   "Cultivating your focus...",
