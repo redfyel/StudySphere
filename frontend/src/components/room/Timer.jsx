@@ -1,19 +1,67 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react'; // --- LEADERBOARD LOGIC ---
 import { Play, Pause, RotateCcw, Timer as TimerIcon, Clock, Plus, Minus } from 'lucide-react';
+import axios from 'axios'; // --- LEADERBOARD LOGIC ---
+import { UserLoginContext } from '../../contexts/UserLoginContext'; // --- LEADERBOARD LOGIC --- (Adjust path if needed)
 
 function Timer() {
+  // --- LEADERBOARD LOGIC ---
+  // Get the auth token to identify the user
+  const { token } = useContext(UserLoginContext);
+  const reportingInterval = 30000; // Report every 30 seconds (30,000 ms)
+
   const [activeTab, setActiveTab] = useState('stopwatch');
   const [time, setTime] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [laps, setLaps] = useState([]);
   
-  // Timer specific states
   const [timerHours, setTimerHours] = useState(0);
   const [timerMinutes, setTimerMinutes] = useState(5);
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [initialTime, setInitialTime] = useState(0);
 
-  // Stopwatch logic
+  // --- LEADERBOARD LOGIC START ---
+
+  // This effect is responsible for periodically sending study data to the backend
+  useEffect(() => {
+    let interval;
+
+    // We only want to track time when the stopwatch is running for an authenticated user
+    if (isRunning && activeTab === 'stopwatch' && token) {
+      interval = setInterval(() => {
+        // Send a ping to the backend with the duration
+        const sendStudyData = async () => {
+          try {
+            const config = {
+              headers: { 'x-auth-token': token }
+            };
+            const payload = {
+              // We send the duration of the interval in seconds
+              duration: reportingInterval / 1000 
+            };
+            // IMPORTANT: You need to create this endpoint on your backend!
+            await axios.post('https://studysphere-n4up.onrender.com/api/study/log', payload, config);
+            console.log('Successfully logged study time.');
+
+          } catch (err) {
+            console.error("Failed to log study time:", err);
+          }
+        };
+
+        sendStudyData();
+        
+      }, reportingInterval);
+    }
+
+    // Cleanup: This function runs when the component unmounts or dependencies change
+    // It prevents memory leaks by clearing the interval when the stopwatch is paused/stopped.
+    return () => clearInterval(interval);
+
+  }, [isRunning, activeTab, token]); // Dependencies: The effect re-runs if these change
+
+  // --- LEADERBOARD LOGIC END ---
+
+
+  // Stopwatch logic (No changes needed here)
   useEffect(() => {
     let interval;
     if (isRunning && activeTab === 'stopwatch') {
@@ -24,7 +72,7 @@ function Timer() {
     return () => clearInterval(interval);
   }, [isRunning, activeTab]);
 
-  // Timer logic
+  // Timer logic (No changes needed here)
   useEffect(() => {
     let interval;
     if (isRunning && activeTab === 'timer' && time > 0) {
@@ -41,6 +89,10 @@ function Timer() {
     }
     return () => clearInterval(interval);
   }, [isRunning, time, activeTab]);
+
+  // ... (the rest of your component remains exactly the same)
+  // playAlarm, toggle, reset, addLap, startTimer, adjustTime, formatTime, etc.
+  // No other code needs to change!
 
   const playAlarm = useCallback(() => {
     // Play multiple beeps for better attention
@@ -156,7 +208,6 @@ function Timer() {
     }
     return 0;
   };
-
   return (
     <div style={{ 
       width: '100%', 

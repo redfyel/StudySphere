@@ -50,6 +50,8 @@ const flashcardRoutes = require("./routes/flashcardRoutes");
 const wellnessRoutes = require("./routes/wellnessRoutes");
 const mindmapRoutes = require("./routes/mindmapRoutes");
 const resourceRoutes= require("./routes/resourceRoutes");
+const studyRoutes = require("./routes/studyRoutes");
+
 
 // --- 4. CREATE THE ASYNCHRONOUS STARTUP FUNCTION ---
 const startServer = async () => {
@@ -98,6 +100,8 @@ const startServer = async () => {
     app.use('/api/wellness', wellnessRoutes);
     app.use('/api/mindmaps', mindmapRoutes)
     app.use('/api/resources', resourceRoutes)
+    app.use('/api/study', studyRoutes)
+
 
 
     // Health check endpoint
