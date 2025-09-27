@@ -113,26 +113,37 @@ router.post(
 
       // 3. Compare the provided password with the stored hashed password
       const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        return res.status(400).json({ msg: 'Invalid password Credentials' });
-      }
+if (!isMatch) {
+  return res.status(400).json({ msg: 'Invalid password Credentials' });
+}
 
-      // 4. If credentials are correct, create and return a JWT
-      const payload = {
-        user: {
-          id: user._id,
-        },
-      };
+// 4. If credentials are correct, create and return a JWT
+const payload = {
+  user: {
+    id: user._id,
+  },
+};
 
-      jwt.sign(
-        payload,
-        process.env.JWT_SECRET,
-        { expiresIn: '5h' },
-        (err, token) => {
-          if (err) throw err;
-          res.json({ token });
-        }
-      );
+jwt.sign(
+  payload,
+  process.env.JWT_SECRET,
+  { expiresIn: '5h' },
+  (err, token) => {
+    if (err) throw err;
+    
+    // === FIX IS HERE ===
+    // Send back the token AND the user info the frontend needs.
+    // Map the database's `_id` to `userId` for consistency.
+    res.json({
+      token,
+      userId: user._id,
+      username: user.username,
+      email: user.email,
+      // You can add logic here to determine if a user is new
+      isNewUser: !user.lastLogin // Example logic
+    });
+  }
+);
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server error');
@@ -145,17 +156,23 @@ router.get('/', auth, async (req, res) => {
         const db = await connectDB();
         const usersCollection = db.collection('users');
 
-        // req.user is set by the 'auth' middleware
         const user = await usersCollection.findOne(
             { _id: new ObjectId(req.user.id) },
-            { projection: { password: 0 } } // Correctly use the projection option
+            { projection: { password: 0 } } 
         ); 
 
         if (!user) {
             return res.status(404).json({ msg: 'User not found' });
         }
 
-        res.json(user);
+        // === FIX IS HERE ===
+        // Restructure the response to match what the frontend expects.
+        res.json({
+            userId: user._id,
+            username: user.username,
+            email: user.email
+        });
+
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');

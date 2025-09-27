@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext'; // Assuming you have an AuthContext
+import { useAuth } from '../../contexts/UserLoginContext'; // Assuming you have an AuthContext
 import './RoomLobby.css'; // Add basic styling
 
 function RoomLobby() {

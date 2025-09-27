@@ -27,7 +27,7 @@ const AllMindMapsView = () => {
       const token = localStorage.getItem('token');
       const config = { headers: { 'x-auth-token': token } };
       try {
-        const res = await axios.get('https://studysphere-n4up.onrender.com//api/mindmaps', config);
+        const res = await axios.get('http://localhost:5000/api/mindmaps', config);
         if (Array.isArray(res.data)) {
             setMaps(res.data);
         }
@@ -44,7 +44,7 @@ const AllMindMapsView = () => {
     const token = localStorage.getItem('token');
     const config = { headers: { 'x-auth-token': token } };
     try {
-      const res = await axios.get(`https://studysphere-n4up.onrender.com//api/mindmaps/${mapId}`, config);
+      const res = await axios.get(`http://localhost:5000/api/mindmaps/${mapId}`, config);
       // Navigate to the existing MindMapView, passing the full data
       navigate('/study-enhance/mindmaps/view', { state: { mindMapData: res.data } });
     } catch (err) {

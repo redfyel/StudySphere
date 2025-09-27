@@ -102,8 +102,8 @@ export default function AllResources() {
       const fetchResources = async () => {
         try {
           const config = { headers: { "x-auth-token": token } };
-          const resourcesRes = await axios.get("https://studysphere-n4up.onrender.com//api/resources", config);
-          const userRes = await axios.get("https://studysphere-n4up.onrender.com//api/auth/me", config);
+          const resourcesRes = await axios.get("http://localhost:5000/api/resources", config);
+          const userRes = await axios.get("http://localhost:5000/api/auth/me", config);
 
           setResources(resourcesRes.data);
           
@@ -136,7 +136,7 @@ export default function AllResources() {
     
     try {
         const config = { headers: { 'x-auth-token': token } };
-        const res = await axios.get(`https://studysphere-n4up.onrender.com//api/resources/${resourceId}/comments`, config);
+        const res = await axios.get(`http://localhost:5000/api/resources/${resourceId}/comments`, config);
         const resourceToComment = resources.find(r => r._id === resourceId);
         setSelectedResource(resourceToComment);
         setComments(res.data.comments || []);
@@ -153,7 +153,7 @@ export default function AllResources() {
     try {
         const config = { headers: { 'x-auth-token': token } };
         const res = await axios.post(
-            `https://studysphere-n4up.onrender.com//api/resources/comment`,
+            `http://localhost:5000/api/resources/comment`,
             { resourceId: selectedResource._id, comment: newComment },
             config
         );
@@ -177,7 +177,7 @@ export default function AllResources() {
         const config = { headers: { 'x-auth-token': token } };
         
         await axios.post(
-            `https://studysphere-n4up.onrender.com//api/auth/action`, // Action endpoint now updates the user's document
+            `http://localhost:5000/api/auth/action`, // Action endpoint now updates the user's document
             { resourceId, actionType },
             config
         );

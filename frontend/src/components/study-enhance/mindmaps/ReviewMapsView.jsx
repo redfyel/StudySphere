@@ -29,7 +29,7 @@ const ReviewMapsView = () => {
       const token = localStorage.getItem('token');
       const config = { headers: { 'x-auth-token': token } };
       try {
-        const res = await axios.get('https://studysphere-n4up.onrender.com//api/mindmaps/sessions/latest', config);
+        const res = await axios.get('http://localhost:5000/api/mindmaps/sessions/latest', config);
         if (Array.isArray(res.data)) {
           setSessions(res.data);
         }
@@ -46,7 +46,7 @@ const ReviewMapsView = () => {
     const token = localStorage.getItem('token');
     const config = { headers: { 'x-auth-token': token } };
     try {
-      const res = await axios.get(`https://studysphere-n4up.onrender.com//api/mindmaps/${mapId}`, config);
+      const res = await axios.get(`http://localhost:5000/api/mindmaps/${mapId}`, config);
       navigate('/study-enhance/mindmaps/view', { state: { mindMapData: res.data } });
     } catch (err) {
       setError('Failed to load the selected mind map.');

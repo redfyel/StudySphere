@@ -1,6 +1,6 @@
 // WelcomePage.js - Full page welcome experience for new users
 import React, { useEffect, useState } from 'react';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../../contexts/UserLoginContext';
 import { useNavigate } from 'react-router-dom';
 import './WelcomePopUp.css';
 

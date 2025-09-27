@@ -910,37 +910,37 @@ const startServer = async () => {
     });
 
     // Get all active rooms with enhanced filtering
-    app.get('/api/rooms', async (req, res) => {
-      try {
-        const { type, userId } = req.query;
+    // app.get('/api/rooms', async (req, res) => {
+    //   try {
+    //     const { type, userId } = req.query;
         
-        let filter = { isActive: true };
-        if (type && ['public', 'private'].includes(type)) {
-          filter.roomType = type;
-        }
+    //     let filter = { isActive: true };
+    //     if (type && ['public', 'private'].includes(type)) {
+    //       filter.roomType = type;
+    //     }
         
-        const rooms = await db.collection('rooms')
-          .find(filter)
-          .sort({ createdAt: -1 })
-          .toArray();
+    //     const rooms = await db.collection('rooms')
+    //       .find(filter)
+    //       .sort({ createdAt: -1 })
+    //       .toArray();
         
-        const roomsWithParticipants = rooms.map(room => {
-          const session = roomSessions.get(room.roomId);
-          return {
-            ...room,
-            currentParticipants: session?.activeParticipants.size || 0,
-            isUserCreator: userId ? room.createdBy === userId : false,
-            canJoin: room.roomType === 'public' || (userId && room.createdBy === userId),
-            hasActiveSession: !!session && session.activeParticipants.size > 0
-          };
-        });
+    //     const roomsWithParticipants = rooms.map(room => {
+    //       const session = roomSessions.get(room.roomId);
+    //       return {
+    //         ...room,
+    //         currentParticipants: session?.activeParticipants.size || 0,
+    //         isUserCreator: userId ? room.createdBy === userId : false,
+    //         canJoin: room.roomType === 'public' || (userId && room.createdBy === userId),
+    //         hasActiveSession: !!session && session.activeParticipants.size > 0
+    //       };
+    //     });
         
-        res.json(roomsWithParticipants);
-      } catch (error) {
-        console.error('Error fetching rooms:', error);
-        res.status(500).json({ error: 'Failed to fetch rooms' });
-      }
-    });
+    //     res.json(roomsWithParticipants);
+    //   } catch (error) {
+    //     console.error('Error fetching rooms:', error);
+    //     res.status(500).json({ error: 'Failed to fetch rooms' });
+    //   }
+    // });
 
     // Create a new room with session validation
     app.post('/api/rooms', async (req, res) => {

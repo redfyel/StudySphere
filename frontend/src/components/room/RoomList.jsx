@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../../contexts/UserLoginContext';
 import { useNavigate } from 'react-router-dom';
 import RoomCard from './RoomCard';
 import CreateRoomModal from './createRoomModal';
@@ -42,13 +42,15 @@ function RoomList() {
 
   // Load rooms from API
   const loadRooms = useCallback(async () => {
+    console.log("Session token", sessionToken)
     if (!sessionToken || !user?.userId) return;
-    
+    console.log("Session token", sessionToken)
     setIsLoading(true);
     setError(null);
     
     try {
-      const response = await fetch(`https://studysphere-n4up.onrender.com//api/rooms?userId=${user.userId}`, {
+      console.log('Loading rooms for user:', user.userId);
+      const response = await fetch(`http://localhost:5000/api/rooms?userId=${user.userId}`, {
         headers: {
           'Authorization': `Bearer ${sessionToken}`,
           'Content-Type': 'application/json',
@@ -79,7 +81,7 @@ function RoomList() {
     try {
       console.log('Creating room:', roomData);
       
-      const response = await fetch('https://studysphere-n4up.onrender.com//api/rooms', {
+      const response = await fetch('http://localhost:5000/api/rooms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -116,7 +118,7 @@ function RoomList() {
     }
 
     try {
-      const response = await fetch(`https://studysphere-n4up.onrender.com//api/rooms/${roomId}`, {
+      const response = await fetch(`http://localhost:5000/api/rooms/${roomId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -210,6 +212,8 @@ function RoomList() {
 
   // Load rooms on component mount and set up refresh interval
   useEffect(() => {
+    console.log("Session token", sessionToken)
+    console.log("User id", user)
     if (sessionToken && user?.userId) {
       loadRooms();
       

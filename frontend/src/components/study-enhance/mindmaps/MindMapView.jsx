@@ -222,7 +222,7 @@ const MindMapView = () => {
     const config = { headers: { 'x-auth-token': token } };
     
     try {
-        await axios.post(`https://studysphere-n4up.onrender.com//api/mindmaps/${mindMapData._id}/sessions`, {}, config);
+        await axios.post(`http://localhost:5000/api/mindmaps/${mindMapData._id}/sessions`, {}, config);
         // Give the user clear feedback!
         showToast(`Review session for "${mindMapData.title}" logged successfully!`, "info");
     } catch (err) {

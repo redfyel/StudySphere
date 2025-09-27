@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, Navigate } from 'react-router-dom';
-import { useAuth } from './AuthContext'; // Import auth context
+import { useAuth } from '../../contexts/UserLoginContext'; // Import auth context
 import io from 'socket.io-client';
 import FloatingToolbar from './FloatingToolbar';
 import MusicPlayer from './MusicPlayer';
@@ -508,7 +508,7 @@ function VideoCall() {
   useEffect(() => {
     if (!isAuthenticated || !sessionToken || !user) return;
 
-    socketRef.current = io('https://studysphere-n4up.onrender.com/', {
+    socketRef.current = io('http://localhost:5000', {
       transports: ['websocket'],
       upgrade: false,
       rememberUpgrade: false,
