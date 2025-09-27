@@ -1,49 +1,90 @@
+/* === Main Container & Header === */
 .leaderboard-container {
   width: 100%;
-  max-width: 400px;
+  max-width: 700px;
   margin: 2rem auto;
-  background-color: #F1F0E8;
-  border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(137, 168, 178, 0.2);
-  padding: 1.5rem;
-  border: 1px solid #E5E1DA;
+  background: linear-gradient(145deg, #FDFCFB, #F1F0E8);
+  border-radius: 24px;
+  box-shadow: 0 12px 40px rgba(137, 168, 178, 0.25);
+  padding: 2rem;
+  border: 1px solid white;
+}
+
+.leaderboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: #89A8B2;
+  margin-bottom: 1.5rem;
 }
 
 .leaderboard-title {
   text-align: center;
-  color: #89A8B2;
-  font-size: 1.5rem;
-  margin-top: 0;
-  margin-bottom: 1rem;
+  font-size: 1.75rem;
+  margin: 0;
+  font-weight: 700;
 }
 
-.leaderboard-tabs {
+
+/* === Podium for Top 3 === */
+.leaderboard-podium {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  margin-top: 2rem;
+  align-items: flex-end;
+}
+
+.podium-member {
   display: flex;
-  background-color: #E5E1DA;
-  border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 1.5rem;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.5rem 1rem;
+  border-radius: 16px;
+  background-color: rgba(229, 225, 218, 0.5);
+  border: 1px solid white;
+  transition: transform 0.3s ease;
 }
 
-.tab-btn {
-  flex: 1;
-  padding: 0.75rem 0.5rem;
-  border: none;
-  background-color: transparent;
-  color: #8FA5AF;
-  font-size: 0.9rem;
+.podium-member:hover {
+  transform: translateY(-8px);
+}
+
+.podium-member.rank-1 { order: 2; min-height: 180px; background-color: rgb(212, 175, 55, 0.3); }
+.podium-member.rank-2 { order: 1; min-height: 150px; background-color: rgb(192, 192, 192, 0.3);}
+.podium-member.rank-3 { order: 3; min-height: 150px; background-color: rgb(205, 127, 50, 0.3);}
+
+.podium-rank {
+  margin-bottom: 0.75rem;
+  height: 40px; /* Give it a fixed height to align content below */
+  display: flex;
+  align-items: center;
+}
+
+.podium-name {
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #6B8A94;
+  margin-bottom: 0.5rem;
+  word-break: break-word;
+}
+
+.podium-score {
+  font-size: 1.2rem;
   font-weight: 600;
-  border-radius: 9px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.tab-btn.active {
-  background-color: #F1F0E8;
   color: #89A8B2;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.podium-number {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #89A8B2;
+}
+
+/* === Main List for 4+ === */
 .leaderboard-list ol {
   list-style: none;
   padding: 0;
@@ -55,21 +96,27 @@
   align-items: center;
   padding: 0.8rem 1rem;
   margin-bottom: 0.5rem;
-  background-color: #E5E1DA;
+  background-color: transparent;
+  border: 1px solid #E5E1DA;
   border-radius: 10px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
 .leaderboard-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(137, 168, 178, 0.2);
+  background-color: rgba(229, 225, 218, 0.4);
 }
 
 .leaderboard-rank {
-  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
   font-weight: 700;
   color: #89A8B2;
-  width: 2rem;
+}
+
+.leaderboard-rank-number {
+  font-size: 1rem;
 }
 
 .leaderboard-name {
@@ -80,21 +127,34 @@
 }
 
 .leaderboard-score {
-  font-weight: 700;
+  font-weight: 600;
   color: #89A8B2;
+  font-variant-numeric: tabular-nums;
 }
 
-/* --- Badge Colors for Top 3 --- */
-.leaderboard-item.rank-1 .leaderboard-rank { color: #D4AF37; /* Gold */ }
-.leaderboard-item.rank-2 .leaderboard-rank { color: #C0C0C0; /* Silver */ }
-.leaderboard-item.rank-3 .leaderboard-rank { color: #CD7F32; /* Bronze */ }
+/* --- CHANGE: Replace icon colors with a style for your images --- */
+.badge-image {
+  width: 100px;  /* Adjust size as needed */
+  height: 100px;
+  object-fit: contain;
+  border-radius: 50%;
+  margin-top: 1rem;
+  margin-bottom: 13px;
+}
 
-.leaderboard-item.rank-1 { border-left: 4px solid #D4AF37; }
-.leaderboard-item.rank-2 { border-left: 4px solid #C0C0C0; }
-.leaderboard-item.rank-3 { border-left: 4px solid #CD7F32; }
 
+/* Loading & Error States */
+.leaderboard-loading-state {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
 .no-data-message {
   text-align: center;
   color: #8FA5AF;
-  padding: 2rem 0;
+  padding: 4rem 1rem;
+  background-color: #E5E1DA;
+  border-radius: 12px;
 }

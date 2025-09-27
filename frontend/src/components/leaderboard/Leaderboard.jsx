@@ -1,32 +1,53 @@
 import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { UserLoginContext } from '../../contexts/UserLoginContext'; // Adjust path if needed
+import { TrendingUp } from 'lucide-react';
+import { UserLoginContext } from '../../contexts/UserLoginContext';
 import Loading from '../loading/Loading';
 import ErrorMessage from '../errormessage/ErrorMessage';
+// --- CHANGE #1: Import your reusable Tab component ---
+import PrimaryNavTabs from '../tabs/PrimaryNavTabs'; // Adjust path if needed
 import './Leaderboard.css';
+
+import gold from '../../assets/badges/gold.png';
+import silver from '../../assets/badges/silver.png';
+import bronze from '../../assets/badges/bronze.png';
 
 // Helper function to format seconds into "Xh Ym"
 const formatStudyTime = (totalSeconds) => {
   if (!totalSeconds) return "0m";
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  }
+  if (hours > 0) return `${hours}h ${minutes}m`;
   return `${minutes}m`;
+};
+
+// RankBadge component remains the same
+const RankBadge = ({ rank }) => {
+  if (rank === 1) return <img src={gold} alt="Gold Badge" className="badge-image" />;
+  if (rank === 2) return <img src={silver} alt="Silver Badge" className="badge-image" />;
+  if (rank === 3) return <img src={bronze} alt="Bronze Badge" className="badge-image" />;
+  return <span className="leaderboard-rank-number">{rank}</span>;
+};
+
+// --- CHANGE #2: Create a mapping between internal state and display labels ---
+const TABS = {
+  time: "Study Hours",
+  streak: "Study Streaks",
 };
 
 const Leaderboard = () => {
   const [leaders, setLeaders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('time'); // 'time' or 'streak'
+  // State remains the same, using 'time' and 'streak' for API calls
+  const [activeTab, setActiveTab] = useState('time'); 
   const { token } = useContext(UserLoginContext);
 
   useEffect(() => {
+    // This useEffect hook works perfectly with no changes needed!
+    // 'activeTab' is still 'time' or 'streak', which is what the API expects.
     const fetchLeaderboard = async () => {
       if (!token) return;
-
       setIsLoading(true);
       setError(null);
       try {
@@ -42,59 +63,86 @@ const Leaderboard = () => {
         setIsLoading(false);
       }
     };
-
     fetchLeaderboard();
-  }, [activeTab, token]); // Refetch when the tab or token changes
+  }, [activeTab, token]);
 
-  const getRankClass = (index) => {
-    if (index === 0) return 'rank-1'; // Gold
-    if (index === 1) return 'rank-2'; // Silver
-    if (index === 2) return 'rank-3'; // Bronze
-    return '';
+  // --- CHANGE #3: Create a handler to translate the clicked label back to an ID ---
+  const handleTabClick = (tabLabel) => {
+    // Find the key ('time' or 'streak') that corresponds to the clicked label
+    const newActiveTabId = Object.keys(TABS).find(key => TABS[key] === tabLabel);
+    if (newActiveTabId) {
+      setActiveTab(newActiveTabId);
+    }
   };
+
+  const loadingMessage = activeTab === 'time'
+    ? "Ranking by Study Hours..."
+    : "Ranking by Study Streaks...";
+
+  const topThree = leaders.slice(0, 3);
+  const restOfLeaders = leaders.slice(3);
 
   return (
     <div className="leaderboard-container">
-      <h2 className="leaderboard-title">Weekly Leaderboard</h2>
-      <div className="leaderboard-tabs">
-        <button
-          className={`tab-btn ${activeTab === 'time' ? 'active' : ''}`}
-          onClick={() => setActiveTab('time')}
-        >
-          Study Hours
-        </button>
-        <button
-          className={`tab-btn ${activeTab === 'streak' ? 'active' : ''}`}
-          onClick={() => setActiveTab('streak')}
-        >
-          Study Streaks
-        </button>
+      <div className="leaderboard-header">
+        <TrendingUp size={28} />
+        <h2 className="leaderboard-title">Weekly Leaders</h2>
       </div>
-      <div className="leaderboard-list">
-        {isLoading ? (
-          <Loading />
-        ) : error ? (
-          <ErrorMessage message={error.message} details={error.details} />
-        ) : (
-          <ol>
-            {leaders.length > 0 ? (
-              leaders.map((user, index) => (
-                <li key={user._id} className={`leaderboard-item ${getRankClass(index)}`}>
-                  <span className="leaderboard-rank">{index + 1}</span>
-                  <span className="leaderboard-name">{user.name}</span>
-                  <span className="leaderboard-score">
-                    {activeTab === 'time'
-                      ? formatStudyTime(user.totalStudyTime)
-                      : `${user.studyStreak || 0} days`}
-                  </span>
-                </li>
-              ))
-            ) : (
-              <p className="no-data-message">No data available yet. Start a study session to appear here!</p>
-            )}
-          </ol>
-        )}
-      </div>
+
+      {/* --- CHANGE #4: Replace the old buttons with the PrimaryNavTabs component --- */}
+      <PrimaryNavTabs
+        tabs={Object.values(TABS)} // Pass the display labels: ["Study Hours", "Study Streaks"]
+        activeTab={TABS[activeTab]} // Pass the active display label: "Study Hours" or "Study Streaks"
+        onTabClick={handleTabClick} // Pass the handler function
+      />
+      
+      {isLoading ? (
+        <div className="leaderboard-loading-state">
+          <Loading text={loadingMessage} />
+        </div>
+      ) : error ? (
+        <ErrorMessage message={error.message} />
+      ) : (
+        <>
+          {leaders.length > 0 ? (
+            <>
+              <div className="leaderboard-podium">
+                {topThree.map((user, index) => (
+                  <div key={user._id} className={`podium-member rank-${index + 1}`}>
+                    <div className="podium-rank"><RankBadge rank={index + 1} /></div>
+                    <div className="podium-name">{user.name}</div>
+                    <div className='podium-number'><span>{index + 1}</span></div>
+                    <div className="podium-score">
+                      {activeTab === 'time'
+                        ? formatStudyTime(user.totalStudyTime)
+                        : `${user.studyStreak || 0} days`}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="leaderboard-list">
+                <ol start="4">
+                  {restOfLeaders.map((user, index) => (
+                    <li key={user._id} className="leaderboard-item">
+                      <div className="leaderboard-rank">
+                        <RankBadge rank={index + 4} />
+                      </div>
+                      <span className="leaderboard-name">{user.name}</span>
+                      <span className="leaderboard-score">
+                        {activeTab === 'time'
+                          ? formatStudyTime(user.totalStudyTime)
+                          : `${user.studyStreak || 0} days`}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </>
+          ) : (
+            <p className="no-data-message">The leaderboard is empty. Be the first to start a study session!</p>
+          )}
+        </>
+      )}
     </div>
   );
 };
