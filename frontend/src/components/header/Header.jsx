@@ -1,5 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./Header.css";
 import logo from "/logo.png";
 
@@ -7,12 +8,13 @@ function Header() {
   return (
     <header className="header">
       {/* Left: Logo + Name */}
-      <div className="logo">
+           <Link to="/" className="logo">
         <img src={logo} alt="logo" className="logo-icon" />
         <div className="logo-text">
           Study<span>Sphere</span>
         </div>
-      </div>
+      </Link>
+
 
       {/* Center: Nav Pills */}
       <nav className="nav-container">

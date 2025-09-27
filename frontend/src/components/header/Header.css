@@ -1,4 +1,3 @@
-
 /* Header container */
 .header {
   position: fixed;
@@ -9,9 +8,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
-  background: transparent;       /* no color at all */
-  box-shadow: none;              /* remove shadow if you want it floating clean */
+  padding: 0 16px;       /* MODIFIED: Reduced padding slightly to give more room */
+  gap: 16px;               /* ADDED: Ensures a minimum gap between logo, nav, and buttons */
+  background: transparent;
+  box-shadow: none;
   z-index: 1000;
 }
 
@@ -20,6 +20,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  text-decoration: none;
 }
 
 .logo-icon {
@@ -30,6 +31,7 @@
   font-size: 1.8rem;
   font-weight: 600;
   color: var(--color-deep-teal);
+  text-decoration: none;
 }
 
 .logo-text span {
@@ -40,7 +42,7 @@
 /* Center: Nav Pills */
 .nav-container {
   display: flex;
-  background: #e7ecef;   /* ONLY pill has background */
+  background: #e7ecef;
   border-radius: 30px;
   justify-content: center;
   margin-top: 8px;
@@ -78,7 +80,7 @@
 /* Right: Buttons */
 .header-buttons {
   display: flex;
-  gap: 8px;
+  gap: 6px; /* MODIFIED: Reduced the gap between the buttons to save space */
 }
 
 .rbtn {
