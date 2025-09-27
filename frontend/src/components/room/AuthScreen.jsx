@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/UserLoginContext';
 // FIX: Added .css extension to resolve the module not found error.
 import './AuthScreen.css'; 
 import axios from 'axios';
+import Loading from '../loading/Loading';
 
 function AuthScreen() {
   const [formData, setFormData] = useState({
@@ -43,7 +44,7 @@ function AuthScreen() {
     }
 
     try {
-      const response = await fetch('https://studysphere-n4up.onrender.com/api/users/authenticate', {
+      const response = await fetch('https://studysphere-n4up.onrender.com/api/auth/authenticate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: name.trim(), email: email.trim() }),
