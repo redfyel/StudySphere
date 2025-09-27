@@ -1,64 +1,26 @@
-import React, { useEffect, useState } from 'react';
+// ProtectedRoute.jsx (Revised)
+import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from './AuthContext';
-import Loading from '../loading/Loading';
+import { useAuth } from '../../contexts/UserLoginContext';
 
 const ProtectedRoute = () => {
-  const { isAuthenticated, sessionToken, handleLogout } = useAuth();
-  const [isVerifying, setIsVerifying] = useState(true);
-  const [isValidSession, setIsValidSession] = useState(false);
+  const { isAuthenticated, isLoading } = useAuth();
 
-  useEffect(() => {
-    const validateSession = async () => {
-      if (!sessionToken) {
-        setIsValidSession(false);
-        setIsVerifying(false);
-        return;
-      }
-
-      try {
-        const response = await fetch('https://studysphere-n4up.onrender.com/api/users/validate-session', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ sessionToken }),
-        });
-
-        if (response.ok) {
-          // Session is valid, no need to update AuthContext as it's already populated
-          setIsValidSession(true);
-        } else {
-          // Session invalid or expired
-          console.warn('Session validation failed:', response.status);
-          handleLogout(); // Clear local storage and context
-          setIsValidSession(false);
-        }
-      } catch (error) {
-        console.error('Error validating session:', error);
-        handleLogout(); // Clear local storage and context on network error
-        setIsValidSession(false);
-      } finally {
-        setIsVerifying(false);
-      }
-    };
-
-    validateSession();
-  }, [sessionToken, handleLogout]);
-
-  if (isVerifying) {
-    // Optionally render a loading spinner or message while verifying session
+  // If the authentication context is still loading the user session, show a loading message
+  if (isLoading) {
     return (
-      <Loading text="Verifying session..." />
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#1a1a2e', color: '#e0e0e0' }}>
+        <h2>Loading session...</h2> {/* More accurate message */}
+      </div>
     );
   }
 
-  // If not authenticated or session is invalid, redirect to auth page
-  if (!isAuthenticated || !isValidSession) {
+  // If context has finished loading AND the user is not authenticated, redirect
+  if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
   }
 
-  // If authenticated and session is valid, render the child routes
+  // If context has finished loading AND the user IS authenticated, render children
   return <Outlet />;
 };
 

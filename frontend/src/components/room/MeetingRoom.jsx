@@ -46,7 +46,7 @@ function MeetingRoom({ roomId }) {
   useEffect(() => {
     if (!username) return;
 
-    const newSocket = io('https://studysphere-n4up.onrender.com/', {
+    const newSocket = io('http://localhost:5000', {
       transports: ['websocket']
     });
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../../contexts/UserLoginContext';
 import { useNavigate } from 'react-router-dom';
 import RoomCard from './RoomCard';
 import CreateRoomModal from './createRoomModal';
@@ -43,8 +43,9 @@ function RoomList() {
 
   // Load rooms from API
   const loadRooms = useCallback(async () => {
+    console.log("Session token", sessionToken)
     if (!sessionToken || !user?.userId) return;
-    
+    console.log("Session token", sessionToken)
     setIsLoading(true);
     setError(null);
     
@@ -211,6 +212,8 @@ function RoomList() {
 
   // Load rooms on component mount and set up refresh interval
   useEffect(() => {
+    console.log("Session token", sessionToken)
+    console.log("User id", user)
     if (sessionToken && user?.userId) {
       loadRooms();
       

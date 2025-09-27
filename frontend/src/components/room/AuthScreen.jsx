@@ -1,21 +1,31 @@
-
-// AuthScreen.js - Updated with session token handling
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from './AuthContext';
-import './AuthScreen.css';
-import Loading from '../loading/Loading';
+import { useNavigate, Link } from 'react-router-dom';
+// FIX: Added .jsx extension to resolve the module not found error.
+import { useAuth } from '../../contexts/UserLoginContext'; 
+// FIX: Added .css extension to resolve the module not found error.
+import './AuthScreen.css'; 
+import axios from 'axios';
 
 function AuthScreen() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { handleAuthSuccess, isAuthenticated } = useAuth();
+
+  // Use the unified authentication hook
+  const { login, isAuthenticated } = useAuth(); 
+  
+  const { email, password } = formData;
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   useEffect(() => {
-    // If already authenticated, redirect to rooms
+    // Redirect immediately if already authenticated
     if (isAuthenticated) {
       navigate('/room', { replace: true });
     }
@@ -26,8 +36,8 @@ function AuthScreen() {
     setError('');
     setIsLoading(true);
 
-    if (!name.trim() || !email.trim()) {
-      setError('Name and Email are required.');
+    if (!password.trim() || !email.trim()) {
+      setError('Email and Password are required.');
       setIsLoading(false);
       return;
     }
@@ -38,66 +48,72 @@ function AuthScreen() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: name.trim(), email: email.trim() }),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Authentication failed.');
-      }
-
-      const data = await response.json();
       
-      // Use context to handle authentication
-      handleAuthSuccess(data.userId, data.username, data.email, data.sessionToken);
+      // 2. Extract necessary data from axios response (res.data)
+      const { token, userId, username, email: userEmail, isNewUser } = res.data;
 
-      // Show welcome message for new users
-      if (data.isNewUser) {
-        alert(`Welcome to StudySphere, ${data.username}! Let's get you started.`);
+      // 3. Call the unified login function to update context and localStorage
+      login(token, userId, username, userEmail); 
+      
+      console.log("Login successful. Redirecting user:", username);
+
+      // 4. Show welcome message for new users (using console.log instead of alert)
+      if (isNewUser) {
+        console.log(`Welcome to StudySphere, ${username}! Let's get you started.`);
       }
 
-      navigate('/room', { replace: true });
+      // 5. Redirect to the protected room
+      navigate('/room',{replace:true}); 
+
     } catch (err) {
-      console.error('Authentication error:', err);
-      setError(err.message || 'An unexpected error occurred.');
-    } finally {
+      // --- Error Handling ---
       setIsLoading(false);
+      if (err.response && err.response.data) {
+        const errorMsg = err.response.data.errors 
+                         ? err.response.data.errors[0].msg 
+                         : err.response.data.msg;
+        setError(errorMsg || 'Login failed. Please check your credentials.');
+      } else {
+        setError('An unexpected error occurred. Please try again.');
+      }
     }
   };
 
   return (
     <div className="auth-screen-container">
       <div className="auth-card">
-        <div className="auth-header">
-          <div className="logo-container">
-            <img src="/studysphere.svg" alt="StudyVerse Logo" className="logo-icon" />
-            <h1>StudySphere</h1>
-          </div>
-          <h2>Welcome!</h2>
+        <div className="auth-header">
+          <div className="logo-container">
+            {/* Note: This image URL requires /studysphere.svg to exist in your public directory */}
+            <img src="/studysphere.svg" alt="StudySphere Logo" className="logo-icon" />
+            <h1>StudySphere</h1>
+          </div>
+          <h2>Welcome!</h2>
           <p>Join collaborative study sessions or create your own focused learning environment.</p>
         </div>
         
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label htmlFor="name">Your Name:</label>
-            <input
-              type="text"
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., John Doe"
-              required
-              autoFocus
-              disabled={isLoading}
-            />
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="email">Your Email:</label>
+            <label htmlFor="email">Email</label>
             <input
               type="email"
               id="email"
+              name="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g., john.doe@example.com"
+              onChange={handleChange}
+              required
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={password}
+              onChange={handleChange}
               required
               disabled={isLoading}
             />
@@ -118,8 +134,7 @@ function AuthScreen() {
         
         <div className="auth-footer">
           <p>
-            <strong>New users:</strong> Create an account automatically<br/>
-            <strong>Returning users:</strong> Access your existing account
+            <strong>Not Registered yet?</strong> <Link to="/register"> Register here</Link>
           </p>
         </div>
       </div>
