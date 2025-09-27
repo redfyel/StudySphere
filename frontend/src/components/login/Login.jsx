@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import { UserLoginContext } from '../../contexts/UserLoginContext'; // Import the context
 import logo from "/logo.png";
+import { Link } from 'react-router-dom';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -82,6 +83,7 @@ const Login = () => {
           />
         </div>
         <button type="submit" className="auth-button">Login</button>
+        <div className="login-link">Not yet registered? <Link to="/register">Register here</Link></div>
       </form>
     </div>
   );

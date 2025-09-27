@@ -4,14 +4,23 @@ import "./Header.css";
 import logo from "/logo.png";
 
 // Correctly import the useAuth hook from your context file
+// Make sure your context exports a 'logout' function
 import { useAuth } from "./../../contexts/UserLoginContext";
 
 function Header() {
-  const { isAuthenticated, isLoading, user } = useAuth();
+  // 1. Destructure the logout function from the context
+  const { isAuthenticated, isLoading, user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = () => {
+    // Close the mobile menu if it's open
+    setIsMenuOpen(false);
+    // Call the logout function from your context
+    logout();
   };
 
   return (
@@ -65,18 +74,30 @@ function Header() {
 
       {/* Right: Buttons - Conditionally Rendered */}
       <div className="header-buttons">
-        {/* 2. Don't render anything while the session is being checked to avoid a UI flash */}
         {isLoading ? null : (
           <>
-            {/* 3. Use the 'isAuthenticated' state to decide what to render */}
             {isAuthenticated ? (
-              <NavLink
-                to="/dashboard"
-                className="profile-link"
-                title={`View Profile for ${user?.username}`} // Use user data for better UX
-              >
-                <span className="material-icons profile-icon">account_circle</span>
-              </NavLink>
+              // 2. Use a fragment to group the profile and logout icons
+              <>
+                <NavLink
+                  to="/dashboard"
+                  className="profile-link"
+                  title={`View Profile for ${user?.username}`}
+                >
+                  <span className="material-icons profile-icon">
+                    account_circle
+                  </span>
+                </NavLink>
+
+                {/* 3. Add the logout button */}
+                <button
+                  onClick={handleLogout}
+                  className="logout-button"
+                  title="Logout"
+                >
+                  <span className="material-icons logout-icon">logout</span>
+                </button>
+              </>
             ) : (
               <NavLink to="/login" className="rbtn join">
                 Join Now

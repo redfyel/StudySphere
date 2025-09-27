@@ -10,7 +10,7 @@
   justify-content: space-between;
   padding: 0 24px; /* Increased padding for better spacing on wider screens */
   gap: 16px;
-  background: #fff; /* Changed background to white for better visibility */
+  
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Added a subtle box shadow */
   z-index: 1000;
   box-sizing: border-box; /* CRITICAL FIX: Ensures padding is included in the 100% width */
