@@ -30,7 +30,7 @@ function SpotifyMusicPlayer() {
   const [showSpotifyPlaylists, setShowSpotifyPlaylists] = useState(false);
   const [activeView, setActiveView] = useState('demo'); // 'demo', 'spotify', 'search'
 
-  const API_BASE_URL = 'http://localhost:5000';
+  const API_BASE_URL = 'https://studysphere-n4up.onrender.com/';
 
   // Default demo tracks
   const demoTracks = [

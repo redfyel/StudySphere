@@ -69,7 +69,7 @@ const AllDecksView = () => {
       }
       const config = { headers: { 'x-auth-token': token } };
       try {
-        const res = await axios.get('http://localhost:5000/api/flashcards/decks', config);
+        const res = await axios.get('https://studysphere-n4up.onrender.com//api/flashcards/decks', config);
         setAllDecks(res.data);
         setFilteredDecks(res.data);
 
@@ -107,7 +107,7 @@ const AllDecksView = () => {
     const token = localStorage.getItem('token');
     const config = { headers: { 'x-auth-token': token } };
     try {
-      const res = await axios.get(`http://localhost:5000/api/flashcards/decks/${deckId}`, config);
+      const res = await axios.get(`https://studysphere-n4up.onrender.com//api/flashcards/decks/${deckId}`, config);
       if (res.data?.flashcards) {
        navigate('/study-enhance/flashcards', { state: { generatedFlashcards: res.data.flashcards, deckId: deckId, deckTitle: res.data.title } });
       }

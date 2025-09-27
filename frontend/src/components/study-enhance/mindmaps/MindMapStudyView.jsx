@@ -116,7 +116,7 @@ const MindMapStudyView = () => {
     const token = localStorage.getItem('token');
     const config = { headers: { 'x-auth-token': token } };
     try {
-      await axios.post(`http://localhost:5000/api/mindmaps/${mindMapData._id}/sessions`, {}, config);
+      await axios.post(`https://studysphere-n4up.onrender.com//api/mindmaps/${mindMapData._id}/sessions`, {}, config);
       showToast("Study session logged!");
     } catch (err) {
       console.error("Failed to log study session", err);

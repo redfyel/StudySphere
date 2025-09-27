@@ -92,7 +92,7 @@ const StartStudyPage = () => {
       }
       const config = { headers: { 'x-auth-token': token } };
       try {
-        const res = await axios.get('http://localhost:5000/api/flashcards/decks', config);
+        const res = await axios.get('https://studysphere-n4up.onrender.com//api/flashcards/decks', config);
         setDecks(res.data);
       } catch (err) {
         setError('Could not load your decks. Please try again.');
@@ -109,7 +109,7 @@ const StartStudyPage = () => {
     const config = { headers: { 'x-auth-token': token } };
     try {
       // Use the NEW backend route to get the full deck content
-      const res = await axios.get(`http://localhost:5000/api/flashcards/decks/${deckId}`, config);
+      const res = await axios.get(`https://studysphere-n4up.onrender.com//api/flashcards/decks/${deckId}`, config);
       const fullDeck = res.data;
 
       if (fullDeck && fullDeck.flashcards) {

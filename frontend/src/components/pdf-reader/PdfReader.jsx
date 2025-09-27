@@ -31,7 +31,7 @@ export default function PdfReader() {
             return;
           }
           try {
-            const res = await axios.get(`http://localhost:5000/api/resources/${id}`);
+            const res = await axios.get(`https://studysphere-n4up.onrender.com//api/resources/${id}`);
             setResource(res.data);
             setIsLoading(false);
           } catch (err) {
