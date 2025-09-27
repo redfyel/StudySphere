@@ -12,10 +12,11 @@ const Footer = () => {
           Study<span>Sphere</span>
         </div>
         <nav className="footer-nav">
-          <NavLink to="/mood-tracker">Mood Tracker</NavLink>
-          <NavLink to="/study-enhance">Study Enhance</NavLink>
-          <NavLink to="/room">Rooms</NavLink>
+           <NavLink to="/room">Collab Rooms</NavLink>
           <NavLink to="/resources">Resource Hub</NavLink>
+          <NavLink to="/mood-tracker">Wellness</NavLink>
+          <NavLink to="/study-enhance">Smart Learn</NavLink>
+         
         </nav>
         <div className="footer-socials">
           <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><FaGithub /></a>

@@ -48,7 +48,7 @@ function RoomList() {
     setError(null);
     
     try {
-      const response = await fetch(`https://studysphere-n4up.onrender.com//api/rooms?userId=${user.userId}`, {
+      const response = await fetch(`https://studysphere-n4up.onrender.com/api/rooms?userId=${user.userId}`, {
         headers: {
           'Authorization': `Bearer ${sessionToken}`,
           'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ function RoomList() {
     try {
       console.log('Creating room:', roomData);
       
-      const response = await fetch('https://studysphere-n4up.onrender.com//api/rooms', {
+      const response = await fetch('https://studysphere-n4up.onrender.com/api/rooms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ function RoomList() {
     }
 
     try {
-      const response = await fetch(`https://studysphere-n4up.onrender.com//api/rooms/${roomId}`, {
+      const response = await fetch(`https://studysphere-n4up.onrender.com/api/rooms/${roomId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

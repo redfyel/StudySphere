@@ -57,7 +57,7 @@ const ReviewMasteredView = () => {
       const config = { headers: { 'x-auth-token': token } };
 
       try {
-        const res = await axios.get('https://studysphere-n4up.onrender.com//api/flashcards/sessions/latest', config);
+        const res = await axios.get('https://studysphere-n4up.onrender.com/api/flashcards/sessions/latest', config);
         
         if (Array.isArray(res.data)) {
           setSessions(res.data);
@@ -79,7 +79,7 @@ const handleStudyDeck = async (deckId) => {
     const config = { headers: { 'x-auth-token': token } };
     try {
       // Use the NEW backend route to get the full deck content
-      const res = await axios.get(`https://studysphere-n4up.onrender.com//api/flashcards/decks/${deckId}`, config);
+      const res = await axios.get(`https://studysphere-n4up.onrender.com/api/flashcards/decks/${deckId}`, config);
       const fullDeck = res.data;
 
       if (fullDeck && fullDeck.flashcards) {
@@ -98,7 +98,7 @@ const handleStudyDeck = async (deckId) => {
     const token = localStorage.getItem('token');
     const config = { headers: { 'x-auth-token': token } };
     try {
-      const res = await axios.get(`https://studysphere-n4up.onrender.com//api/flashcards/decks/${deckId}`, config);
+      const res = await axios.get(`https://studysphere-n4up.onrender.com/api/flashcards/decks/${deckId}`, config);
       if (res.data?.flashcards) {
         navigate('/study-enhance/flashcards/session', { 
           state: { 

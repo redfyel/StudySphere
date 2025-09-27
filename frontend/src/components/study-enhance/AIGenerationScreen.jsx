@@ -88,7 +88,7 @@ const AIGenerationScreen = () => {
     formData.append("focusArea", focusArea);
     formData.append("generateType", generateType);
 
-    const aiEndpoint = `https://studysphere-n4up.onrender.com//api/ai/generate-${generateType}`;
+    const aiEndpoint = `https://studysphere-n4up.onrender.com/api/ai/generate-${generateType}`;
 
     try {
       const aiResponse = await fetch(aiEndpoint, {
@@ -136,7 +136,7 @@ const AIGenerationScreen = () => {
         const body = { title: deckTitle, flashcards: generatedData.flashcards };
 
         await axios.post(
-          "https://studysphere-n4up.onrender.com//api/flashcards/decks",
+          "https://studysphere-n4up.onrender.com/api/flashcards/decks",
           body,
           config
         );
@@ -160,7 +160,7 @@ const AIGenerationScreen = () => {
         const body = { title: mapTitle, mindMapData: generatedData };
 
         // 3. Save the mind map to the database
-        const savedMapResponse = await axios.post("https://studysphere-n4up.onrender.com//api/mindmaps/", body, config);
+        const savedMapResponse = await axios.post("https://studysphere-n4up.onrender.com/api/mindmaps/", body, config);
         const savedMap = savedMapResponse.data;
 
         // 4. Navigate to the viewer with the saved data

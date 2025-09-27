@@ -20,7 +20,7 @@ export const UserLoginStore = ({ children }) => {
             axios.defaults.headers.common['x-auth-token'] = token;
             try {
                 // Fetch the user data from the backend
-                const res = await axios.get('https://studysphere-n4up.onrender.com//api/auth');
+                const res = await axios.get('https://studysphere-n4up.onrender.com/api/auth');
                 setUser(res.data);
                 setIsAuthenticated(true);
             } catch (err) {

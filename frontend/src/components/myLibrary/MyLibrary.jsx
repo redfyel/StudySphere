@@ -86,7 +86,7 @@ export default function MyLibraryPage() {
                 try {
                     const config = { headers: { "x-auth-token": token } };
                     // ✅ NEW/UPDATED: Fetch saved resources from the dedicated endpoint
-                    const res = await axios.get("https://studysphere-n4up.onrender.com//api/resources/mylibrary", config);
+                    const res = await axios.get("https://studysphere-n4up.onrender.com/api/resources/mylibrary", config);
                     setSavedResources(res.data);
                     setIsLoading(false);
 
@@ -117,7 +117,7 @@ export default function MyLibraryPage() {
 
             // ✅ Action now targets the Auth route to update the user document
             await axios.post(
-                `https://studysphere-n4up.onrender.com//api/auth/action`,
+                `https://studysphere-n4up.onrender.com/api/auth/action`,
                 { resourceId, actionType },
                 config
             );
@@ -153,7 +153,7 @@ export default function MyLibraryPage() {
         
         try {
             const config = { headers: { 'x-auth-token': token } };
-            const res = await axios.get(`https://studysphere-n4up.onrender.com//api/resources/${resourceId}/comments`, config);
+            const res = await axios.get(`https://studysphere-n4up.onrender.com/api/resources/${resourceId}/comments`, config);
             const resourceToComment = savedResources.find(r => r._id === resourceId);
             setSelectedResource(resourceToComment);
             setComments(res.data.comments || []);
@@ -169,7 +169,7 @@ export default function MyLibraryPage() {
         try {
             const config = { headers: { 'x-auth-token': token } };
             const res = await axios.post(
-                `https://studysphere-n4up.onrender.com//api/resources/comment`,
+                `https://studysphere-n4up.onrender.com/api/resources/comment`,
                 { resourceId: selectedResource._id, comment: newComment },
                 config
             );

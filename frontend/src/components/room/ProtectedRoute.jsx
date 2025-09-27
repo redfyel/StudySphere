@@ -16,7 +16,7 @@ const ProtectedRoute = () => {
       }
 
       try {
-        const response = await fetch('https://studysphere-n4up.onrender.com//api/users/validate-session', {
+        const response = await fetch('https://studysphere-n4up.onrender.com/api/users/validate-session', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

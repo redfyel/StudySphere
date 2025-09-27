@@ -192,7 +192,7 @@ const AnalyticsSection = () => {
             const { startDate, endDate } = getTimeframeDetails(selectedView, anchorDate);
             const token = localStorage.getItem("token");
             const config = { headers: { "x-auth-token": token } };
-            const res = await axios.get(`https://studysphere-n4up.onrender.com//api/wellness/logs?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`, config);
+            const res = await axios.get(`https://studysphere-n4up.onrender.com/api/wellness/logs?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`, config);
             setChartData(transformLogsForCharts(res.data, selectedView));
         } catch (err) {
             console.error("Failed to fetch analytics data", err);
