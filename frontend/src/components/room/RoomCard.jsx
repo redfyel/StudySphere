@@ -220,22 +220,6 @@ function RoomCard({ room, userId, onDelete }) {
         </div>
       </div>
 
-      {/* Room Settings Info */}
-      <div className="room-settings">
-        {roomType === 'private' && room.requiresApproval && (
-          <div className="setting-item">
-            <span className="material-icons setting-icon">verified_user</span>
-            <span className="setting-text">Approval Required</span>
-          </div>
-        )}
-        {roomType === 'public' && (
-          <div className="setting-item">
-            <span className="material-icons setting-icon">meeting_room</span>
-            <span className="setting-text">Open Access</span>
-          </div>
-        )}
-      </div>
-
       {/* Card Footer */}
       <div className="card-footer">
         <div className="footer-info">
@@ -280,12 +264,7 @@ function RoomCard({ room, userId, onDelete }) {
         </button>
       </div>
 
-      {/* Development Debug Info */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="debug-info">
-          ID: {room.roomId || 'undefined'} | Type: {roomType}
-        </div>
-      )}
+      
 
       {/* Full Room Overlay */}
       {participantCount >= maxParticipants && (
