@@ -44,7 +44,7 @@ function AuthScreen() {
     }
 
     try {
-      const response = await fetch('https://studysphere-n4up.onrender.com/api/auth/authenticate', {
+      const response = await fetch('https://studysphere-n4up.onrender.com/api/users/authenticate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: name.trim(), email: email.trim() }),
