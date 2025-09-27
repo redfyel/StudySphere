@@ -46,27 +46,39 @@
   border-color: var(--primary-medium);
 }
 
-/* Card States */
-.room-card.empty {
-  border-left: 4px solid var(--primary-medium);
+
+
+
+/* Add this to your RoomCard.css */
+.room-card-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* Or left, depending on desired alignment */
+  gap: 16px; /* Adjust the gap as needed */
+  padding: 16px;
+}
+.room-card {
+  background: var(--primary-lightest);
+  border: 1px solid var(--primary-light);
+  border-radius: 16px;
+  padding: 20px;
+  /* Remove margin and let the container's gap handle spacing */
+  /* margin: 12px; */ 
+  position: relative;
+  transition: all var(--transition-normal);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  min-width: 320px;
+  max-width: 400px;
+  box-sizing: border-box; /* Add this line */
 }
 
-.room-card.active {
-  border-left: 4px solid var(--success);
+.room-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--primary-medium);
 }
 
-.room-card.half-full {
-  border-left: 4px solid var(--warning);
-}
-
-.room-card.almost-full {
-  border-left: 4px solid var(--danger);
-}
-
-.room-card.full {
-  border-left: 4px solid var(--danger);
-  opacity: 0.8;
-}
 
 /* Error Banner */
 .error-banner {
