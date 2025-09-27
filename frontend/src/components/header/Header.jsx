@@ -50,6 +50,14 @@ function Header() {
         >
           Smart Learn
         </NavLink>
+         <NavLink
+          to="/leaderboard"
+          className={({ isActive }) =>
+            isActive ? "nav-link active" : "nav-link"
+          }
+        >
+          Leaderboard
+        </NavLink>
       </nav>
 
       {/* Right: Buttons */}

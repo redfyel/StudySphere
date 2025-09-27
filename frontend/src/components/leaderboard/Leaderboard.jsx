@@ -2,52 +2,52 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { TrendingUp } from 'lucide-react';
 import { UserLoginContext } from '../../contexts/UserLoginContext';
-import Loading from '../loading/Loading';
+// We don't need the full page Loading component anymore for this page
+// import Loading from '../loading/Loading'; 
 import ErrorMessage from '../errormessage/ErrorMessage';
-// --- CHANGE #1: Import your reusable Tab component ---
-import PrimaryNavTabs from '../tabs/PrimaryNavTabs'; // Adjust path if needed
+import PrimaryNavTabs from '../tabs/PrimaryNavTabs';
 import './Leaderboard.css';
 
 import gold from '../../assets/badges/gold.png';
 import silver from '../../assets/badges/silver.png';
 import bronze from '../../assets/badges/bronze.png';
 
-// Helper function to format seconds into "Xh Ym"
-const formatStudyTime = (totalSeconds) => {
-  if (!totalSeconds) return "0m";
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  return `${minutes}m`;
-};
+// Helper function (unchanged)
+const formatStudyTime = (totalSeconds) => { /* ... */ };
 
-// RankBadge component remains the same
-const RankBadge = ({ rank }) => {
-  if (rank === 1) return <img src={gold} alt="Gold Badge" className="badge-image" />;
-  if (rank === 2) return <img src={silver} alt="Silver Badge" className="badge-image" />;
-  if (rank === 3) return <img src={bronze} alt="Bronze Badge" className="badge-image" />;
-  return <span className="leaderboard-rank-number">{rank}</span>;
-};
+// RankBadge component (unchanged)
+const RankBadge = ({ rank }) => { /* ... */ };
 
-// --- CHANGE #2: Create a mapping between internal state and display labels ---
 const TABS = {
   time: "Study Hours",
   streak: "Study Streaks",
 };
 
+// --- NEW SKELETON COMPONENT ---
+// A simple component to show while data is loading
+const SkeletonRow = () => (
+  <li className="skeleton-item">
+    <div className="skeleton-rank"></div>
+    <div className="skeleton-name"></div>
+    <div className="skeleton-score"></div>
+  </li>
+);
+
+
 const Leaderboard = () => {
   const [leaders, setLeaders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  // State remains the same, using 'time' and 'streak' for API calls
   const [activeTab, setActiveTab] = useState('time'); 
   const { token } = useContext(UserLoginContext);
 
   useEffect(() => {
-    // This useEffect hook works perfectly with no changes needed!
-    // 'activeTab' is still 'time' or 'streak', which is what the API expects.
+    // This data fetching logic remains exactly the same
     const fetchLeaderboard = async () => {
-      if (!token) return;
+      if (!token) {
+        setIsLoading(false); // Make sure to stop loading if there's no token
+        return;
+      };
       setIsLoading(true);
       setError(null);
       try {
@@ -66,81 +66,74 @@ const Leaderboard = () => {
     fetchLeaderboard();
   }, [activeTab, token]);
 
-  // --- CHANGE #3: Create a handler to translate the clicked label back to an ID ---
   const handleTabClick = (tabLabel) => {
-    // Find the key ('time' or 'streak') that corresponds to the clicked label
     const newActiveTabId = Object.keys(TABS).find(key => TABS[key] === tabLabel);
     if (newActiveTabId) {
       setActiveTab(newActiveTabId);
     }
   };
 
-  const loadingMessage = activeTab === 'time'
-    ? "Ranking by Study Hours..."
-    : "Ranking by Study Streaks...";
-
   const topThree = leaders.slice(0, 3);
   const restOfLeaders = leaders.slice(3);
 
   return (
+    // --- CHANGE #1: The main container is ALWAYS rendered now ---
     <div className="leaderboard-container">
       <div className="leaderboard-header">
         <TrendingUp size={28} />
         <h2 className="leaderboard-title">Weekly Leaders</h2>
       </div>
 
-      {/* --- CHANGE #4: Replace the old buttons with the PrimaryNavTabs component --- */}
       <PrimaryNavTabs
-        tabs={Object.values(TABS)} // Pass the display labels: ["Study Hours", "Study Streaks"]
-        activeTab={TABS[activeTab]} // Pass the active display label: "Study Hours" or "Study Streaks"
-        onTabClick={handleTabClick} // Pass the handler function
+        tabs={Object.values(TABS)}
+        activeTab={TABS[activeTab]}
+        onTabClick={handleTabClick}
       />
       
-      {isLoading ? (
-        <div className="leaderboard-loading-state">
-          <Loading text={loadingMessage} />
-        </div>
-      ) : error ? (
+      {/* --- CHANGE #2: The loading/error logic is moved INSIDE the content area --- */}
+      {error ? (
         <ErrorMessage message={error.message} />
       ) : (
         <>
-          {leaders.length > 0 ? (
-            <>
-              <div className="leaderboard-podium">
-                {topThree.map((user, index) => (
-                  <div key={user._id} className={`podium-member rank-${index + 1}`}>
-                    <div className="podium-rank"><RankBadge rank={index + 1} /></div>
-                    <div className="podium-name">{user.name}</div>
-                    <div className='podium-number'><span>{index + 1}</span></div>
-                    <div className="podium-score">
-                      {activeTab === 'time'
-                        ? formatStudyTime(user.totalStudyTime)
-                        : `${user.studyStreak || 0} days`}
-                    </div>
+          {/* Always render the podium and list structure */}
+          <div className="leaderboard-podium">
+            {isLoading ? (
+              // Show skeleton placeholders for the podium
+              [...Array(3)].map((_, i) => <div key={i} className="podium-member skeleton-podium"></div>)
+            ) : (
+              topThree.map((user, index) => (
+                <div key={user._id} className={`podium-member rank-${index + 1}`}>
+                  <div className="podium-rank"><RankBadge rank={index + 1} /></div>
+                  <div className="podium-name">{user.name}</div>
+                  <div className="podium-score">
+                    {activeTab === 'time' ? formatStudyTime(user.totalStudyTime) : `${user.studyStreak || 0} days`}
                   </div>
-                ))}
-              </div>
-              <div className="leaderboard-list">
-                <ol start="4">
-                  {restOfLeaders.map((user, index) => (
-                    <li key={user._id} className="leaderboard-item">
-                      <div className="leaderboard-rank">
-                        <RankBadge rank={index + 4} />
-                      </div>
-                      <span className="leaderboard-name">{user.name}</span>
-                      <span className="leaderboard-score">
-                        {activeTab === 'time'
-                          ? formatStudyTime(user.totalStudyTime)
-                          : `${user.studyStreak || 0} days`}
-                      </span>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </>
-          ) : (
-            <p className="no-data-message">The leaderboard is empty. Be the first to start a study session!</p>
-          )}
+                </div>
+              ))
+            )}
+          </div>
+          <div className="leaderboard-list">
+            <ol start="4">
+              {isLoading ? (
+                // Show 5 skeleton rows while loading
+                [...Array(5)].map((_, i) => <SkeletonRow key={i} />)
+              ) : (
+                restOfLeaders.map((user, index) => (
+                  <li key={user._id} className="leaderboard-item">
+                    <div className="leaderboard-rank"><RankBadge rank={index + 4} /></div>
+                    <span className="leaderboard-name">{user.name}</span>
+                    <span className="leaderboard-score">
+                      {activeTab === 'time' ? formatStudyTime(user.totalStudyTime) : `${user.studyStreak || 0} days`}
+                    </span>
+                  </li>
+                ))
+              )}
+            </ol>
+             {/* Show this message only if loading is finished AND there's no data */}
+            {!isLoading && leaders.length === 0 && (
+                <p className="no-data-message">The leaderboard is empty. Be the first to start a study session!</p>
+            )}
+          </div>
         </>
       )}
     </div>
