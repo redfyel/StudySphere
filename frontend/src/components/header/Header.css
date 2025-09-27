@@ -8,11 +8,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;       /* MODIFIED: Reduced padding slightly to give more room */
-  gap: 16px;               /* ADDED: Ensures a minimum gap between logo, nav, and buttons */
+  padding: 0 24px; /* Increased padding for better spacing on wider screens */
+  gap: 16px;
   background: transparent;
   box-shadow: none;
   z-index: 1000;
+  box-sizing: border-box; /* CRITICAL FIX: Ensures padding is included in the 100% width */
 }
 
 /* Left: Logo + Name */
@@ -21,6 +22,7 @@
   align-items: center;
   gap: 8px;
   text-decoration: none;
+  flex-shrink: 0; /* ADDED: Prevents the logo from shrinking */
 }
 
 .logo-icon {
@@ -38,7 +40,6 @@
   color: var(--color-text-dark);
 }
 
-
 /* Center: Nav Pills */
 .nav-container {
   display: flex;
@@ -46,21 +47,20 @@
   border-radius: 30px;
   justify-content: center;
   margin-top: 8px;
-  padding-top: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
+  padding: 5px;
   gap: 4px;
+  flex: 1; /* CRITICAL FIX: Allows the nav to grow and shrink */
+  min-width: 0; /* CRITICAL FIX: Allows the container to shrink below its content's size */
 }
 
 .nav-link {
   color: #2a3d66;
   text-decoration: none;
-  padding: 6px;
+  padding: 6px 12px; /* Adjusted padding for better fit */
   border-radius: 25px;
   transition: all 0.2s ease;
-    font-size: 1.2rem;
-    text-align: none;
-
+  font-size: 1.2rem;
+  white-space: nowrap; /* ADDED: Prevents text like "Collab Rooms" from wrapping */
 }
 
 .nav-link:hover {
@@ -80,7 +80,9 @@
 /* Right: Buttons */
 .header-buttons {
   display: flex;
-  gap: 6px; /* MODIFIED: Reduced the gap between the buttons to save space */
+  align-items: center;
+  gap: 12px; /* Consolidated the gap property */
+  flex-shrink: 0; /* ADDED: Prevents the button group from shrinking */
 }
 
 .rbtn {
@@ -93,6 +95,7 @@
   color: #2a3d66;
   transition: background 0.2s ease;
   text-decoration: none;
+  white-space: nowrap; /* ADDED: Prevents button text from wrapping */
 }
 
 .rbtn:hover {
@@ -102,9 +105,46 @@
 .rbtn.join {
   background: #89a8b2;
   color: #fff;
-
 }
 
 .rbtn.join:hover {
   background: #6f8f97;
+}
+
+/* Profile Link & Icon Styling */
+.profile-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  padding: 6px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  color: var(--primary-dark, #89A8B2);
+}
+
+.profile-link:hover {
+  background-color: rgba(137, 168, 178, 0.1);
+}
+
+.profile-link.active {
+  background-color: rgba(137, 168, 178, 0.2);
+  box-shadow: 0 0 0 2px rgba(137, 168, 178, 0.4);
+}
+
+.profile-icon {
+  font-size: 28px;
+  color: inherit;
+}
+
+/* Optional: If you use an actual image for the avatar */
+.profile-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid transparent;
+}
+
+.profile-link.active .profile-avatar {
+  border-color: var(--primary-dark, #89A8B2);
 }
