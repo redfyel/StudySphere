@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import './AuthScreen.css';
+import Loading from '../loading/Loading';
 
 function AuthScreen() {
   const [name, setName] = useState('');
@@ -107,8 +108,7 @@ function AuthScreen() {
           <button type="submit" className="auth-button" disabled={isLoading}>
             {isLoading ? (
               <>
-                <span className="loading-spinner"></span>
-                Authenticating...
+                <Loading text="Authenticating..." />
               </>
             ) : (
               'Continue to Study Rooms'

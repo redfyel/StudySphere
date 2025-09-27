@@ -1,0 +1,122 @@
+/* loading.css */
+
+:root {
+  --primary: #89A8B2;
+  --secondary: #B3C8CF;
+  --tertiary: #E5E1DA;
+  --background: #F1F0E8;
+}
+
+.c-loading-container {
+  /* --- Core Centering Logic --- */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Vertically centers the content */
+  align-items: center;    /* Horizontally centers the content */
+
+  /* --- MODERN SPACING: Replaces margin-top on the text --- */
+  gap: 30px; /* Creates a 30px space between the animation and the text */
+
+  /* --- ROBUST Fullscreen Overlay --- */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;   /* ADDED: Ensures it stretches to the right edge */
+  bottom: 0;  /* ADDED: Ensures it stretches to the bottom edge */
+  width: 100%;  /* Use 100% instead of 100vw to avoid scrollbar issues */
+  height: 100%;
+
+  z-index: 9999; /* Ensure it's on top of all other content */
+  background-color: var(--background);
+}
+
+.synapse-animation {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.central-hub {
+  width: 50px;
+  height: 50px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  box-shadow: 0 0 15px 5px rgba(137, 168, 178, 0.5);
+  animation: pulse 2.5s infinite ease-in-out;
+}
+
+.node {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.node-1 {
+  background-color: var(--secondary);
+  animation: travel-1 4s infinite ease-in-out;
+}
+
+.node-2 {
+  background-color: var(--tertiary);
+  animation: travel-2 4s infinite ease-in-out;
+  animation-delay: -1.3s;
+}
+
+.node-3 {
+  background-color: var(--secondary);
+  animation: travel-3 4s infinite ease-in-out;
+  animation-delay: -2.6s;
+}
+
+/* REMOVED margin-top as it is now handled by 'gap' in the container */
+.c-loading-text {
+  color: var(--primary);
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  animation: text-fade 2s infinite alternate ease-in-out;
+}
+
+/* Keyframe animations remain the same */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 15px 5px rgba(137, 168, 178, 0.5);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 25px 10px rgba(137, 168, 178, 0.7);
+  }
+}
+
+@keyframes travel-1 {
+  0% { opacity: 0; transform: translate(-100px, -100px) scale(0.5); }
+  20% { opacity: 1; transform: translate(-60px, -30px) scale(1); }
+  80% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(0, 0) scale(0.3); }
+}
+
+@keyframes travel-2 {
+  0% { opacity: 0; transform: translate(100px, 80px) scale(0.5); }
+  20% { opacity: 1; transform: translate(50px, 20px) scale(1); }
+  80% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(0, 0) scale(0.3); }
+}
+
+@keyframes travel-3 {
+  0% { opacity: 0; transform: translate(20px, -120px) scale(0.5); }
+  20% { opacity: 1; transform: translate(0px, -60px) scale(1); }
+  80% { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% { opacity: 0; transform: translate(0, 0) scale(0.3); }
+}
+
+@keyframes text-fade {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}

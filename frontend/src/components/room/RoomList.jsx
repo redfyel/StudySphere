@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import RoomCard from './RoomCard';
 import CreateRoomModal from './createRoomModal';
 import './RoomList.css';
+import Loading from '../loading/Loading';
 
 function RoomList() {
   const [rooms, setRooms] = useState([]);
@@ -234,13 +235,7 @@ function RoomList() {
 
   if (isLoading && rooms.length === 0) {
     return (
-      <div className="room-list-container">
-        <div className="loading-state">
-          <div className="loading-spinner"></div>
-          <h2>Loading study rooms...</h2>
-          <p>Please wait while we fetch the available rooms</p>
-        </div>
-      </div>
+      <Loading text="Loading Collab Rooms..Please wait while we fetch rooms!"/>
     );
   }
 
@@ -415,14 +410,14 @@ function RoomList() {
       </div>
 
       {/* Floating Refresh Button */}
-      <button 
+      {/* <button 
         className="refresh-btn"
         onClick={loadRooms}
         title="Refresh rooms"
         disabled={isLoading}
       >
         {isLoading ? '🕒' : '🔄'}
-      </button>
+      </button> */}
 
       {/* Create Room Modal */}
       {showCreateModal && (

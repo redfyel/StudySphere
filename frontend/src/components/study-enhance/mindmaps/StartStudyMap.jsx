@@ -5,6 +5,9 @@ import Sidebar from '../../sidebar/Sidebar';
 import { FaSitemap, FaPlus, FaStar, FaUserFriends, FaRocket } from 'react-icons/fa';
 import { BsLightningFill, BsCollectionFill } from 'react-icons/bs';
 import './StartStudyMaps.css';
+import Loading from '../../loading/Loading';
+import ErrorMessage from '../../errormessage/ErrorMessage';
+
 
 const AllMindMapsView = () => {
   const [maps, setMaps] = useState([]);
@@ -53,8 +56,9 @@ const AllMindMapsView = () => {
   };
 
   const renderContent = () => {
-    if (loading) return <div className="loading-spinner"></div>;
-    if (error) return <div className="error-message">{error}</div>;
+
+    if (loading) return <Loading text="Loading your Study Session..." />
+    if (error) return <ErrorMessage message={"There was an error loading your maps."}/>;
     if (maps.length === 0) {
       return (
         <div className="no-content-container">

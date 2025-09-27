@@ -22,9 +22,9 @@ import CommandBar from "./CommandBar";
 import WeeklyMoodStrip from "./WeeklyMoodStrip"; // This is still used for the 'week' view
 import "./AnalyticsSection.css";
 import "./Wellness.css";
-// ✅ NEW: Import the new component and its CSS
 import MonthlyMoodGrid from "./MonthlyMoodGrid";
 import "./MonthlyMoodGrid.css";
+import Loading from "../loading/Loading";
 
 // --- COMPONENTS ---
 const NoDataPlaceholder = () => (
@@ -244,7 +244,7 @@ const AnalyticsSection = () => {
                 title={title}
             />
             {isLoading ? (
-                <p className="loading-text">Brewing your insights...</p>
+                <Loading text = "Brewing your analyis!"/>
             ) : (
                 <div className="analytics-dashboard-grid">
                      <ChartCard

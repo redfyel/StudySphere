@@ -8,6 +8,8 @@ import './AllDecksview.css';
 import { FaPlus, FaBookOpen, FaTag, FaChevronDown } from 'react-icons/fa';
 import { BsCollectionFill, BsLightningFill } from 'react-icons/bs';
 import { FaStar, FaUserFriends, FaRocket, FaLayerGroup, FaChartBar, FaCog } from 'react-icons/fa';
+import Loading from '../../loading/Loading';
+import ErrorMessage from '../../errormessage/ErrorMessage';
 
 const AllDecksView = () => {
   const [allDecks, setAllDecks] = useState([]);
@@ -117,8 +119,8 @@ const AllDecksView = () => {
   };
 
   const renderContent = () => {
-    if (loading) return <div className="loading-spinner"></div>;
-    if (error) return <div className="error-message">{error}</div>;
+    if (loading) return <Loading text="Loading your decks..." />
+    if (error) return <ErrorMessage message={"There was an error loading your decks."}/>;
     if (allDecks.length === 0) {
       return (
         <div className="no-decks-container">

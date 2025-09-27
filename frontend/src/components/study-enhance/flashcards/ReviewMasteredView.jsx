@@ -8,6 +8,8 @@ import Sidebar from '../../sidebar/Sidebar';
 import { BsCollectionFill, BsLightningFill } from 'react-icons/bs';
 import { FaUserFriends, FaLayerGroup, FaChartBar, FaCog, FaStar, FaRedoAlt, FaRocket } from 'react-icons/fa';
 import './ReviewMasteredView.css';
+import Loading from '../../loading/Loading';
+import ErrorMessage from '../../errormessage/ErrorMessage';
 
 const ReviewMasteredView = () => {
   const [sessions, setSessions] = useState([]);
@@ -114,8 +116,8 @@ const handleStudyDeck = async (deckId) => {
   };
 
   const renderContent = () => {
-    if (loading) return <div className="loading-spinner"></div>;
-    if (error) return <div className="error-message">{error}</div>;
+    if (loading) return <Loading text="Loading your decks for review..." />
+    if (error) return <ErrorMessage message={"There was an error loading your decks."}/>;
     if (!sessions || sessions.length === 0) {
       return (
         <div className="no-sessions-container">

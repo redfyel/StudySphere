@@ -16,6 +16,7 @@ import Sidebar from '../sidebar/Sidebar'
 import Tooltip from "../tooltips/Tooltip";
 import axios from "axios";
 import { UserLoginContext } from "../../contexts/UserLoginContext";
+import Loading from "../loading/Loading";
 
 const CommentModal = ({ resource, comments, onClose, onSubmit, newComment, setNewComment }) => {
     if (!resource) return null;
@@ -184,20 +185,7 @@ export default function MyLibraryPage() {
 
     if (isLoading) {
         return (
-            <div className="resources-page-layout">
-                <Sidebar
-                    sectionName="Resources"
-                    isCollapsed={isCollapsed}
-                    toggleSidebar={toggleSidebar}
-                    items={navItems}
-                />
-                <div className={`resources-page-content ${isCollapsed ? "collapsed" : ""}`}>
-                    <div className="loading-state">
-                        <div className="spinner"></div>
-                        <p>Loading your library...</p>
-                    </div>
-                </div>
-            </div>
+            <Loading text = "Loading your library..."/>
         );
     }
 

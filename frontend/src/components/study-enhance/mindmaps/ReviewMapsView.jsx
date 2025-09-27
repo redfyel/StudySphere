@@ -7,6 +7,8 @@ import { FaUserFriends, FaRocket } from 'react-icons/fa';
 
 import { FaStar, FaRedoAlt, FaSitemap } from 'react-icons/fa';
 import './ReviewMapsView.css';
+import Loading from '../../loading/Loading';
+import ErrorMessage from '../../errormessage/ErrorMessage';
 
 const ReviewMapsView = () => {
   const [sessions, setSessions] = useState([]);
@@ -54,8 +56,8 @@ const ReviewMapsView = () => {
   };
 
   const renderContent = () => {
-    if (loading) return <div className="loading-spinner"></div>;
-    if (error) return <div className="error-message">{error}</div>;
+    if (loading) return <Loading text="Loading your mind maps for review..." />
+    if (error) return <ErrorMessage message={"There was an error loading your maps."}/>;
     if (sessions.length === 0) {
       return (
         <div className="no-content-container">

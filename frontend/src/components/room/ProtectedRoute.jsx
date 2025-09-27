@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import Loading from '../loading/Loading';
 
 const ProtectedRoute = () => {
   const { isAuthenticated, sessionToken, handleLogout } = useAuth();
@@ -48,9 +49,7 @@ const ProtectedRoute = () => {
   if (isVerifying) {
     // Optionally render a loading spinner or message while verifying session
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#1a1a2e', color: '#e0e0e0' }}>
-        <h2>Verifying session...</h2>
-      </div>
+      <Loading text="Verifying session..." />
     );
   }
 
