@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/UserLoginContext';
 // FIX: Added .css extension to resolve the module not found error.
 import './AuthScreen.css'; 
 import axios from 'axios';
+import Loading from '../loading/Loading';
 
 function AuthScreen() {
   const [formData, setFormData] = useState({
@@ -32,52 +33,56 @@ function AuthScreen() {
   }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
+  e.preventDefault();
+  setError('');
+  setIsLoading(true);
 
-    if (!password.trim() || !email.trim()) {
-      setError('Email and Password are required.');
-      setIsLoading(false);
-      return;
+  if (!password.trim() || !email.trim()) {
+    setError('Email and Password are required.');
+    setIsLoading(false);
+    return;
+  }
+
+  try {
+    // FIX 1: Use the correct URL (assuming your routes are mounted at /api/auth)
+    // FIX 2: Use axios instead of fetch (you already imported it)
+    // FIX 3: Send the correct data (email and password)
+    const res = await axios.post('https://studysphere-n4up.onrender.com/api/auth/login', {
+       email: email.trim(),
+       password: password
+    });
+    
+    // FIX 4: Now res.data works because we are using axios and named the variable 'res'
+    const { token, userId, username, email: userEmail, isNewUser } = res.data;
+
+    // 3. Call the unified login function to update context and localStorage
+    login(token, userId, username, userEmail); 
+    
+    console.log("Login successful. Redirecting user:", username);
+
+    // 4. Show welcome message for new users
+    if (isNewUser) {
+      console.log(`Welcome to StudySphere, ${username}! Let's get you started.`);
     }
 
-    try {
-      const response = await fetch('https://studysphere-n4up.onrender.com/api/users/authenticate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
-      });
-      
-      // 2. Extract necessary data from axios response (res.data)
-      const { token, userId, username, email: userEmail, isNewUser } = res.data;
+    // 5. Redirect to the protected room
+    navigate('/room',{replace:true}); 
 
-      // 3. Call the unified login function to update context and localStorage
-      login(token, userId, username, userEmail); 
-      
-      console.log("Login successful. Redirecting user:", username);
-
-      // 4. Show welcome message for new users (using console.log instead of alert)
-      if (isNewUser) {
-        console.log(`Welcome to StudySphere, ${username}! Let's get you started.`);
-      }
-
-      // 5. Redirect to the protected room
-      navigate('/room',{replace:true}); 
-
-    } catch (err) {
-      // --- Error Handling ---
-      setIsLoading(false);
-      if (err.response && err.response.data) {
-        const errorMsg = err.response.data.errors 
-                         ? err.response.data.errors[0].msg 
-                         : err.response.data.msg;
-        setError(errorMsg || 'Login failed. Please check your credentials.');
-      } else {
-        setError('An unexpected error occurred. Please try again.');
-      }
+  } catch (err) {
+    // --- Error Handling ---
+    setIsLoading(false);
+    // Your existing error handling works perfectly with axios
+    if (err.response && err.response.data) {
+      const errorMsg = err.response.data.errors 
+                       ? err.response.data.errors[0].msg 
+                       : err.response.data.msg;
+      setError(errorMsg || 'Login failed. Please check your credentials.');
+    } else {
+      console.error(err); 
+      setError('An unexpected error occurred. Please try again.');
     }
-  };
+  }
+};
 
   return (
     <div className="auth-screen-container">
