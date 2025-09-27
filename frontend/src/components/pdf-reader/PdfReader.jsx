@@ -4,6 +4,8 @@ import { MdClose } from "react-icons/md";
 import "./PdfReader.css";
 import axios from "axios";
 import { UserLoginContext } from "../../contexts/UserLoginContext";
+import Loading from "../loading/Loading";
+import ErrorMessage from '../errormessage/ErrorMessage';
 
 export default function PdfReader() {
   const { id } = useParams();
@@ -11,6 +13,8 @@ export default function PdfReader() {
 
   const [resource, setResource] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // The error state will now hold an object { message, details } or null
   const [error, setError] = useState(null);
 
   const [timer, setTimer] = useState(0);
@@ -20,23 +24,29 @@ export default function PdfReader() {
   // Hardcoded average time for UI demonstration purposes
   const avgTime = "00:05:30";
 
-  // ✅ NEW: Fetch the specific resource from the backend
   useEffect(() => {
-    // Only fetch if authentication state has been resolved
     if (!isAuthLoading) { 
         const fetchResource = async () => {
           if (!isAuthenticated || !token) {
             setIsLoading(false);
-            setError("You must be logged in to view resources.");
+            // --- CHANGE #1: Set error state to an object ---
+            setError({
+              message: "You must be logged in to view this resource.",
+              details: { status: 401, reason: "Authentication token not found." }
+            });
             return;
           }
           try {
-            const res = await axios.get(`http://localhost:5000/api/resources/${id}`);
+            const res = await axios.get(`https://studysphere-n4up.onrender.com/api/resources/${id}`);
             setResource(res.data);
             setIsLoading(false);
           } catch (err) {
             console.error("Error fetching resource:", err);
-            setError("Failed to load resource. Please ensure you have access.");
+            // --- CHANGE #2: Set error state to an object with technical details ---
+            setError({
+              message: "Failed to load the resource. It might not exist or you may not have access.",
+              details: err.response?.data || { error: err.message } // Capture backend error or generic message
+            });
             setIsLoading(false);
           }
         };
@@ -72,15 +82,20 @@ export default function PdfReader() {
   };
 
   if (isLoading || isAuthLoading) {
-    return <div className="loading-state">Loading resource...</div>;
+    // Note: Your Loading component was designed without a 'text' prop. 
+    // You might want to add that or remove the prop here.
+    return <Loading text = "Loading your resource..."/>;
   }
   
+  // --- CHANGE #3: This code now works perfectly ---
+  // It correctly reads the .message and .details properties from the error object
   if (error) {
-    return <div className="loading-state">{error}</div>;
+    return <ErrorMessage message={error.message} details={error.details} />;
   }
 
   if (!resource) {
-    return <div className="loading-state">Resource not found.</div>;
+    // This can be a simple message or you can also use your ErrorMessage component
+    return <ErrorMessage message="Resource not found." title="404 - Not Found" />;
   }
 
   return (

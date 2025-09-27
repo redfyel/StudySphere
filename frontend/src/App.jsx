@@ -50,11 +50,12 @@ import GroupResources from "./components/group-resources/GroupResources.jsx";
 import Tasks from "./components/tasks/Tasks.jsx";
 import CalendarView from "./components/tasks/CalendarView.jsx";
 
-// --- AUTH COMPONENTS ---
-// FIX: Assuming components are .jsx
-import Login from "./components/login/Login.jsx";
-import Register from "./components/register/Register.jsx";
-import Dashboard from "./components/dashboard/Dashboard.jsx";
+// --- AUTH COMPONENTS (Prioritizing first file's detail, but using AuthScreen for consistency) ---
+import Login from "./components/login/Login";
+import Register from "./components/register/Register";
+import Dashboard from "./components/dashboard/Dashboard";
+
+import Leaderboard from "./components/leaderboard/Leaderboard";
 
 function App() {
 const router = createBrowserRouter([
@@ -132,14 +133,16 @@ const router = createBrowserRouter([
           ],
         },
 
-        // 🗓️ Tasks 
-        { path: "tasksu", element: <Tasks /> }, // Duplicated route kept
-        { path: "tasks", element: <CalendarView /> },
-      ],
-    },
- ],
- },
-]);
+                // 🗓️ Tasks 
+                { path: "tasksu", element: <Tasks /> }, // Duplicated route kept
+                { path: "tasks", element: <CalendarView /> }
+            ],
+        },
+
+         { path: "leaderboard", element: <Leaderboard />}
+      ],
+    },
+  ]);
 
 // Use the unified UserLoginStore Provider
 return (

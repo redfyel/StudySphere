@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './RoomCard.css';
+import Loading from '../loading/Loading';
+import ErrorMessage from '../errormessage/ErrorMessage';
 
 function RoomCard({ room, userId, onDelete }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -15,7 +17,7 @@ function RoomCard({ room, userId, onDelete }) {
   const handleJoinRoom = async (e) => {
     e.stopPropagation();
     
-    if (isLoading) return;
+    if (isLoading) return <Loading text = "Loading..."/>;
     
     if (!room.roomId || room.roomId === 'undefined') {
       setError('Invalid room ID');
@@ -34,7 +36,7 @@ function RoomCard({ room, userId, onDelete }) {
     try {
       console.log('Joining room:', room.roomId, 'Room data:', room);
       
-      const response = await fetch(`http://localhost:5000/api/rooms/${room.roomId}`);
+      const response = await fetch(`https://studysphere-n4up.onrender.com/api/rooms/${room.roomId}`);
       
       if (!response.ok) {
         if (response.status === 404) {
@@ -257,13 +259,13 @@ function RoomCard({ room, userId, onDelete }) {
           <span className="button-content">
             {isLoading ? (
               <>
-                <span className="loading-spinner"></span>
-                {roomType === 'private' && !isOwner ? 'Requesting...' : 'Joining...'}
+<Loading 
+    text={roomType === 'private' && !isOwner ? 'Requesting...' : 'Joining...'} 
+  />
               </>
             ) : error ? (
               <>
-                <span className="material-icons button-icon">refresh</span>
-                Try Again
+               <ErrorMessage message={"There was an error. Please try again later!"}/>
               </>
             ) : (
               <>

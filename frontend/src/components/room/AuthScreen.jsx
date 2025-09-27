@@ -43,10 +43,10 @@ function AuthScreen() {
     }
 
     try {
-      // 1. Post login data
-      const res = await axios.post('http://localhost:5000/api/auth/login', {
-        email,
-        password,
+      const response = await fetch('https://studysphere-n4up.onrender.com/api/users/authenticate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
       });
       
       // 2. Extract necessary data from axios response (res.data)
@@ -124,8 +124,7 @@ function AuthScreen() {
           <button type="submit" className="auth-button" disabled={isLoading}>
             {isLoading ? (
               <>
-                <span className="loading-spinner"></span>
-                Authenticating...
+                <Loading text="Authenticating..." />
               </>
             ) : (
               'Continue to Study Rooms'

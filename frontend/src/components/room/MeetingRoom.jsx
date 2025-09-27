@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import ParticipantList from './ParticipantList';
 import './MeetingRoom.css';
+import Loading from '../loading/Loading';
 
 function MeetingRoom({ roomId }) {
   const [socket, setSocket] = useState(null);
@@ -277,12 +278,7 @@ function MeetingRoom({ roomId }) {
 
   if (!isConnected) {
     return (
-      <div className="meeting-room loading">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p>Connecting to room...</p>
-        </div>
-      </div>
+      <Loading text="Connecting to a Room..."/>
     );
   }
 
@@ -317,12 +313,7 @@ function MeetingRoom({ roomId }) {
 
   if (!hasJoined) {
     return (
-      <div className="meeting-room loading">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p>Joining room...</p>
-        </div>
-      </div>
+      <Loading text= "Joining Room..."/>
     );
   }
 

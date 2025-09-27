@@ -77,7 +77,7 @@ export default function UploadPage() {
       },
     };
       
-      const res = await axios.post('http://localhost:5000/api/resources/upload', formData, config);
+      const res = await axios.post('https://studysphere-n4up.onrender.com/api/resources/upload', formData, config);
     setSuccess(res.data.msg);
       
       // Reset form

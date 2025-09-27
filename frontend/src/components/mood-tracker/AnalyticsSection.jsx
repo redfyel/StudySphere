@@ -22,9 +22,9 @@ import CommandBar from "./CommandBar";
 import WeeklyMoodStrip from "./WeeklyMoodStrip"; // This is still used for the 'week' view
 import "./AnalyticsSection.css";
 import "./Wellness.css";
-// ✅ NEW: Import the new component and its CSS
 import MonthlyMoodGrid from "./MonthlyMoodGrid";
 import "./MonthlyMoodGrid.css";
+import Loading from "../loading/Loading";
 
 // --- COMPONENTS ---
 const NoDataPlaceholder = () => (
@@ -192,7 +192,7 @@ const AnalyticsSection = () => {
             const { startDate, endDate } = getTimeframeDetails(selectedView, anchorDate);
             const token = localStorage.getItem("token");
             const config = { headers: { "x-auth-token": token } };
-            const res = await axios.get(`http://localhost:5000/api/wellness/logs?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`, config);
+            const res = await axios.get(`https://studysphere-n4up.onrender.com/api/wellness/logs?startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`, config);
             setChartData(transformLogsForCharts(res.data, selectedView));
         } catch (err) {
             console.error("Failed to fetch analytics data", err);
@@ -244,7 +244,7 @@ const AnalyticsSection = () => {
                 title={title}
             />
             {isLoading ? (
-                <p className="loading-text">Brewing your insights...</p>
+                <Loading text = "Brewing your analyis!"/>
             ) : (
                 <div className="analytics-dashboard-grid">
                      <ChartCard

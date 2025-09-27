@@ -16,7 +16,11 @@ const LoggingSection = ({ onDataLogged }) => {
             const today = new Date();
             const startDate = new Date(today.setHours(0, 0, 0, 0)).toISOString();
             const endDate = new Date(today.setHours(23, 59, 59, 999)).toISOString();
+<<<<<<< HEAD
             const res = await axios.get(`http://localhost:5000/api/wellness/logs?startDate=${startDate}&endDate=${endDate}`, config);
+=======
+            const res = await axios.get(`https://studysphere-n4up.onrender.com/api/wellness/logs?startDate=${startDate}&endDate=${endDate}`, config);
+>>>>>>> 6a055587982790bb7a24b992b251616b9378f30f
             setTodaysLogs(res.data);
         } catch (err) {
             console.error("Could not fetch today's logs.", err);
@@ -32,7 +36,7 @@ const LoggingSection = ({ onDataLogged }) => {
             const token = localStorage.getItem('token');
             const config = { headers: { 'Content-Type': 'application/json', 'x-auth-token': token } };
             const body = { type: 'vibe', value: data };
-            await axios.post('http://localhost:5000/api/wellness/log', body, config);
+            await axios.post('https://studysphere-n4up.onrender.com/api/wellness/log', body, config);
             onDataLogged("Study Vibe Logged!", "info");
             fetchTodaysLogs(); // ✅ Refresh logs immediately
         } catch (err) {
@@ -45,7 +49,7 @@ const LoggingSection = ({ onDataLogged }) => {
             const token = localStorage.getItem('token');
             const config = { headers: { 'Content-Type': 'application/json', 'x-auth-token': token } };
             const body = { type: 'mood', value: data.mood.label, notes: data.notes };
-            await axios.post('http://localhost:5000/api/wellness/log', body, config);
+            await axios.post('https://studysphere-n4up.onrender.com/api/wellness/log', body, config);
             showToast("Daily Mood Logged!", "info");
             fetchTodaysLogs(); // ✅ Refresh logs immediately
         } catch (err) {

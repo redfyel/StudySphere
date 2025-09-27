@@ -2,6 +2,7 @@
 
 import React, { useContext } from 'react';
 import { UserLoginContext } from '../../contexts/UserLoginContext'; // Correct path
+import Loading from '../loading/Loading'
 
 const Dashboard = () => {
     // Access the 'user' and 'isAuthenticated' state from the context
@@ -9,7 +10,7 @@ const Dashboard = () => {
 
     // Show a loading state while the user data is being fetched
     if (isLoading) {
-        return <div>Loading...</div>;
+        return <Loading/>
     }
 
     // Check if the user is authenticated

@@ -18,6 +18,7 @@ import Dropdown from "../dropdown/Dropdown";
 import Tooltip from "../tooltips/Tooltip";
 import axios from "axios";
 import { UserLoginContext } from "../../contexts/UserLoginContext";
+import Loading from "../loading/Loading";
 
 const CommentModal = ({ resource, comments, onClose, onSubmit, newComment, setNewComment }) => {
     if (!resource) return null;
@@ -102,8 +103,13 @@ export default function AllResources() {
       const fetchResources = async () => {
         try {
           const config = { headers: { "x-auth-token": token } };
+<<<<<<< HEAD
           const resourcesRes = await axios.get("http://localhost:5000/api/resources", config);
           const userRes = await axios.get("http://localhost:5000/api/auth/me", config);
+=======
+          const resourcesRes = await axios.get("https://studysphere-n4up.onrender.com/api/resources", config);
+          const userRes = await axios.get("https://studysphere-n4up.onrender.com/api/auth/me", config);
+>>>>>>> 6a055587982790bb7a24b992b251616b9378f30f
 
           setResources(resourcesRes.data);
           
@@ -136,7 +142,11 @@ export default function AllResources() {
     
     try {
         const config = { headers: { 'x-auth-token': token } };
+<<<<<<< HEAD
         const res = await axios.get(`http://localhost:5000/api/resources/${resourceId}/comments`, config);
+=======
+        const res = await axios.get(`https://studysphere-n4up.onrender.com/api/resources/${resourceId}/comments`, config);
+>>>>>>> 6a055587982790bb7a24b992b251616b9378f30f
         const resourceToComment = resources.find(r => r._id === resourceId);
         setSelectedResource(resourceToComment);
         setComments(res.data.comments || []);
@@ -153,7 +163,7 @@ export default function AllResources() {
     try {
         const config = { headers: { 'x-auth-token': token } };
         const res = await axios.post(
-            `http://localhost:5000/api/resources/comment`,
+            `https://studysphere-n4up.onrender.com/api/resources/comment`,
             { resourceId: selectedResource._id, comment: newComment },
             config
         );
@@ -177,7 +187,7 @@ export default function AllResources() {
         const config = { headers: { 'x-auth-token': token } };
         
         await axios.post(
-            `http://localhost:5000/api/auth/action`, // Action endpoint now updates the user's document
+            `https://studysphere-n4up.onrender.com/api/auth/action`, // Action endpoint now updates the user's document
             { resourceId, actionType },
             config
         );
@@ -249,22 +259,7 @@ export default function AllResources() {
     });
 
   if (isLoading) {
-    return (
-      <div className="resources-page-layout">
-        <Sidebar
-          sectionName="Resources"
-          isCollapsed={isCollapsed}
-          toggleSidebar={toggleSidebar}
-          items={navItems}
-        />
-        <div className={`resources-page-content ${isCollapsed ? "collapsed" : ""}`}>
-          <div className="loading-state">
-            <div className="spinner"></div>
-            <p>Loading resources...</p>
-          </div>
-        </div>
-      </div>
-    );
+    return <Loading/>
   }
 
   if (error) {

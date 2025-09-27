@@ -5,6 +5,9 @@ import Sidebar from '../../sidebar/Sidebar';
 import { FaSitemap, FaPlus, FaStar, FaUserFriends, FaRocket } from 'react-icons/fa';
 import { BsLightningFill, BsCollectionFill } from 'react-icons/bs';
 import './StartStudyMaps.css';
+import Loading from '../../loading/Loading';
+import ErrorMessage from '../../errormessage/ErrorMessage';
+
 
 const AllMindMapsView = () => {
   const [maps, setMaps] = useState([]);
@@ -27,7 +30,7 @@ const AllMindMapsView = () => {
       const token = localStorage.getItem('token');
       const config = { headers: { 'x-auth-token': token } };
       try {
-        const res = await axios.get('http://localhost:5000/api/mindmaps', config);
+        const res = await axios.get('https://studysphere-n4up.onrender.com/api/mindmaps', config);
         if (Array.isArray(res.data)) {
             setMaps(res.data);
         }
@@ -44,7 +47,7 @@ const AllMindMapsView = () => {
     const token = localStorage.getItem('token');
     const config = { headers: { 'x-auth-token': token } };
     try {
-      const res = await axios.get(`http://localhost:5000/api/mindmaps/${mapId}`, config);
+      const res = await axios.get(`https://studysphere-n4up.onrender.com/api/mindmaps/${mapId}`, config);
       // Navigate to the existing MindMapView, passing the full data
       navigate('/study-enhance/mindmaps/view', { state: { mindMapData: res.data } });
     } catch (err) {
@@ -53,8 +56,9 @@ const AllMindMapsView = () => {
   };
 
   const renderContent = () => {
-    if (loading) return <div className="loading-spinner"></div>;
-    if (error) return <div className="error-message">{error}</div>;
+
+    if (loading) return <Loading text="Loading your Study Session..." />
+    if (error) return <ErrorMessage message={"There was an error loading your maps."}/>;
     if (maps.length === 0) {
       return (
         <div className="no-content-container">

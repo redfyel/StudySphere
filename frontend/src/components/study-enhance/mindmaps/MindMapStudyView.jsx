@@ -5,6 +5,7 @@ import axios from 'axios';
 import { FaArrowLeft, FaArrowRight, FaCheck } from 'react-icons/fa';
 import { useToast } from '../../../contexts/ToastProvider';
 import './MindMapStudyView.css';
+import Loading from '../../loading/Loading';
 
 // Re-usable D3 text wrapping function
 function wrap(text, width) {
@@ -116,7 +117,7 @@ const MindMapStudyView = () => {
     const token = localStorage.getItem('token');
     const config = { headers: { 'x-auth-token': token } };
     try {
-      await axios.post(`http://localhost:5000/api/mindmaps/${mindMapData._id}/sessions`, {}, config);
+      await axios.post(`https://studysphere-n4up.onrender.com/api/mindmaps/${mindMapData._id}/sessions`, {}, config);
       showToast("Study session logged!");
     } catch (err) {
       console.error("Failed to log study session", err);
@@ -128,8 +129,8 @@ const MindMapStudyView = () => {
   
   if (!mindMapData) {
     // Fallback if the page is accessed directly
-    return <div>Loading study session...</div>;
-  }
+    return <Loading text="Loading your Study Session.."/>
+    }
 
   return (
     <div className={`mindmap-study-view ${timeOfDay}`}>

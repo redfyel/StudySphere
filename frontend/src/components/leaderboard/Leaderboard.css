@@ -1,0 +1,160 @@
+/* === Main Container & Header === */
+.leaderboard-container {
+  width: 100%;
+  max-width: 700px;
+  margin: 2rem auto;
+  background: linear-gradient(145deg, #FDFCFB, #F1F0E8);
+  border-radius: 24px;
+  box-shadow: 0 12px 40px rgba(137, 168, 178, 0.25);
+  padding: 2rem;
+  border: 1px solid white;
+}
+
+.leaderboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: #89A8B2;
+  margin-bottom: 1.5rem;
+}
+
+.leaderboard-title {
+  text-align: center;
+  font-size: 1.75rem;
+  margin: 0;
+  font-weight: 700;
+}
+
+
+/* === Podium for Top 3 === */
+.leaderboard-podium {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  margin-top: 2rem;
+  align-items: flex-end;
+}
+
+.podium-member {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.5rem 1rem;
+  border-radius: 16px;
+  background-color: rgba(229, 225, 218, 0.5);
+  border: 1px solid white;
+  transition: transform 0.3s ease;
+}
+
+.podium-member:hover {
+  transform: translateY(-8px);
+}
+
+.podium-member.rank-1 { order: 2; min-height: 180px; background-color: rgb(212, 175, 55, 0.3); }
+.podium-member.rank-2 { order: 1; min-height: 150px; background-color: rgb(192, 192, 192, 0.3);}
+.podium-member.rank-3 { order: 3; min-height: 150px; background-color: rgb(205, 127, 50, 0.3);}
+
+.podium-rank {
+  margin-bottom: 0.75rem;
+  height: 40px; /* Give it a fixed height to align content below */
+  display: flex;
+  align-items: center;
+}
+
+.podium-name {
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: #6B8A94;
+  margin-bottom: 0.5rem;
+  word-break: break-word;
+}
+
+.podium-score {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #89A8B2;
+}
+
+.podium-number {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #89A8B2;
+}
+
+/* === Main List for 4+ === */
+.leaderboard-list ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.5rem;
+  background-color: transparent;
+  border: 1px solid #E5E1DA;
+  border-radius: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.leaderboard-item:hover {
+  background-color: rgba(229, 225, 218, 0.4);
+}
+
+.leaderboard-rank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  font-weight: 700;
+  color: #89A8B2;
+}
+
+.leaderboard-rank-number {
+  font-size: 1rem;
+}
+
+.leaderboard-name {
+  flex-grow: 1;
+  font-weight: 600;
+  color: #6B8A94;
+  margin-left: 0.5rem;
+}
+
+.leaderboard-score {
+  font-weight: 600;
+  color: #89A8B2;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- CHANGE: Replace icon colors with a style for your images --- */
+.badge-image {
+  width: 100px;  /* Adjust size as needed */
+  height: 100px;
+  object-fit: contain;
+  border-radius: 50%;
+  margin-top: 1rem;
+  margin-bottom: 13px;
+}
+
+
+/* Loading & Error States */
+.leaderboard-loading-state {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.no-data-message {
+  text-align: center;
+  color: #8FA5AF;
+  padding: 4rem 1rem;
+  background-color: #E5E1DA;
+  border-radius: 12px;
+}

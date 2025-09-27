@@ -8,6 +8,8 @@ import './AllDecksview.css';
 import { FaPlus, FaBookOpen, FaTag, FaChevronDown } from 'react-icons/fa';
 import { BsCollectionFill, BsLightningFill } from 'react-icons/bs';
 import { FaStar, FaUserFriends, FaRocket, FaLayerGroup, FaChartBar, FaCog } from 'react-icons/fa';
+import Loading from '../../loading/Loading';
+import ErrorMessage from '../../errormessage/ErrorMessage';
 
 const AllDecksView = () => {
   const [allDecks, setAllDecks] = useState([]);
@@ -69,7 +71,7 @@ const AllDecksView = () => {
       }
       const config = { headers: { 'x-auth-token': token } };
       try {
-        const res = await axios.get('http://localhost:5000/api/flashcards/decks', config);
+        const res = await axios.get('https://studysphere-n4up.onrender.com/api/flashcards/decks', config);
         setAllDecks(res.data);
         setFilteredDecks(res.data);
 
@@ -107,7 +109,7 @@ const AllDecksView = () => {
     const token = localStorage.getItem('token');
     const config = { headers: { 'x-auth-token': token } };
     try {
-      const res = await axios.get(`http://localhost:5000/api/flashcards/decks/${deckId}`, config);
+      const res = await axios.get(`https://studysphere-n4up.onrender.com/api/flashcards/decks/${deckId}`, config);
       if (res.data?.flashcards) {
        navigate('/study-enhance/flashcards', { state: { generatedFlashcards: res.data.flashcards, deckId: deckId, deckTitle: res.data.title } });
       }
@@ -117,8 +119,8 @@ const AllDecksView = () => {
   };
 
   const renderContent = () => {
-    if (loading) return <div className="loading-spinner"></div>;
-    if (error) return <div className="error-message">{error}</div>;
+    if (loading) return <Loading text="Loading your decks..." />
+    if (error) return <ErrorMessage message={"There was an error loading your decks."}/>;
     if (allDecks.length === 0) {
       return (
         <div className="no-decks-container">

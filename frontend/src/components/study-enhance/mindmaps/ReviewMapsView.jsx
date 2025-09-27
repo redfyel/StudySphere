@@ -7,6 +7,8 @@ import { FaUserFriends, FaRocket } from 'react-icons/fa';
 
 import { FaStar, FaRedoAlt, FaSitemap } from 'react-icons/fa';
 import './ReviewMapsView.css';
+import Loading from '../../loading/Loading';
+import ErrorMessage from '../../errormessage/ErrorMessage';
 
 const ReviewMapsView = () => {
   const [sessions, setSessions] = useState([]);
@@ -29,7 +31,7 @@ const ReviewMapsView = () => {
       const token = localStorage.getItem('token');
       const config = { headers: { 'x-auth-token': token } };
       try {
-        const res = await axios.get('http://localhost:5000/api/mindmaps/sessions/latest', config);
+        const res = await axios.get('https://studysphere-n4up.onrender.com/api/mindmaps/sessions/latest', config);
         if (Array.isArray(res.data)) {
           setSessions(res.data);
         }
@@ -46,7 +48,7 @@ const ReviewMapsView = () => {
     const token = localStorage.getItem('token');
     const config = { headers: { 'x-auth-token': token } };
     try {
-      const res = await axios.get(`http://localhost:5000/api/mindmaps/${mapId}`, config);
+      const res = await axios.get(`https://studysphere-n4up.onrender.com/api/mindmaps/${mapId}`, config);
       navigate('/study-enhance/mindmaps/view', { state: { mindMapData: res.data } });
     } catch (err) {
       setError('Failed to load the selected mind map.');
@@ -54,8 +56,8 @@ const ReviewMapsView = () => {
   };
 
   const renderContent = () => {
-    if (loading) return <div className="loading-spinner"></div>;
-    if (error) return <div className="error-message">{error}</div>;
+    if (loading) return <Loading text="Loading your mind maps for review..." />
+    if (error) return <ErrorMessage message={"There was an error loading your maps."}/>;
     if (sessions.length === 0) {
       return (
         <div className="no-content-container">

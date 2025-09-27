@@ -8,6 +8,8 @@ import './StartStudyPage.css'; // We will create this CSS file next
 import { FaBookOpen, FaPlus } from 'react-icons/fa';
 import { BsCollectionFill, BsLightningFill } from 'react-icons/bs';
 import { FaStar, FaUserFriends, FaRocket, FaLayerGroup, FaChartBar, FaCog } from 'react-icons/fa';
+import Loading from '../../loading/Loading';
+import ErrorMessage from '../../errormessage/ErrorMessage';
 
 const StartStudyPage = () => {
   const [decks, setDecks] = useState([]);
@@ -92,7 +94,7 @@ const StartStudyPage = () => {
       }
       const config = { headers: { 'x-auth-token': token } };
       try {
-        const res = await axios.get('http://localhost:5000/api/flashcards/decks', config);
+        const res = await axios.get('https://studysphere-n4up.onrender.com/api/flashcards/decks', config);
         setDecks(res.data);
       } catch (err) {
         setError('Could not load your decks. Please try again.');
@@ -109,7 +111,7 @@ const StartStudyPage = () => {
     const config = { headers: { 'x-auth-token': token } };
     try {
       // Use the NEW backend route to get the full deck content
-      const res = await axios.get(`http://localhost:5000/api/flashcards/decks/${deckId}`, config);
+      const res = await axios.get(`https://studysphere-n4up.onrender.com/api/flashcards/decks/${deckId}`, config);
       const fullDeck = res.data;
 
       if (fullDeck && fullDeck.flashcards) {
@@ -125,8 +127,8 @@ const StartStudyPage = () => {
   };
 
   const renderContent = () => {
-    if (loading) return <div className="loading-spinner"></div>;
-    if (error) return <div className="error-message">{error}</div>;
+    if (loading) return <Loading text="Loading your deck for a study session..." />
+    if (error) return <ErrorMessage message={"There was an error loading your study session."}/>;
     if (decks.length === 0) {
       return (
         <div className="no-decks-container">

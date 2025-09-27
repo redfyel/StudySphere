@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import RoomCard from './RoomCard';
 import CreateRoomModal from './createRoomModal';
 import './RoomList.css';
+import Loading from '../loading/Loading';
 
 function RoomList() {
   const [rooms, setRooms] = useState([]);
@@ -49,8 +50,7 @@ function RoomList() {
     setError(null);
     
     try {
-      console.log('Loading rooms for user:', user.userId);
-      const response = await fetch(`http://localhost:5000/api/rooms?userId=${user.userId}`, {
+      const response = await fetch(`https://studysphere-n4up.onrender.com/api/rooms?userId=${user.userId}`, {
         headers: {
           'Authorization': `Bearer ${sessionToken}`,
           'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ function RoomList() {
     try {
       console.log('Creating room:', roomData);
       
-      const response = await fetch('http://localhost:5000/api/rooms', {
+      const response = await fetch('https://studysphere-n4up.onrender.com/api/rooms', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -118,7 +118,7 @@ function RoomList() {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/api/rooms/${roomId}`, {
+      const response = await fetch(`https://studysphere-n4up.onrender.com/api/rooms/${roomId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -238,13 +238,7 @@ function RoomList() {
 
   if (isLoading && rooms.length === 0) {
     return (
-      <div className="room-list-container">
-        <div className="loading-state">
-          <div className="loading-spinner"></div>
-          <h2>Loading study rooms...</h2>
-          <p>Please wait while we fetch the available rooms</p>
-        </div>
-      </div>
+      <Loading text="Loading Collab Rooms..Please wait while we fetch rooms!"/>
     );
   }
 
@@ -419,14 +413,14 @@ function RoomList() {
       </div>
 
       {/* Floating Refresh Button */}
-      <button 
+      {/* <button 
         className="refresh-btn"
         onClick={loadRooms}
         title="Refresh rooms"
         disabled={isLoading}
       >
         {isLoading ? '🕒' : '🔄'}
-      </button>
+      </button> */}
 
       {/* Create Room Modal */}
       {showCreateModal && (
