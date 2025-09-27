@@ -43,6 +43,7 @@ const authRoutes = require("./routes/authRoutes");
 const flashcardRoutes = require("./routes/flashcardRoutes");
 const wellnessRoutes = require("./routes/wellnessRoutes");
 const mindmapRoutes = require("./routes/mindmapRoutes");
+const resourceRoutes = require("./routes/resourceRoutes");
 
 // --- 4. CREATE THE ASYNCHRONOUS STARTUP FUNCTION ---
 const startServer = async () => {
@@ -65,7 +66,7 @@ const startServer = async () => {
 
         // --- MIDDLEWARE SETUP ---
         app.use(cors({
-            origin: [process.env.FRONTEND_URL || 'http://localhost:3000', 'http://localhost:5173'],
+            origin: [process.env.FRONTEND_URL || 'http://localhost:3000', 'http://localhost:5173', 'https://the-study-sphere.vercel.app/'],
             credentials: true
         }));
         app.use(express.json());
@@ -90,6 +91,7 @@ const startServer = async () => {
         app.use('/api/flashcards', flashcardRoutes);
         app.use('/api/wellness', wellnessRoutes);
         app.use('/api/mindmaps', mindmapRoutes)
+        app.use('/api/resources', resourceRoutes);
 
         // Health check endpoint
         app.get('/health', (req, res) => {
