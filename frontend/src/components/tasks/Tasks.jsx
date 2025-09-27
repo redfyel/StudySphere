@@ -4,7 +4,7 @@ import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './Tasks.css';
 
-import CustomToolbar from './CustomToolbar';
+import CustomToolBar from './CustomToolBar';
 import CustomEvent from './CustomEvent';
 import Sidebar from './Sidebar';
 
@@ -30,7 +30,7 @@ const Tasks = () => {
   const [activeDate, setActiveDate] = useState(new Date());
 
   const components = {
-    toolbar: (props) => <CustomToolbar {...props} onNavigate={date => setActiveDate(date)} />,
+    toolbar: (props) => <CustomToolBar {...props} onNavigate={date => setActiveDate(date)} />,
     event: CustomEvent,
   };
 

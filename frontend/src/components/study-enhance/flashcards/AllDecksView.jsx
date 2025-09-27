@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import Sidebar from '../../sidebar/Sidebar';
-import './AllDecksView.css';
+import './AllDecksview.css';
 import { FaPlus, FaBookOpen, FaTag, FaChevronDown } from 'react-icons/fa';
 import { BsCollectionFill, BsLightningFill } from 'react-icons/bs';
 import { FaStar, FaUserFriends, FaRocket, FaLayerGroup, FaChartBar, FaCog } from 'react-icons/fa';
