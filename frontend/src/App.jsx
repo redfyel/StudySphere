@@ -4,7 +4,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 // --- CONTEXTS & LAYOUTS ---
 // Use UserLoginStore (now the unified context provider)
 // FIX: Assuming the context file is UserLoginContext.jsx
-import { UserLoginStore } from "./contexts/UserLoginContext.jsx"; 
+import { UserLoginStore } from "./contexts/UserLoginContext.jsx";
 
 // FIX: Assuming RootLayout is RootLayout.jsx
 import RootLayout from "./RootLayout.jsx";
@@ -15,7 +15,7 @@ import ProtectedRoute from "./components/room/ProtectedRoute.jsx";
 // FIX: Assuming components are .jsx
 import Home from "./components/home/Home.jsx";
 // FIX: Assuming components are .jsx
-import WellnessPage from "./components/mood-tracker/Wellness.jsx"; 
+import WellnessPage from "./components/mood-tracker/Wellness.jsx";
 
 // --- STUDY ENHANCE COMPONENTS ---
 // FIX: Assuming components are .jsx
@@ -33,9 +33,9 @@ import StartStudyPage from "./components/study-enhance/flashcards/StartStudyPage
 // FIX: Assuming components are .jsx
 import RoomList from "./components/room/RoomList.jsx";
 import VideoCall from "./components/room/VideoCall.jsx";
-import AuthScreen from "./components/room/AuthScreen.jsx"; 
-import WelcomePopUp from "./components/room/WelcomePopUp.jsx"; 
-import RoomLobby from "./components/room/RoomLobby.jsx"; 
+import AuthScreen from "./components/room/AuthScreen.jsx";
+import WelcomePopUp from "./components/room/WelcomePopUp.jsx";
+import RoomLobby from "./components/room/RoomLobby.jsx";
 
 // --- RESOURCE HUB COMPONENTS ---
 // FIX: Assuming components are .jsx
@@ -50,7 +50,6 @@ import GroupResources from "./components/group-resources/GroupResources.jsx";
 import Tasks from "./components/tasks/Tasks.jsx";
 import CalendarView from "./components/tasks/CalendarView.jsx";
 
-// --- AUTH COMPONENTS (Prioritizing first file's detail, but using AuthScreen for consistency) ---
 import Login from "./components/login/Login";
 import Register from "./components/register/Register";
 import Dashboard from "./components/dashboard/Dashboard";
@@ -58,98 +57,98 @@ import Dashboard from "./components/dashboard/Dashboard";
 import Leaderboard from "./components/leaderboard/Leaderboard";
 
 function App() {
-const router = createBrowserRouter([
- {
- path: "/",
- element: <RootLayout />,
- children: [
-  // 🏠 Landing Page
-  { index: true, element: <Home /> },
-
-    // 🔑 Global Authentication Screen
-    { path: "auth", element: <AuthScreen /> }, 
-    { path: "login", element: <Login /> },
-  { path: "register", element: <Register /> },
-
-  // 📊 Mood Tracker
-  { path: "mood-tracker", element: <WellnessPage /> },
-
-    // --- PROTECTED ROUTES START HERE ---
+  const router = createBrowserRouter([
     {
-      element: <ProtectedRoute />, 
+      path: "/",
+      element: <RootLayout />,
       children: [
-        
-        { path: "dashboard", element: <Dashboard/> },
-        { path: "welcome", element: <WelcomePopUp /> },
+        // 🏠 Landing Page
+        { index: true, element: <Home /> },
 
-        // 🎓 Study Enhance
+        // 🔑 Global Authentication Screen
+        { path: "auth", element: <AuthScreen /> },
+        { path: "login", element: <Login /> },
+        { path: "register", element: <Register /> },
+
+        // 📊 Mood Tracker
+       
+
         {
-          path: "study-enhance",
+          element: <ProtectedRoute />,
           children: [
-            // Default and generation routes
-            { index: true, element: <AIGenerationScreen /> },
-            { path: "generate", element: <AIGenerationScreen /> },
+            { path: "dashboard", element: <Dashboard /> },
+            { path: "welcome", element: <WelcomePopUp /> },
+             { path: "mood-tracker", element: <WellnessPage /> },
+              { path: "leaderboard", element: <Leaderboard /> },
 
-      // All Mind Map related routes
-      { path: "mindmaps", element: <AllMindMapsView /> },
-      { path: "mindmaps/all", element: <AllMindMapsView /> },
-      { path: "mindmaps/session", element: <StartStudyMap /> },
-      { path: "mindmaps/shared", element: <MindMapView /> },
-      { path: "mindmaps/review", element: <ReviewMapsView /> },
-      { path: "mindmaps/view", element: <MindMapView /> },
+            // 🎓 Study Enhance
+            {
+              path: "study-enhance",
+              children: [
+                // Default and generation routes
+                { index: true, element: <AIGenerationScreen /> },
+                { path: "generate", element: <AIGenerationScreen /> },
 
-            // Flashcard routes
-            { path: "decks", element: <AllDecksView /> },
-            { path: "flashcards", element: <FlashcardsView /> },
-            { path: "flashcards/session", element: <StartStudyPage /> },
-            { path: "flashcards/review", element: <ReviewMasteredView /> },
-            { path: "flashcards/shared", element: <FlashcardsView /> },
+                // All Mind Map related routes
+                { path: "mindmaps", element: <AllMindMapsView /> },
+                { path: "mindmaps/all", element: <AllMindMapsView /> },
+                { path: "mindmaps/session", element: <StartStudyMap /> },
+                { path: "mindmaps/shared", element: <MindMapView /> },
+                { path: "mindmaps/review", element: <ReviewMapsView /> },
+                { path: "mindmaps/view", element: <MindMapView /> },
 
-            // Other Study Enhance routes
-            { path: "stats", element: <h2>Statistics Page</h2> },
-            { path: "settings", element: <h2>Settings Page</h2> },
+                // Flashcard routes
+                { path: "decks", element: <AllDecksView /> },
+                { path: "flashcards", element: <FlashcardsView /> },
+                { path: "flashcards/session", element: <StartStudyPage /> },
+                { path: "flashcards/review", element: <ReviewMasteredView /> },
+                { path: "flashcards/shared", element: <FlashcardsView /> },
+
+                // Other Study Enhance routes
+                { path: "stats", element: <h2>Statistics Page</h2> },
+                { path: "settings", element: <h2>Settings Page</h2> },
+              ],
+            },
+
+            // 🗣️ Rooms
+            {
+              path: "room",
+              children: [
+                { index: true, element: <RoomList /> }, // room list
+                { path: ":roomId", element: <VideoCall /> }, // direct video call
+                { path: "lobby/:roomId", element: <RoomLobby /> }, // new lobby route
+              ],
+            },
+
+            // 📚 Resource Hub
+            {
+              path: "resources",
+              children: [
+                { index: true, element: <AllResources /> },
+                { path: "upload", element: <UploadPage /> },
+                { path: "library", element: <MyLibrary /> },
+                { path: "groups", element: <GroupResources /> },
+                { path: "pdf/:id", element: <PdfReader /> },
+              ],
+            },
+
+            // 🗓️ Tasks
+            { path: "tasksu", element: <Tasks /> }, // Duplicated route kept
+            { path: "tasks", element: <CalendarView /> },
           ],
         },
 
-        // 🗣️ Rooms 
-        {
-          path: "room", 
-          children: [
-            { index: true, element: <RoomList /> }, // room list
-            { path: ":roomId", element: <VideoCall /> }, // direct video call
-            { path: "lobby/:roomId", element: <RoomLobby />}, // new lobby route
-          ],
-        },
+       
+      ],
+    },
+  ]);
 
-        // 📚 Resource Hub 
-        {
-          path: "resources",
-          children: [
-            { index: true, element: <AllResources /> },
-            { path: "upload", element: <UploadPage /> },
-            { path: "library", element: <MyLibrary /> },
-            { path: "groups", element: <GroupResources /> },
-            { path: "pdf/:id", element: <PdfReader /> },
-          ],
-        },
-
-                // 🗓️ Tasks 
-                { path: "tasksu", element: <Tasks /> }, // Duplicated route kept
-                { path: "tasks", element: <CalendarView /> }
-            ],
-        },
-
-         { path: "leaderboard", element: <Leaderboard />}
-      ],
-    },
-  ]);
-
-// Use the unified UserLoginStore Provider
-return (
-  <UserLoginStore> 
-    <RouterProvider router={router} />
-  </UserLoginStore> 
-);
+  // Use the unified UserLoginStore Provider
+  return (
+    <UserLoginStore>
+      <RouterProvider router={router} />
+    </UserLoginStore>
+  );
 }
 
 export default App;

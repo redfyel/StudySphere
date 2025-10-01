@@ -41,7 +41,7 @@
 }
 
 /* Center: Nav Pills */
-.nav-container {
+.nnav-container {
   display: flex;
   background: #e7ecef;
   border-radius: 30px;
@@ -49,8 +49,8 @@
   margin-top: 8px;
   padding: 5px;
   gap: 4px;
-  flex: 1; /* CRITICAL FIX: Allows the nav to grow and shrink */
-  min-width: 0; /* CRITICAL FIX: Allows the container to shrink below its content's size */
+  /* flex: 1;  */
+  /* min-width: 0; */
 }
 
 .nav-link {
@@ -166,7 +166,7 @@
 
 /* Responsive Styles */
 @media (max-width: 768px) {
-  .nav-container {
+  .nnav-container {
     display: none;
     flex-direction: column;
     position: absolute;
@@ -178,7 +178,7 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
 
-  .nav-container.active {
+  .nnav-container.active {
     display: flex;
   }
 

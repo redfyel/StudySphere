@@ -18,7 +18,7 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: var(--color-main-bg); /* Near-White background for the whole page */
+     background: linear-gradient(135deg, var(--color-light-cream), var(--color-light-teal));
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   padding: 20px;
 }
@@ -181,6 +181,7 @@
 /* ---------------------------------------------------- */
 
 .auth-footer {
+  margin-top: 20px;
   padding: 15px 40px;
   border-top: 1px solid var(--color-secondary); /* Separator line */
   text-align: center;

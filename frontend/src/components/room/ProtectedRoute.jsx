@@ -58,7 +58,7 @@ const ProtectedRoute = () => {
 
   // If context has finished loading AND the user is not authenticated, redirect
   if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   // If context has finished loading AND the user IS authenticated, render children
