@@ -1,10 +1,10 @@
-/* RoomCard.css - Enhanced styling with color palette */
-
-/* Color Palette Variables */
+/* ===============================
+    Color Palette Variables
+================================= */
 :root {
   --primary-dark: #89A8B2;    /* Main blue-gray */
   --primary-medium: #B3C8CF;  /* Medium blue-gray */
-  --primary-light: #E5E1DA;   /* Light beige */
+  --primary-light: #E5E1DA;    /* Light beige */
   --primary-lightest: #F1F0E8; /* Lightest cream */
   
   /* Status Colors */
@@ -25,7 +25,9 @@
   --transition-slow: 0.5s ease;
 }
 
-/* Main Card Container */
+/* ===============================
+    Main Card Container
+================================= */
 .room-card {
   background: var(--primary-lightest);
   border: 1px solid var(--primary-light);
@@ -80,7 +82,9 @@
 }
 
 
-/* Error Banner */
+/* ===============================
+    Error Banner
+================================= */
 .error-banner {
   position: absolute;
   top: 0;
@@ -130,7 +134,9 @@
   background: rgba(153, 27, 27, 0.1);
 }
 
-/* Card Header */
+/* ===============================
+    Card Header
+================================= */
 .card-header {
   display: flex;
   align-items: flex-start;
@@ -202,28 +208,9 @@
   font-size: 11px;
 }
 
-.delete-button {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 8px;
-  padding: 8px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  color: var(--danger);
-  font-size: 16px;
-  min-width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.delete-button:hover {
-  background: rgba(239, 68, 68, 0.2);
-  transform: scale(1.05);
-}
-
-/* Room Topic */
+/* ===============================
+    Room Topic
+================================= */
 .room-topic {
   display: flex;
   align-items: center;
@@ -248,7 +235,9 @@
   white-space: nowrap;
 }
 
-/* Room Description */
+/* ===============================
+    Room Description
+================================= */
 .room-description {
   margin-bottom: 16px;
 }
@@ -261,7 +250,9 @@
   word-wrap: break-word;
 }
 
-/* Participants Section */
+/* ===============================
+    Participants Section
+================================= */
 .participants-section {
   margin-bottom: 16px;
 }
@@ -321,7 +312,9 @@
   100% { opacity: 1; }
 }
 
-/* Progress Bar */
+/* ===============================
+    Progress Bar
+================================= */
 .progress-bar {
   width: 100%;
   height: 6px;
@@ -353,12 +346,18 @@
   background: linear-gradient(90deg, var(--danger) 0%, #F87171 100%);
 }
 
-/* Room Settings */
+/* ===============================
+    Room Settings
+================================= */
 .room-settings {
   margin-bottom: 16px;
   display: flex;
+  /* Use space-between to push the delete button to the right end */
+  justify-content: space-between;
+  align-items: center; /* Align items vertically in the middle */
   flex-wrap: wrap;
-  gap: 8px;
+  /* Reduced gap for settings items, but the space-between handles the delete button */
+  gap: 8px; 
 }
 
 .setting-item {
@@ -381,7 +380,40 @@
   font-weight: 500;
 }
 
-/* Card Footer */
+/* New Delete Button Style - Smaller and in-line */
+.delete-button-setting {
+  /* Inherit some settings style but change color and size */
+  background: none;
+  border: none;
+  color: var(--danger);
+  opacity: 0.8;
+  cursor: pointer;
+  padding: 4px; /* Smaller padding */
+  width: 28px; /* Fixed width/height for circular hover */
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all var(--transition-fast);
+  flex-shrink: 0; /* Prevents it from shrinking */
+  margin-left: auto; /* Push it all the way to the right */
+}
+
+.delete-button-setting:hover {
+  background: rgba(239, 68, 68, 0.1);
+  opacity: 1;
+  /* Removed transform: scale(1.1); for a subtler, Google-like effect */
+}
+
+.delete-icon-setting {
+  font-size: 18px; /* Standard small Google icon size */
+}
+
+
+/* ===============================
+    Card Footer
+================================= */
 .card-footer {
   display: flex;
   flex-direction: column;
@@ -415,7 +447,9 @@
   font-weight: 500;
 }
 
-/* Join Button */
+/* ===============================
+    Join Button
+================================= */
 .join-button {
   width: 100%;
   padding: 12px 16px;
@@ -488,26 +522,14 @@
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
-/* Debug Info */
-.debug-info {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
-  font-size: 10px;
-  color: #94A3B8;
-  font-family: 'Courier New', monospace;
-  background: rgba(241, 240, 232, 0.8);
-  padding: 2px 4px;
-  border-radius: 4px;
-  pointer-events: none;
-}
+/* REMOVED: Old .delete-button-bottom and .delete-icon-bottom styles */
 
-/* Full Room Overlay */
+/* ===============================
+    Full Room Overlay
+================================= */
 .full-room-overlay {
   position: absolute;
   top: 0;
@@ -540,7 +562,9 @@
   font-weight: 600;
 }
 
-/* Responsive Design */
+/* ===============================
+    Responsive Design
+================================= */
 @media (max-width: 480px) {
   .room-card {
     margin: 8px;
@@ -557,9 +581,7 @@
     width: 100%;
   }
   
-  .delete-button {
-    align-self: flex-end;
-  }
+  /* REMOVED: delete-button-bottom overrides */
   
   .footer-info {
     flex-direction: column;
@@ -568,7 +590,9 @@
   }
 }
 
-/* Dark Mode Support */
+/* ===============================
+    Dark Mode
+================================= */
 @media (prefers-color-scheme: dark) {
   .room-card {
     background: #1a1a1a;
@@ -584,8 +608,8 @@
     color: #a1a1aa;
   }
   
-  .debug-info {
-    background: rgba(26, 26, 26, 0.8);
-    color: #71717a;
+  /* UPDATED: Hover for the new delete button class */
+  .delete-button-setting:hover {
+    background: rgba(239, 68, 68, 0.2);
   }
 }

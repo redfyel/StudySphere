@@ -1,171 +1,220 @@
-/* Color Palette */
+/* Color Palette Variables (Assuming these exist or are inherited) */
 :root {
-  --notes-text-color: #1F2937;
-  --notes-placeholder-color: #89A8B2;
-  --notes-border-color: #B3C8CF;
-  --notes-hover-color:#89A8B2;
-  --notes-background:#89A8B2;
-  --notes-focus-color: #89A8B2;
-  --notes-stats-color: #6B7280;
-  --notes-saved-color: #89A8B2;
+    --primary-dark: #89A8B2;
+    --primary-medium: #B3C8CF;
+    --primary-light: #E5E1DA; /* Used for header/footer contrast */
+    --primary-lightest: #F1F0E8; /* Used for background */
+    --danger: #EF4444;
+    --text-color: #1F2937;
+    --mobile-breakpoint: 768px;
 }
 
+/* Base Notes Container Styles (Desktop/Sidebar View - "Not a box") */
 .notes {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  transition: all 0.3s ease;
-  color: var(--notes-text-color);
+    /* Remove box styling for integration into a sidebar */
+    background-color: transparent; 
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    
+    /* Ensure it behaves as a clean flex item within the parent sidebar */
+    display: flex;
+    flex-direction: column;
+    height: 100%; 
+    width: 100%;
+    /* Override for the panel stack, which usually sets padding/background */
+    padding: 0; 
+    transition: all 0.3s ease-in-out;
 }
 
+/* Expanded/Full-Screen State (Shared between Desktop and Mobile) */
 .notes-expanded {
-  max-width: 90vw;
-  width: 90vw;
+    /* For desktop, this expands vertically within the sidebar area */
+    position: relative;
+    z-index: 10;
+    flex-grow: 1; 
+    height: auto;
+    max-height: none;
+    
+    /* Re-introduce a subtle border/shadow only when expanded on desktop */
+    border: 1px solid var(--primary-medium);
+    border-radius: 12px;
+    background-color: var(--primary-lightest);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+
+/* ---------------------------------------------------- */
+/* Mobile Full-Screen Modal Overlay (Always takes precedence) */
+/* ---------------------------------------------------- */
+@media (max-width: var(--mobile-breakpoint)) {
+    .notes, .notes-expanded {
+        /* Full Screen Coverage */
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+        z-index: 9999; /* Ensure it covers everything */
+        background-color: var(--primary-lightest); 
+        padding: 0; /* No external padding */
+    }
+    
+    /* Reset header/footer padding for neatness */
+    .notes-header, .notes-footer {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    /* Textarea container takes up the remaining space */
+    .textarea-container {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 0 1rem;
+    }
+
+    .notes-textarea {
+        width: 100%;
+        height: 100%;
+        min-height: 200px; 
+        max-height: none !important;
+        padding: 0;
+        box-sizing: border-box;
+    }
+}
+
+/* ---------------------------------------------------- */
+/* Standard Styling for Components (Minimal change) */
+/* ---------------------------------------------------- */
+
+/* Header Styles */
 .notes-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid var(--notes-border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--primary-medium);
+    background-color: var(--primary-light); /* Keep a background for the header area */
+    border-radius: 0; /* No rounding by default */
 }
 
-.notes h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  /* font-weight: 600; */
-  color: var(--notes-focus-color);
+.notes-expanded .notes-header {
+    /* Re-apply top rounding when expanded/full-screen */
+    border-radius: 12px 12px 0 0;
+}
+
+.notes-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--text-color);
 }
 
 .notes-actions {
-  display: flex;
-  gap: 8px;
+    display: flex;
+    gap: 8px;
 }
 
+/* Action Button Styles (No changes needed) */
 .action-btn {
-  padding: 6px 10px;
-  /* border: 1px solid var(--notes-border-color); */
-  border-radius: 6px;
-  background: var(--notes-background);
-  color: var(--notes-text-color);
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s ease;
-  min-width: 32px;
+    background: var(--primary-medium);
+    border: none;
+    border-radius: 6px;
+    color: var(--text-color);
+    cursor: pointer;
+    padding: 6px 10px;
+    font-size: 0.8rem;
+    transition: background-color 0.2s, transform 0.1s;
 }
 
 .action-btn:hover:not(:disabled) {
-  background: var(--notes-hover-color);
-  transform: translateY(-1px);
- 
+    background-color: var(--primary-dark);
+    color: white;
+    transform: translateY(-1px);
+}
+
+.clear-btn {
+    background-color: var(--danger);
+    color: white;
+}
+
+.clear-btn:hover:not(:disabled) {
+    background-color: #C53030;
 }
 
 .action-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
-.expand-btn {
-  font-weight: bold;
-  font-size: 16px;
-}
-
+/* Textarea Content */
 .textarea-container {
-  position: relative;
-  color:#5e8694;
+    padding: 16px;
+    overflow-y: hidden;
+    flex-grow: 1; 
 }
 
 .notes-textarea {
-  width: 100%;
-  min-height: 120px;
-  max-height: 400px;
-  padding: 16px;
-  /* border: 2px solid var(--notes-border-color); */
-  border-radius: 8px;
-  font-size: 14px;
-  line-height: 1.5;
-  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
-  resize: vertical;
-  background: var(--notes-background);
-  color: #020b0e;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  box-sizing: border-box;
+    width: 100%;
+    min-height: 150px;
+    padding: 10px;
+    /* Remove outer border/background from textarea itself */
+    border: none; 
+    background-color: transparent;
+    border-radius: 8px;
+    resize: none;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    font-family: inherit;
+    box-sizing: border-box;
+    color: var(--text-color);
+    transition: border-color 0.2s;
+    overflow-y: hidden;
 }
 
+/* ADD A SUBTLE BORDER WHEN FOCUSED IN SIDEBAR MODE */
 .notes-textarea:focus {
-  outline: none;
-  border-color: var(--notes-focus-color);
-  /* box-shadow: 0 0 0 3px rgba(137, 168, 178, 0.5); */
-}
-
-.notes-textarea::placeholder {
- color: var(--notes-stats-color);
-  line-height: 1.4;
+    outline: none;
+    /* Apply focus styling directly to the textarea if no box is desired */
+    border-bottom: 2px solid var(--primary-dark);
+    box-shadow: none;
+    background-color: var(--primary-lightest); /* Give it a light background on focus */
 }
 
 .notes-expanded .notes-textarea {
-  min-height: 300px;
-  max-height: 600px;
+    /* When expanded, make the textarea transparent, and let the container background show */
+    min-height: 100%; 
+    overflow-y: auto;
+    background-color: transparent;
 }
 
+
+/* Footer Styles */
 .notes-footer {
-  margin-top: 8px;
+    padding: 8px 16px;
+    border-top: 1px solid var(--primary-medium);
+    background-color: var(--primary-light);
+    font-size: 0.75rem;
+    color: #64748B;
+    border-radius: 0; /* No rounding by default */
+}
+
+.notes-expanded .notes-footer {
+    /* Re-apply bottom rounding when expanded/full-screen */
+    border-radius: 0 0 12px 12px;
 }
 
 .notes-stats {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-  color: var(--notes-stats-color);
-}
-
-.stat {
-  margin-right: 16px;
-}
-
-.last-saved {
-  font-style: italic;
-  color: var(--notes-saved-color);
-}
-
-/* Mobile responsive */
-@media (max-width: 640px) {
-  .notes {
-    max-width: 100%;
-    padding: 0 8px;
-  }
-  .notes-header {
-    flex-direction: column;
-    align-items: flex-start;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
     gap: 8px;
-  }
-  .notes-actions {
-    align-self: flex-end;
-  }
-  .action-btn {
-    padding: 8px 12px;
-    min-width: 36px;
-  }
-  .notes-textarea {
-    font-size: 16px;
-  }
-  .notes-stats {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-  }
 }
 
-/* Smooth animations */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.last-saved {
-  animation: fadeIn 0.3s ease;
+.stat strong {
+    font-weight: 700;
+    color: var(--text-color);
 }

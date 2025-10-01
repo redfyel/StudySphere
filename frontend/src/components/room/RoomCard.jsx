@@ -169,17 +169,6 @@ function RoomCard({ room, userId, onDelete }) {
             )}
           </div>
         </div>
-        
-        {isOwner && (
-          <button
-            className="delete-button"
-            onClick={handleDeleteRoom}
-            title="Delete room"
-            aria-label="Delete room"
-          >
-            <span className="material-icons">delete</span>
-          </button>
-        )}
       </div>
 
       {/* Room Topic */}
@@ -220,6 +209,34 @@ function RoomCard({ room, userId, onDelete }) {
         </div>
       </div>
 
+      {/* Room Settings Info - DELETE BUTTON IS MOVED HERE */}
+      <div className="room-settings">
+        {roomType === 'private' && room.requiresApproval && (
+          <div className="setting-item">
+            <span className="material-icons setting-icon">verified_user</span>
+            <span className="setting-text">Approval Required</span>
+          </div>
+        )}
+        {roomType === 'public' && (
+          <div className="setting-item">
+            <span className="material-icons setting-icon">meeting_room</span>
+            <span className="setting-text">Open Access</span>
+          </div>
+        )}
+        
+        {/* New Delete Button Position */}
+        {isOwner && (
+          <button
+            className="delete-button-setting" /* New class for styling */
+            onClick={handleDeleteRoom}
+            title="Delete room"
+            aria-label="Delete room"
+          >
+            <span className="material-icons delete-icon-setting">delete</span> {/* New class for icon size */}
+          </button>
+        )}
+      </div>
+
       {/* Card Footer */}
       <div className="card-footer">
         <div className="footer-info">
@@ -255,7 +272,7 @@ function RoomCard({ room, userId, onDelete }) {
               <>
                 <span className="material-icons button-icon">
                   {participantCount >= maxParticipants ? 'block' : 
-                   participantCount === 0 ? 'play_arrow' : 'meeting_room'}
+                    participantCount === 0 ? 'play_arrow' : 'meeting_room'}
                 </span>
                 {getRoomStatusText()}
               </>

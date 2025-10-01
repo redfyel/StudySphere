@@ -5,10 +5,12 @@ import { ArrowRight, Users, Library, HeartPulse, Sparkles } from 'lucide-react';
 import './Home.css';
 
 const Home = () => {
+  // --- CHANGE #2: Initialize the navigate function ---
   const navigate = useNavigate();
 
+  // --- CHANGE #3: Create a handler function to go to the register page ---
   const handleNavigateToRegister = () => {
-    navigate('/register'); 
+    navigate('/register'); // Make sure '/register' is the correct path in your router setup
   };
 
   return (
@@ -22,6 +24,7 @@ const Home = () => {
           <p className="hero-subtitle">
             Unite AI-powered learning tools, shared resources, and collaborative study rooms—all while keeping your wellbeing in check.
           </p>
+          {/* --- CHANGE #4: Attach the onClick handler to the button --- */}
           <button className="hero-cta-button" onClick={handleNavigateToRegister}>
             Join StudySphere <ArrowRight size={20} />
           </button>
@@ -37,7 +40,9 @@ const Home = () => {
         </div>
       </header>
 
+      {/* --- Redesigned Features Section --- */}
       <section className="features-showcase-section" id="features">
+        {/* Card 1: Collab Rooms */}
         <div className="feature-showcase-card">
           <div className="card-content">
             <div className="feature-icon-wrapper"><Users size={28} /></div>
@@ -52,6 +57,7 @@ const Home = () => {
           </div>
         </div>
         
+        {/* Card 2: Smart Learn (AI) */}
         <div className="feature-showcase-card">
           <div className="card-content">
             <div className="feature-icon-wrapper"><Sparkles size={28} /></div>
@@ -67,6 +73,7 @@ const Home = () => {
           </div>
         </div>
 
+        {/* Card 3: Resource Hub */}
         <div className="feature-showcase-card">
           <div className="card-content">
             <div className="feature-icon-wrapper"><Library size={28} /></div>
@@ -80,6 +87,7 @@ const Home = () => {
           </div>
         </div>
 
+        {/* Card 4: Track & Compete */}
         <div className="feature-showcase-card">
           <div className="card-content">
             <div className="feature-icon-wrapper"><HeartPulse size={28} /></div>
@@ -101,6 +109,7 @@ const Home = () => {
       {/* Final CTA Section */}
       <section className="final-cta-section">
         <h2 className="final-cta-title">Ready to Transform Your Study Habits?</h2>
+        {/* --- CHANGE #5: Attach the same handler to this button --- */}
         <button className="hero-cta-button" onClick={handleNavigateToRegister}>
           Join StudySphere <ArrowRight size={20} />
         </button>

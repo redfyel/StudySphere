@@ -43,27 +43,27 @@ function AuthScreen() {
     return;
   }
 
-  try {
-    // FIX 1: Use the correct URL (assuming your routes are mounted at /api/auth)
-    // FIX 2: Use axios instead of fetch (you already imported it)
-    // FIX 3: Send the correct data (email and password)
-    const res = await axios.post('https://studysphere-n4up.onrender.com/api/auth/login', {
-       email: email.trim(),
-       password: password
-    });
-    
-    // FIX 4: Now res.data works because we are using axios and named the variable 'res'
-    const { token, userId, username, email: userEmail, isNewUser } = res.data;
+    try {
+      const response = await fetch('https://studysphere-n4up.onrender.com/api/users/authenticate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
+      });
 
-    // 3. Call the unified login function to update context and localStorage
-    login(token, userId, username, userEmail); 
-    
-    console.log("Login successful. Redirecting user:", username);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Authentication failed.');
+      }
 
-    // 4. Show welcome message for new users
-    if (isNewUser) {
-      console.log(`Welcome to StudySphere, ${username}! Let's get you started.`);
-    }
+      const data = await response.json();
+      
+      // Use context to handle authentication
+      handleAuthSuccess(data.userId, data.username, data.email, data.sessionToken);
+
+      // Show welcome message for new users
+      if (data.isNewUser) {
+        alert(`Welcome to StudySphere, ${data.username}! Let's get you started.`);
+      }
 
     // 5. Redirect to the protected room
     navigate('/room',{replace:true}); 
