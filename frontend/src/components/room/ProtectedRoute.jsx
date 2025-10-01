@@ -2,6 +2,7 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../contexts/UserLoginContext';
+import { useState, useEffect } from 'react';
 
 const ProtectedRoute = () => {
   const { isAuthenticated, sessionToken, handleLogout } = useAuth();
