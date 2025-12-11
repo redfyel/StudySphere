@@ -94,7 +94,7 @@ button:active {
 
 /* RoomCard */
 .room-card {
-  background-color: var(--cards-highlights);
+ 
   border-radius: 12px;
   padding: 25px;
   box-shadow: 0 4px 15px rgba(var(--text-color-rgb), 0.1);
@@ -108,11 +108,11 @@ button:active {
 
 .room-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(var(--text-color-rgb), 0.15);
+  /* box-shadow: 0 8px 25px rgba(var(--text-color-rgb), 0.15); */
 }
 
 .room-card h3 {
-  color: var(--text-color);
+  /* color: var(--text-color); */
   margin-top: 0;
   margin-bottom: 10px;
   font-size: 1.5rem;

@@ -10,12 +10,14 @@ import ChatPanel from './ChatPanel';
 import ParticipantList from './ParticipantList';
 import './VideoCall.css';
 
+
 // Import local video assets
 import vid1 from '../../assets/vid1.mp4';
 import vid2 from '../../assets/vid2.mp4';
 import vid3 from '../../assets/vid3.mp4';
 import vid4 from '../../assets/vid4.mp4';
 import vid5 from '../../assets/vid5.mp4';
+
 
 const BACKGROUNDS = [
   { name: 'Study Scene 1', url: vid1, type: 'video' },
@@ -26,11 +28,13 @@ const BACKGROUNDS = [
   { name: 'No Background', url: 'none', type: 'none' },
 ];
 
+
 const ICE_SERVERS = [
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' },
   { urls: 'stun:stun2.l.google.com:19302' }
 ];
+
 
 const WaitingForApproval = ({ roomId, onCancel }) => {
   return (
@@ -47,6 +51,7 @@ const WaitingForApproval = ({ roomId, onCancel }) => {
     </div>
   );
 };
+
 
 function VideoCall() {
   const { roomId } = useParams();
@@ -99,6 +104,7 @@ function VideoCall() {
   const [isConnecting, setIsConnecting] = useState(true);
   const [connectionError, setConnectionError] = useState(null);
 
+
   // Refs
   const localCameraVideoRef = useRef(null);
   const localScreenShareVideoRef = useRef(null); 
@@ -111,18 +117,26 @@ function VideoCall() {
   const fullScreenRef = useRef(null);
   const handleDataChannelMessageRef = useRef();
 
-// ----------------------------------------------------------------------
-// CORE UTILITIES AND CALLBACK DEFINITIONS
-// ----------------------------------------------------------------------
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!isAuthenticated || !sessionToken || !user) {
+      navigate('/auth', { replace: true });
+      return;
+    }
+  }, [isAuthenticated, sessionToken, user, navigate]);
+
 
   const handleCloseChat = useCallback(() => {
     setShowChatPanel(false);
   }, []);
 
+
   // Update refs
   useEffect(() => {
     localStreamRef.current = localStream;
   }, [localStream]);
+
 
   // User display name helper
   const getUserDisplayName = useCallback((userId) => {
@@ -132,7 +146,8 @@ function VideoCall() {
     return participant?.name || remoteData?.username || `Guest ${userId?.slice(-4) || 'Unknown'}`;
   }, [user?.userId, user?.username, participants, remoteUsersData]);
 
-  // Data channel message handler (For WebRTC data channels)
+
+  // Data channel message handler
   const handleDataChannelMessage = useCallback((senderId, data) => {
     switch (data.type) {
       case 'chat':
@@ -142,8 +157,7 @@ function VideoCall() {
           username: getUserDisplayName(senderId),
           message: data.message,
           timestamp: new Date(),
-          type: 'text',
-          read: showChatPanel // Mark as read if chat is open when received
+          type: 'text'
         }]);
         break;
       case 'userUpdate':
@@ -155,12 +169,14 @@ function VideoCall() {
       default:
         console.log('Unknown data channel message type:', data.type);
     }
-  }, [getUserDisplayName, showChatPanel]);
+  }, [getUserDisplayName]);
+
 
   // Update the ref whenever handleDataChannelMessage changes
   useEffect(() => {
     handleDataChannelMessageRef.current = handleDataChannelMessage;
   }, [handleDataChannelMessage]);
+
 
   // Initialize media
   const initializeMedia = useCallback(async () => {
@@ -178,6 +194,7 @@ function VideoCall() {
         noiseSuppression: true,
         autoGainControl: true
       } : false;
+
 
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: videoConstraints, 
@@ -222,11 +239,13 @@ function VideoCall() {
     }
   }, [initialAudio, initialVideo]);
 
+
   // Connection quality monitoring
   const startConnectionMonitoring = useCallback((remoteUserId, peerConnection) => {
     if (connectionStatsIntervals.current[remoteUserId]) {
       clearInterval(connectionStatsIntervals.current[remoteUserId]);
     }
+
 
     connectionStatsIntervals.current[remoteUserId] = setInterval(async () => {
       try {
@@ -242,6 +261,7 @@ function VideoCall() {
             bytesSent += report.bytesSent || 0;
           }
         });
+
 
         setConnectionQuality(prev => ({
           ...prev,
@@ -259,128 +279,36 @@ function VideoCall() {
   }, []);
 
 
-// 1. FIXED: updatePeerConnectionTracks function - More robust track replacement
-const updatePeerConnectionTracks = useCallback(async (newStream) => {
-  console.log('Updating peer connection tracks with new stream:', {
-    audioTracks: newStream.getAudioTracks().length,
-    videoTracks: newStream.getVideoTracks().length,
-    streamId: newStream.id
-  });
-
-  const peerConnections = peerConnectionsRef.current;
-  const audioTrack = newStream.getAudioTracks()[0];
-  const videoTrack = newStream.getVideoTracks()[0];
-
-  const updatePromises = Object.keys(peerConnections).map(async (remoteUserId) => {
-    const pc = peerConnections[remoteUserId];
-    if (pc.connectionState === 'closed' || pc.connectionState === 'failed') {
-      console.log(`Skipping track update for ${remoteUserId} - connection state: ${pc.connectionState}`);
-      return;
-    }
-
-    try {
-      console.log(`Updating tracks for peer: ${remoteUserId}`);
-      
-      // Get all current senders
-      const senders = pc.getSenders();
-      const videoSender = senders.find(sender => sender.track?.kind === 'video');
-      const audioSender = senders.find(sender => sender.track?.kind === 'audio');
-
-      // Handle VIDEO track replacement
-      if (videoTrack) {
-        if (videoSender) {
-          console.log(`Replacing video track for ${remoteUserId}`);
-          await videoSender.replaceTrack(videoTrack);
-        } else {
-          console.log(`Adding new video track for ${remoteUserId}`);
-          pc.addTrack(videoTrack, newStream);
-        }
-      } else if (videoSender && videoSender.track) {
-        console.log(`Removing video track for ${remoteUserId}`);
-        await videoSender.replaceTrack(null);
-      }
-
-      // Handle AUDIO track replacement  
-      if (audioTrack) {
-        if (audioSender) {
-          console.log(`Replacing audio track for ${remoteUserId}`);
-          await audioSender.replaceTrack(audioTrack);
-        } else {
-          console.log(`Adding new audio track for ${remoteUserId}`);
-          pc.addTrack(audioTrack, newStream);
-        }
-      } else if (audioSender && audioSender.track) {
-        console.log(`Removing audio track for ${remoteUserId}`);
-        await audioSender.replaceTrack(null);
-      }
-
-      // Force renegotiation after track updates
-      console.log(`Forcing renegotiation for ${remoteUserId}`);
-      if (pc.signalingState === 'stable') {
-        const offer = await pc.createOffer({
-          offerToReceiveAudio: true,
-          offerToReceiveVideo: true
-        });
-        await pc.setLocalDescription(offer);
-        
-        if (socketRef.current?.connected) {
-          socketRef.current.emit('signal', {
-            targetUserId: remoteUserId,
-            signal: pc.localDescription,
-          });
-          console.log(`Sent renegotiation offer to ${remoteUserId}`);
-        }
-      }
-
-    } catch (error) {
-      console.error(`Error updating tracks for ${remoteUserId}:`, error);
-    }
-  });
-
-  await Promise.allSettled(updatePromises);
-  console.log('Track update complete for all peers');
-}, []);
-
-
-  // 3. FIXED: createPeerConnection - Better handling of remote streams
-  const createPeerConnection = useCallback((remoteUserId, isInitiator = false) => {
-    console.log('Creating peer connection for:', remoteUserId, 'isInitiator:', isInitiator);
-    
+  // FIXED: Create peer connection with enhanced screen share support
+  const createPeerConnection = useCallback((remoteUserId) => {
+    console.log('Creating peer connection for:', remoteUserId);
     const peerConnection = new RTCPeerConnection({
       iceServers: ICE_SERVERS,
       iceCandidatePoolSize: 10
     });
 
-    // Add local stream tracks if available
-    if (localStreamRef.current && localStreamRef.current.getTracks().length > 0) {
+
+    // Add local stream tracks
+    if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach(track => {
-        console.log(`Adding ${track.kind} track to peer connection for:`, remoteUserId);
+        console.log('Adding track:', track.kind, 'to peer connection for:', remoteUserId);
         peerConnection.addTrack(track, localStreamRef.current);
       });
     }
 
+
     // Enhanced remote stream handling
     peerConnection.ontrack = (event) => {
-      console.log('Received remote track from:', remoteUserId, event.track.kind);
+      console.log('Received remote stream from:', remoteUserId, 'Stream tracks:', event.streams[0].getTracks().length);
       const remoteStream = event.streams[0];
-      
-      if (!remoteStream) {
-        console.error('No remote stream received');
-        return;
-      }
-      
-      console.log('Remote stream details:', {
-        id: remoteStream.id,
-        videoTracks: remoteStream.getVideoTracks().length,
-        audioTracks: remoteStream.getAudioTracks().length
-      });
       
       setRemoteStreams(prev => ({ 
         ...prev, 
         [remoteUserId]: remoteStream 
       }));
 
-      // Auto-focus screen shares with delay to ensure state is updated
+
+      // Auto-focus screen shares from remote users
       setTimeout(() => {
         setRemoteUsersData(current => {
           const userData = current[remoteUserId];
@@ -392,13 +320,13 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
           }
           return current;
         });
-      }, 1000);
+      }, 500);
     };
 
-    // ICE candidate handling
+
+    // Handle ICE candidates
     peerConnection.onicecandidate = (event) => {
       if (event.candidate && socketRef.current?.connected) {
-        console.log('Sending ICE candidate to:', remoteUserId);
         socketRef.current.emit('ice-candidate', {
           targetUserId: remoteUserId,
           candidate: event.candidate,
@@ -406,7 +334,8 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       }
     };
 
-    // Negotiation needed
+
+    // Enhanced negotiation handling
     peerConnection.onnegotiationneeded = async () => {
       try {
         console.log('Negotiation needed with:', remoteUserId);
@@ -418,7 +347,6 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
           await peerConnection.setLocalDescription(offer);
           
           if (socketRef.current?.connected) {
-            console.log('Sending offer to:', remoteUserId);
             socketRef.current.emit('signal', {
               targetUserId: remoteUserId,
               signal: peerConnection.localDescription,
@@ -430,7 +358,8 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       }
     };
 
-    // Connection state monitoring
+
+    // Monitor connection state
     peerConnection.onconnectionstatechange = () => {
       const state = peerConnection.connectionState;
       console.log(`Connection state with ${remoteUserId}:`, state);
@@ -440,19 +369,27 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         [remoteUserId]: state
       }));
 
+
+      // Less aggressive reconnection
       if (state === 'failed') {
-        console.log(`Connection failed with ${remoteUserId}, attempting restart`);
         setTimeout(() => {
           if (peerConnection.connectionState === 'failed') {
+            console.log(`Attempting ICE restart with ${remoteUserId}`);
             peerConnection.restartIce();
           }
         }, 2000);
       }
     };
 
-    // Data channel setup (existing code)
+
+    // Create data channel
     const dataChannel = peerConnection.createDataChannel('chat', { ordered: true });
-    dataChannel.onopen = () => console.log(`Data channel opened with ${remoteUserId}`);
+    
+    dataChannel.onopen = () => {
+      console.log(`Data channel opened with ${remoteUserId}`);
+    };
+
+
     dataChannel.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
@@ -461,9 +398,12 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         console.error('Error parsing data channel message:', err);
       }
     };
-    
+
+
     dataChannelsRef.current[remoteUserId] = dataChannel;
-    
+
+
+    // Handle incoming data channels
     peerConnection.ondatachannel = (event) => {
       const channel = event.channel;
       channel.onmessage = (event) => {
@@ -476,40 +416,33 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       };
     };
 
+
     startConnectionMonitoring(remoteUserId, peerConnection);
     peerConnectionsRef.current[remoteUserId] = peerConnection;
-
     return peerConnection;
   }, [startConnectionMonitoring]);
 
-  // 4. FIXED: handleSignal - Better signaling handling
+
+  // FIXED: Handle WebRTC signaling
   const handleSignal = useCallback(async (senderUserId, signal) => {
-    console.log('Handling signal from:', senderUserId, 'type:', signal.type);
-    
-    if (!localStreamRef.current) {
-      console.warn('No local stream available for signaling');
-      return;
-    }
+    if (!localStreamRef.current) return;
+
 
     let peerConnection = peerConnectionsRef.current[senderUserId];
     if (!peerConnection) {
-      console.log('Creating new peer connection for:', senderUserId);
       peerConnection = createPeerConnection(senderUserId);
     }
 
+
     try {
       if (signal.type === 'offer' || signal.type === 'answer') {
-        const canSetRemote = 
-          peerConnection.signalingState === 'stable' || 
-          peerConnection.signalingState === 'have-local-offer' ||
-          signal.type === 'answer';
-
-        if (canSetRemote) {
-          console.log(`Setting remote description for ${senderUserId}`);
+        if (peerConnection.signalingState === 'stable' || 
+            peerConnection.signalingState === 'have-local-offer' ||
+            signal.type === 'answer') {
+          
           await peerConnection.setRemoteDescription(new RTCSessionDescription(signal));
           
           if (signal.type === 'offer') {
-            console.log(`Creating answer for ${senderUserId}`);
             const answer = await peerConnection.createAnswer({
               offerToReceiveAudio: true,
               offerToReceiveVideo: true
@@ -517,15 +450,12 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
             await peerConnection.setLocalDescription(answer);
             
             if (socketRef.current?.connected) {
-              console.log(`Sending answer to ${senderUserId}`);
               socketRef.current.emit('signal', {
                 targetUserId: senderUserId,
                 signal: peerConnection.localDescription,
               });
             }
           }
-        } else {
-          console.warn(`Cannot set remote description for ${senderUserId}, state:`, peerConnection.signalingState);
         }
       }
     } catch (err) {
@@ -533,7 +463,8 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
     }
   }, [createPeerConnection]);
 
-  // **CRITICAL FIX FUNCTION:** handleIceCandidate
+
+  // Handle ICE candidates
   const handleIceCandidate = useCallback(async (senderUserId, candidate) => {
     const peerConnection = peerConnectionsRef.current[senderUserId];
     if (peerConnection) {
@@ -545,19 +476,6 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
     }
   }, []);
 
-
-// ----------------------------------------------------------------------
-// REACT HOOKS AND EFFECTS
-// ----------------------------------------------------------------------
-
-
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!isAuthenticated || !sessionToken || !user) {
-      navigate('/auth', { replace: true });
-      return;
-    }
-  }, [isAuthenticated, sessionToken, user, navigate]);
 
   // Initialize media on component mount
   useEffect(() => {
@@ -573,6 +491,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       }
     };
   }, [isAuthenticated, user, initializeMedia, navigate]);
+
 
   // Update video refs when stream changes
   useEffect(() => {
@@ -592,6 +511,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
     }
   }, [localStream, isScreenSharing]);
 
+
   // Update background video
   useEffect(() => {
     if (backgroundVideoRef.current && selectedBackground && selectedBackground.type === 'video') {
@@ -600,47 +520,96 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
     }
   }, [selectedBackground]);
 
-// The actual track replacement is now called manually inside toggleScreenShare/toggleCamera
-// This useEffect is kept primarily for logging/debugging (as per corrected guidance)
+
+// ----------------------------------------------------------------------
+// FIXED: TRACK REPLACEMENT LOGIC FOR SCREEN SHARING / CAMERA TOGGLE
+// This section is critical for remote users to see the screen share.
+
+
   useEffect(() => {
+    // Ensure localStream is ready before attempting to send tracks
     if (!localStream) return;
 
+
+    const peerConnections = peerConnectionsRef.current;
     const audioTrack = localStream.getAudioTracks()[0];
     const videoTrack = localStream.getVideoTracks()[0];
 
-    console.log('Local stream updated:', {
-      audio: !!audioTrack,
-      video: !!videoTrack,
-      audioEnabled: audioTrack?.enabled,
-      videoEnabled: videoTrack?.enabled,
-      isScreenSharing,
-      isCameraOff,
-      isMuted
+
+    Object.keys(peerConnections).forEach(remoteUserId => {
+      const pc = peerConnections[remoteUserId];
+      if (pc.connectionState === 'closed') return;
+
+
+      try {
+        // 1. Handle VIDEO track replacement (Camera or Screen Share)
+        const videoSender = pc.getSenders().find(
+          sender => sender.track && sender.track.kind === 'video'
+        );
+
+
+        if (videoTrack) {
+          if (videoSender) {
+            // Use replaceTrack to swap the video source (camera <-> screen)
+            videoSender.replaceTrack(videoTrack).catch(error => {
+              console.error(`Error replacing video track for ${remoteUserId}:`, error);
+            });
+          } else {
+                // If a sender doesn't exist, we add the track and force negotiation
+                pc.addTrack(videoTrack, localStream);
+                // Need to force renegotiation on addTrack/removeTrack in older WebRTC implementations
+                pc.createOffer().then(offer => pc.setLocalDescription(offer))
+                    .then(() => {
+                        socketRef.current?.emit('signal', { targetUserId: remoteUserId, signal: pc.localDescription });
+                    });
+            }
+        } else if (videoSender) {
+          // If no video track in the new stream (camera/screen off), send null to stop transmission
+          videoSender.replaceTrack(null).catch(error => {
+                console.error(`Error replacing video track with null for ${remoteUserId}:`, error);
+            });
+        }
+
+
+        // 2. Handle AUDIO track replacement (only if stream changes, like screen share with audio)
+        const audioSender = pc.getSenders().find(
+          sender => sender.track && sender.track.kind === 'audio'
+        );
+
+
+        if (audioTrack && audioSender) {
+            // Only replace if the actual track reference is different (e.g., swapping mics/streams)
+            if (audioSender.track !== audioTrack) {
+                audioSender.replaceTrack(audioTrack).catch(error => {
+                    console.error(`Error replacing audio track for ${remoteUserId}:`, error);
+                });
+            }
+        } else if (audioSender) {
+             // If no audio track in the new stream, send null to stop transmission
+            audioSender.replaceTrack(null).catch(error => {
+                console.error(`Error replacing audio track with null for ${remoteUserId}:`, error);
+            });
+        }
+
+
+
+
+      } catch (error) {
+        console.error(`Unexpected error updating tracks for ${remoteUserId}:`, error);
+      }
     });
 
-    return () => {}; 
 
-  }, [localStream, isScreenSharing, isCameraOff, isMuted]);
+    // Use a tiny debounce to ensure the operation is atomic
+    const timeoutId = setTimeout(() => {}, 100);
+    return () => clearTimeout(timeoutId);
 
-  // Debug logging hook (Temporary)
-  useEffect(() => {
-    console.log('Chat messages updated:', chatMessages);
-  }, [chatMessages]);
 
-  useEffect(() => {
-    console.log('Socket connection status:', socketRef.current?.connected);
-    console.log('User data:', { userId: user?.userId, username: user?.username });
-  }, [user]);
-  // End Debug logging hook
-  
-  // Hook to mark messages as read when chat panel opens
-  useEffect(() => {
-    if (showChatPanel) {
-      setChatMessages(prevMessages => 
-        prevMessages.map(msg => ({ ...msg, read: true }))
-      );
-    }
-  }, [showChatPanel]);
+  }, [localStream]); // CRITICAL: This effect runs whenever a new stream (local, screen, or stopped) is set.
+
+
+// ----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 
 
   // Fullscreen handlers
@@ -661,15 +630,18 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
     }
   }, [isFullScreen]);
 
+
   // Listen for fullscreen changes
   useEffect(() => {
     const handleFullScreenChange = () => {
       setIsFullScreen(!!document.fullscreenElement);
     };
 
+
     document.addEventListener('fullscreenchange', handleFullScreenChange);
     return () => document.removeEventListener('fullscreenchange', handleFullScreenChange);
   }, []);
+
 
   // FIXED: Media control functions with delayed notifications
   const toggleMute = useCallback(() => {
@@ -695,12 +667,13 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
     }
   }, [localStream, isMuted, isCameraOff, isScreenSharing]);
 
-  // **CORRECTED AND IMPROVED:** toggleCamera
+
   const toggleCamera = useCallback(async () => {
     if (isScreenSharing) {
       alert("Please stop screen sharing before toggling your camera.");
       return;
     }
+
 
     if (!isCameraOff) {
       // Turn off camera
@@ -712,9 +685,6 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         const updatedStream = new MediaStream([...localStream.getTracks()]);
         setLocalStream(updatedStream);
         setIsCameraOff(true);
-        
-        // Update peer connections
-        await updatePeerConnectionTracks(updatedStream);
       }
     } else {
       // Turn on camera
@@ -728,10 +698,10 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         });
         const newVideoTrack = newVideoMedia.getVideoTracks()[0];
         
-        let updatedStream;
         if (localStream) {
           localStream.addTrack(newVideoTrack);
-          updatedStream = new MediaStream([...localStream.getTracks()]);
+          const updatedStream = new MediaStream([...localStream.getTracks()]);
+          setLocalStream(updatedStream);
         } else {
           const fullStream = await navigator.mediaDevices.getUserMedia({ 
             video: { 
@@ -745,21 +715,16 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
               autoGainControl: true
             }
           });
-          updatedStream = fullStream;
+          setLocalStream(fullStream);
         }
-        
-        setLocalStream(updatedStream);
         setIsCameraOff(false);
-        
-        // Update peer connections
-        await updatePeerConnectionTracks(updatedStream);
-        
       } catch (err) {
         console.error('Camera access error:', err);
         alert('Could not access camera. Please ensure permissions are granted.');
         return;
       }
     }
+
 
     // Delayed notification to prevent disconnections
     if (socketRef.current?.connected) {
@@ -773,138 +738,104 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         }
       }, 300);
     }
-  }, [localStream, isMuted, isCameraOff, isScreenSharing, updatePeerConnectionTracks]);
+  }, [localStream, isMuted, isCameraOff, isScreenSharing]);
 
-  // 2. FIXED: toggleScreenShare function - Proper stream management
+
+  // FIXED: Enhanced screen share toggle
   const toggleScreenShare = useCallback(async () => {
     if (isScreenSharing) {
-      // --- STOP SCREEN SHARING ---
-      console.log('Stopping screen share...');
-      
-      // Stop current screen share tracks
+      // Stop screen sharing
       if (localStream) {
-        localStream.getTracks().forEach(track => {
-          track.stop();
-          console.log(`Stopped ${track.kind} track`);
-        });
+        localStream.getTracks().forEach(track => track.stop());
       }
-
+      
       try {
-        // Get fresh camera/audio stream
-        const constraints = {
-          video: initialVideo ? { 
+        // Re-initialize camera/audio media
+        const newStream = await navigator.mediaDevices.getUserMedia({ 
+          video: { 
             width: { ideal: 1920 }, 
-            height: { ideal: 1080 }, 
-            frameRate: { ideal: 30 } 
-          } : false,
-          audio: initialAudio ? {
+            height: { ideal: 1080 },
+            frameRate: { ideal: 30 }
+          }, 
+          audio: {
             echoCancellation: true,
             noiseSuppression: true,
             autoGainControl: true
-          } : false
-        };
-
-        const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+          }
+        });
         
-        // Apply current mute/camera state
-        newStream.getAudioTracks().forEach(track => (track.enabled = !isMuted));
-        newStream.getVideoTracks().forEach(track => (track.enabled = !isCameraOff));
+        // Apply current media states
+        newStream.getAudioTracks().forEach(track => {
+          track.enabled = !isMuted;
+        });
+        newStream.getVideoTracks().forEach(track => {
+          track.enabled = !initialVideo; // Use initial video state for camera re-enable
+        });
         
         setLocalStream(newStream);
         setIsScreenSharing(false);
-
-        // Clear screen share UI state
+        setIsCameraOff(!initialVideo); // Restore camera state
+        
         if (activeScreenShareUserId === user?.userId) {
           setActiveScreenShareUserId(null);
           setMainViewRemoteStream(null);
           setMainViewRemoteUserId(null);
         }
 
-        // Update peer connections with new stream
-        await updatePeerConnectionTracks(newStream);
 
-        // Notify server
+        // Separate events with delays
         if (socketRef.current?.connected) {
           socketRef.current.emit('screen-share-stop', { roomId });
-          
-          // Wait before sending media state update
           setTimeout(() => {
             if (socketRef.current?.connected) {
               socketRef.current.emit('media-state-update', { 
                 isMuted,
-                isCameraOff,
+                isCameraOff: !initialVideo, // Send actual camera state
                 isScreenSharing: false
               });
             }
-          }, 1000);
+          }, 500);
         }
-
       } catch (err) {
         console.error('Error stopping screen share:', err);
-        // Fallback
-        const emptyStream = new MediaStream();
-        setLocalStream(emptyStream);
+        setLocalStream(new MediaStream());
         setIsScreenSharing(false);
         setIsCameraOff(true);
-        await updatePeerConnectionTracks(emptyStream);
+        if (activeScreenShareUserId === user?.userId) {
+          setActiveScreenShareUserId(null);
+        }
       }
-
     } else {
-      // --- START SCREEN SHARING ---
-      console.log('Starting screen share...');
-      
-      // Stop current camera/audio tracks
+      // Start screen sharing
       if (localStream) {
-        localStream.getTracks().forEach(track => {
-          track.stop();
-          console.log(`Stopped ${track.kind} track before screen share`);
-        });
+        localStream.getTracks().forEach(track => track.stop());
       }
       
       try {
-        // Get screen share stream
         const screenStream = await navigator.mediaDevices.getDisplayMedia({ 
-          video: { 
-            width: { ideal: 1920 }, 
-            height: { ideal: 1080 }, 
-            frameRate: { ideal: 30 } 
+          video: {
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
+            frameRate: { ideal: 30 }
           }, 
           audio: true 
-        });
-        
-        console.log('Screen share stream obtained:', {
-          videoTracks: screenStream.getVideoTracks().length,
-          audioTracks: screenStream.getAudioTracks().length
         });
         
         setLocalStream(screenStream);
         setIsScreenSharing(true);
         setIsCameraOff(true);
         
-        // Set as active screen share in UI
         setActiveScreenShareUserId(user?.userId);
         setMainViewRemoteStream(screenStream);
         setMainViewRemoteUserId(user?.userId);
         
-        // Handle native screen share stop
-        const videoTrack = screenStream.getVideoTracks()[0];
-        if (videoTrack) {
-          videoTrack.onended = () => {
-            console.log('Screen share ended via browser UI');
-            if (isScreenSharing) {
-              toggleScreenShare();
-            }
-          };
-        }
-
-        // Update peer connections with screen share stream
-        await updatePeerConnectionTracks(screenStream);
+        screenStream.getVideoTracks()[0].onended = () => {
+          toggleScreenShare();
+        };
         
-        // Notify server
+        // Separate events with delays
         if (socketRef.current?.connected) {
           socketRef.current.emit('screen-share-start', { roomId });
-          
-          // Wait before sending media state update
           setTimeout(() => {
             if (socketRef.current?.connected) {
               socketRef.current.emit('media-state-update', { 
@@ -915,34 +846,16 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
             }
           }, 1000);
         }
-        
       } catch (err) {
-        console.error('Screen share failed:', err);
+        console.error('Screen share error:', err);
         if (err.name !== 'NotAllowedError') {
           alert('Could not start screen sharing. Please ensure permissions are granted.');
         }
-        // Fallback to camera
         initializeMedia();
       }
     }
-  }, [
-    localStream, 
-    isScreenSharing, 
-    roomId, 
-    user?.userId, 
-    isMuted, 
-    isCameraOff, 
-    activeScreenShareUserId, 
-    initialVideo, 
-    initialAudio, 
-    updatePeerConnectionTracks,
-    initializeMedia
-  ]);
+  }, [localStream, isScreenSharing, roomId, initializeMedia, user?.userId, isMuted, isCameraOff, activeScreenShareUserId, initialVideo]); // Added initialVideo
 
-
-// ----------------------------------------------------------------------
-// SOCKET CONNECTION HOOK (NOW DEFINED AFTER ALL CALLBACKS)
-// ----------------------------------------------------------------------
 
   // Socket connection and event handlers
   useEffect(() => {
@@ -951,19 +864,21 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         return;
     }
 
-    // NOTE: Changed port back to 3001 as per previous correct code structure, assuming 5000 was a typo.
-    socketRef.current = io('https://studysphere-n4up.onrender.com/', { 
+
+    socketRef.current = io('http://localhost:5000', {
       transports: ['websocket'],
       upgrade: false,
       rememberUpgrade: false,
       query: { sessionToken }
     });
 
+
     socketRef.current.on('connect', () => {
       console.log('Connected to server with session token');
       setConnectionError(null);
       socketRef.current.emit('join-room', { roomId, sessionToken });
     });
+
 
     // Handle successful room join
     socketRef.current.on('room-joined-successfully', ({ 
@@ -990,6 +905,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       setIsCreator(isCurrentUserCreator);
       setIsConnecting(false);
 
+
       const initialRemoteData = {};
       initialParticipants.forEach(p => {
         if (p.id !== user.userId) {
@@ -1003,12 +919,13 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       });
       setRemoteUsersData(initialRemoteData);
 
+
       initialParticipants.forEach(p => {
         if (p.id !== user.userId) {
-          // When we join a room, we are not the initiator for existing users, so no true flag is needed here.
-          setTimeout(() => createPeerConnection(p.id, false), 1000); 
+          setTimeout(() => createPeerConnection(p.id), 1000);
         }
       });
+
 
       setTimeout(() => {
         if (socketRef.current?.connected) {
@@ -1021,6 +938,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       }, 2000);
     });
 
+
     // Handle join request sent
     socketRef.current.on('join-request-sent', ({ roomId, message, shouldWait }) => {
       if (shouldWait) {
@@ -1030,6 +948,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         alert(message);
       }
     });
+
 
     // FIXED: Handle join approval
     socketRef.current.on('join-approved', ({
@@ -1060,6 +979,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       setIsConnecting(false);
       setIsWaitingForApproval(false);
 
+
       const initialRemoteData = {};
       initialParticipants.forEach(p => {
         if (p.id !== user.userId) {
@@ -1073,13 +993,15 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       });
       setRemoteUsersData(initialRemoteData);
 
+
       setTimeout(() => {
         initialParticipants.forEach(p => {
           if (p.id !== user.userId) {
-            createPeerConnection(p.id, false);
+            createPeerConnection(p.id);
           }
         });
       }, 1500);
+
 
       setTimeout(() => {
         if (socketRef.current?.connected) {
@@ -1091,33 +1013,40 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         }
       }, 3000);
 
+
       alert('Your join request was approved! Welcome to the room.');
     });
+
 
     socketRef.current.on('join-rejected', ({ roomId, message }) => {
       alert(message || `Your request to join room ${roomId} was rejected.`);
       navigate('/room');
     });
 
+
     socketRef.current.on('private-room-empty', ({ roomId, message }) => {
       alert(message || `This private room creator is not currently present.`);
       navigate('/room');
     });
+
 
     socketRef.current.on('room-not-found', () => {
       alert('Room not found!');
       navigate('/room');
     });
 
+
     socketRef.current.on('disconnect', () => {
       console.log('Disconnected from server');
       setConnectionError('Connection lost. Attempting to reconnect...');
     });
 
+
     socketRef.current.on('connect_error', (error) => {
       console.error('Connection error:', error);
       setConnectionError('Failed to connect to server');
     });
+
 
     socketRef.current.on('authentication-required', ({ message }) => {
       console.error('Authentication required:', message);
@@ -1125,7 +1054,8 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       navigate('/auth', { replace: true });
     });
 
-    // **FIXED:** Handle new user connected (The screen sharer initiates the negotiation)
+
+    // User connection events
     socketRef.current.on('user-connected', ({ userId, username, isMuted, isCameraOff, isScreenSharing, isAdmin, isCreator, canBeControlledByAdmin }) => {
       console.log('User connected:', username);
       setParticipants(prev => {
@@ -1148,11 +1078,12 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         [userId]: { isMuted, isCameraOff, isScreenSharing, username }
       }));
 
+
       if (userId !== user.userId) {
-          // We are the initiator of the negotiation when a new user joins, so pass 'true'.
-        setTimeout(() => createPeerConnection(userId, true), 500); 
+        setTimeout(() => createPeerConnection(userId), 500);
       }
     });
+
 
     socketRef.current.on('user-disconnected', (userId) => {
       console.log('User disconnected:', userId);
@@ -1174,26 +1105,31 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         return newQuality;
       });
 
+
       if (activeScreenShareUserId === userId) {
         setActiveScreenShareUserId(null);
         setMainViewRemoteStream(null);
         setMainViewRemoteUserId(null);
       }
 
+
       if (peerConnectionsRef.current[userId]) {
         peerConnectionsRef.current[userId].close();
         delete peerConnectionsRef.current[userId];
       }
+
 
       if (dataChannelsRef.current[userId]) {
         dataChannelsRef.current[userId].close();
         delete dataChannelsRef.current[userId];
       }
 
+
       if (connectionStatsIntervals.current[userId]) {
         clearInterval(connectionStatsIntervals.current[userId]);
         delete connectionStatsIntervals.current[userId];
       }
+
 
       if (mainViewRemoteUserId === userId) {
         setMainViewRemoteStream(null);
@@ -1201,19 +1137,23 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       }
     });
 
+
     // WebRTC signaling
     socketRef.current.on('signal', ({ userId, signal }) => {
       handleSignal(userId, signal);
     });
 
+
     socketRef.current.on('ice-candidate', ({ userId, candidate }) => {
       handleIceCandidate(userId, candidate);
     });
+
 
     // Room feature updates
     socketRef.current.on('notes-update', (newNotes) => setNotes(newNotes));
     socketRef.current.on('timer-update', (newTimer) => setTimer(newTimer));
     socketRef.current.on('targets-update', (newTargets) => setTargets(newTargets));
+
 
     // Join request handling
     socketRef.current.on('new-join-request', (request) => {
@@ -1223,30 +1163,21 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       }
     });
 
+
     socketRef.current.on('update-join-requests', (updatedRequests) => {
       setJoinRequests(updatedRequests);
     });
+
 
     socketRef.current.on('room-lock-status', (locked) => {
       setIsRoomLocked(locked);
     });
 
-    // 2. Fix socket chat-message event handler
-    socketRef.current.on('chat-message', (messageData) => {
-      // Don't add our own messages again (already added locally)
-      if (messageData.userId !== user?.userId) {
-        const formattedMessage = {
-          id: messageData.id || Date.now(),
-          userId: messageData.userId,
-          username: messageData.username || 'Unknown User',
-          message: messageData.message,
-          timestamp: messageData.timestamp ? new Date(messageData.timestamp) : new Date(),
-          type: messageData.type || 'text',
-          read: showChatPanel // Mark as read if chat panel is currently open
-        };
-        setChatMessages(prev => [...prev, formattedMessage]);
-      }
+
+    socketRef.current.on('chat-message', (message) => {
+      setChatMessages(prev => [...prev, message]);
     });
+
 
     // FIXED: Media state change notifications
     socketRef.current.on('media-state-changed', ({ userId, isMuted, isCameraOff, isScreenSharing }) => {
@@ -1262,6 +1193,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       setParticipants(prev => prev.map(p => 
         p.id === userId ? { ...p, isMuted, isCameraOff, isScreenSharing } : p
       ));
+
 
       if (isScreenSharing) {
         setActiveScreenShareUserId(userId);
@@ -1283,6 +1215,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       }
     });
 
+
     // FIXED: Enhanced screen sharing events
     socketRef.current.on('user-screen-share-start', ({ userId, username }) => {
       console.log(`User ${username} started screen sharing`);
@@ -1299,7 +1232,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         if (attempts > 10) return;
         
         setRemoteStreams(currentStreams => {
-          if (currentStreams[userId]) { // Check if stream exists (it should, from ontrack/renegotiation)
+          if (currentStreams[userId]) {
             console.log('Auto-focusing screen share from:', username);
             setMainViewRemoteStream(currentStreams[userId]);
             setMainViewRemoteUserId(userId);
@@ -1312,6 +1245,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       
       setTimeout(() => checkForStream(), 500);
     });
+
 
     socketRef.current.on('user-screen-share-stop', ({ userId }) => {
       console.log(`User stopped screen sharing: ${userId}`);
@@ -1332,6 +1266,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       }
     });
 
+
     // Audio/video toggle notifications
     socketRef.current.on('user-audio-toggle', ({ userId, isMuted }) => {
       setRemoteUsersData(prev => ({
@@ -1343,6 +1278,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       ));
     });
 
+
     socketRef.current.on('user-video-toggle', ({ userId, isCameraOff }) => {
       setRemoteUsersData(prev => ({
         ...prev,
@@ -1352,6 +1288,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         p.id === userId ? { ...p, isCameraOff } : p
       ));
     });
+
 
     // Admin control events
     socketRef.current.on('admin-mute-command', ({ roomId, isMuted, adminName }) => {
@@ -1363,6 +1300,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       alert(`You have been ${isMuted ? 'muted' : 'unmuted'} by ${adminName}.`);
     });
 
+
     socketRef.current.on('admin-camera-command', ({ roomId, isCameraOff, adminName }) => {
       console.log(`Admin ${adminName} ${isCameraOff ? 'disabled' : 'enabled'} your camera.`);
       setIsCameraOff(isCameraOff);
@@ -1372,10 +1310,12 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       alert(`Your camera has been ${isCameraOff ? 'disabled' : 'enabled'} by ${adminName}.`);
     });
 
+
     socketRef.current.on('removed-by-admin', ({ roomId, adminName, reason }) => {
       alert(`You have been removed from the room by ${adminName}. Reason: ${reason}`);
       navigate('/room');
     });
+
 
     socketRef.current.on('participant-muted-by-admin', ({ participantId, isMuted, adminName }) => {
       setRemoteUsersData(prev => ({
@@ -1386,6 +1326,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       console.log(`Participant ${participantId} was ${isMuted ? 'muted' : 'unmuted'} by admin ${adminName}`);
     });
 
+
     socketRef.current.on('participant-camera-toggled-by-admin', ({ participantId, isCameraOff, adminName }) => {
       setRemoteUsersData(prev => ({
         ...prev,
@@ -1395,9 +1336,11 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       console.log(`Participant ${participantId} camera was ${isCameraOff ? 'disabled' : 'enabled'} by admin ${adminName}`);
     });
 
+
     socketRef.current.on('participant-removed-by-admin', ({ participantId, participantName, adminName }) => {
       console.log(`${participantName} was removed from the room by ${adminName}.`);
     });
+
 
     return () => {
       if (socketRef.current) {
@@ -1410,33 +1353,13 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       Object.values(dataChannelsRef.current).forEach(dc => dc.close());
       dataChannelsRef.current = {};
 
+
       Object.values(connectionStatsIntervals.current).forEach(interval => {
         clearInterval(interval);
       });
       connectionStatsIntervals.current = {};
     };
-  }, [
-    roomId, 
-    user, 
-    sessionToken, 
-    isAuthenticated, 
-    navigate, 
-    createPeerConnection, 
-    handleSignal, 
-    handleIceCandidate, 
-    isCreator, 
-    initialAudio, 
-    initialVideo, 
-    activeScreenShareUserId, 
-    remoteStreams, 
-    mainViewRemoteUserId, 
-    localStream
-    // Removed showChatPanel dependency to prevent accidental disconnections
-  ]); 
-
-// ----------------------------------------------------------------------
-// UI EVENT HANDLERS
-// ----------------------------------------------------------------------
+  }, [roomId, user, sessionToken, isAuthenticated, navigate, createPeerConnection, handleSignal, handleIceCandidate, isCreator, initialAudio, initialVideo, activeScreenShareUserId, remoteStreams, mainViewRemoteUserId, localStream]);
 
 
   // UI event handlers
@@ -1449,37 +1372,32 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
     }
   }, [activeScreenShareUserId]);
 
-  // **FIXED:** Participant click logic to focus on camera or screen share
-  const handleParticipantClick = useCallback((participantId, stream) => {
-    if (!stream) return; // Cannot focus on a participant without a stream
 
-    const isUserScreenSharing = remoteUsersData[participantId]?.isScreenSharing ||
+  // FIXED: Better participant click handling
+  const handleParticipantClick = useCallback((participantId, stream) => {
+    const isUserScreenSharing = participantId === activeScreenShareUserId || 
+                               remoteUsersData[participantId]?.isScreenSharing ||
                                (participantId === user?.userId && isScreenSharing);
     
-    // 1. If the participant is currently screen sharing (remote or local), focus on that.
     if (isUserScreenSharing) {
-      setActiveScreenShareUserId(participantId);
       setMainViewRemoteStream(stream);
       setMainViewRemoteUserId(participantId);
       return;
     }
-
-    // 2. If the user clicked on the currently focused camera/stream, unfocus.
-    if (mainViewRemoteUserId === participantId) {
-      // If no one is screen sharing, clear the main view
+    
+    if (mainViewRemoteUserId === participantId || !stream) {
       if (!activeScreenShareUserId) {
         setMainViewRemoteStream(null);
         setMainViewRemoteUserId(null);
       }
     } else {
-      // 3. If they clicked a different camera/stream, focus on it.
-      // Only focus camera if no one is currently screen sharing in the main view.
       if (!activeScreenShareUserId) {
         setMainViewRemoteStream(stream);
         setMainViewRemoteUserId(participantId);
       }
     }
   }, [mainViewRemoteUserId, activeScreenShareUserId, remoteUsersData, user?.userId, isScreenSharing]);
+
 
   // Room feature handlers
   const handleNotesChange = useCallback((e) => {
@@ -1490,12 +1408,14 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
     }
   }, [roomId, isCreator]);
 
+
   const handleTimerChange = useCallback((newTimer) => {
     setTimer(newTimer);
     if (socketRef.current?.connected && isCreator) {
       socketRef.current.emit('timer-update', { roomId, timer: newTimer });
     }
   }, [roomId, isCreator]);
+
 
   const handleTargetsChange = useCallback((newTargets) => {
     setTargets(newTargets);
@@ -1504,6 +1424,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
     }
   }, [roomId, isCreator]);
 
+
   const handleJoinRequestResponse = useCallback((requesterId, action) => {
     setJoinRequests(prev => prev.filter(req => req.userId !== requesterId));
     if (socketRef.current?.connected && isCreator) {
@@ -1511,33 +1432,20 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
     }
   }, [roomId, isCreator]);
 
-  // 1. Fix handleSendChatMessage function
+
   const handleSendChatMessage = useCallback((message) => {
     if (socketRef.current?.connected && message.trim()) {
-      // Create the message object locally first
-      const newMessage = {
-        id: Date.now(),
-        userId: user?.userId,
-        username: user?.username || 'You',
-        message: message.trim(),
-        timestamp: new Date().toISOString(), // Use ISO string for reliable transport
-        type: 'text',
-        read: true // Always mark locally sent messages as read
-      };
-      
-      // Add to local state immediately for better UX
-      setChatMessages(prev => [...prev, newMessage]);
-      
-      // Send to server
-      socketRef.current.emit('chat-message', { roomId, message: message.trim(), id: newMessage.id, timestamp: newMessage.timestamp });
+      socketRef.current.emit('chat-message', { roomId, message: message.trim() });
     }
-  }, [roomId, user?.userId, user?.username]);
+  }, [roomId]);
+
 
   const toggleRoomLock = useCallback(() => {
     if (isCreator && socketRef.current?.connected) {
       socketRef.current.emit('toggle-room-lock', { roomId });
     }
   }, [isCreator, roomId]);
+
 
   // Admin actions
   const onAdminMuteParticipant = useCallback((participantId, isMutedState) => {
@@ -1546,17 +1454,20 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
     }
   }, [isCreator, roomId]);
 
+
   const onAdminRemoveParticipant = useCallback((participantId) => {
     if (socketRef.current?.connected && isCreator) {
       socketRef.current.emit('admin-remove-participant', { roomId, participantId });
     }
   }, [isCreator, roomId]);
 
+
   const onAdminToggleParticipantCamera = useCallback((participantId, isCameraOffState) => {
     if (socketRef.current?.connected && isCreator) {
       socketRef.current.emit('admin-toggle-participant-camera', { roomId, participantId, isCameraOff: isCameraOffState });
     }
   }, [isCreator, roomId]);
+
 
   const handleLeaveRoom = useCallback(() => {
     if (socketRef.current) {
@@ -1565,12 +1476,14 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
     navigate('/room');
   }, [navigate]);
 
+
   const handleCancelWaiting = useCallback(() => {
     setIsWaitingForApproval(false);
     navigate('/room');
   }, [navigate]);
 
-  // FIXED: Enhanced main content logic (Removed conditional ref for React warning)
+
+  // FIXED: Enhanced main content logic
   const getMainContent = () => {
     if (activeScreenShareUserId) {
       const screenShareStream = activeScreenShareUserId === user?.userId ? localStream : remoteStreams[activeScreenShareUserId];
@@ -1580,7 +1493,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         return (
           <div className="main-screen-share-wrapper" ref={fullScreenRef}>
             <video 
-              // Removed conditional ref to fix React DOM warning
+              ref={activeScreenShareUserId === user?.userId ? localScreenShareVideoRef : null}
               autoPlay 
               playsInline 
               muted={activeScreenShareUserId === user?.userId} 
@@ -1597,6 +1510,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       }
     }
 
+
     if (!activeScreenShareUserId && mainViewRemoteStream && mainViewRemoteUserId) {
       return (
         <div className="main-participant-view-wrapper" ref={fullScreenRef}>
@@ -1611,16 +1525,20 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
       );
     }
 
+
     return null;
   };
+
 
   if (!isAuthenticated || !sessionToken || !user) {
     return <Navigate to="/auth" replace />;
   }
 
+
   if (isWaitingForApproval) {
     return <WaitingForApproval roomId={roomId} onCancel={handleCancelWaiting} />;
   }
+
 
   if (isConnecting) {
     return (
@@ -1637,15 +1555,11 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
               <small>Video: {initialVideo ? 'ON' : 'OFF'}</small>
             </div>
           </div>
-          {connectionError && (
-            <div className="connection-error">
-              <span>{connectionError}</span>
-            </div>
-          )}
         </div>
       </div>
     );
   }
+
 
   return (
     <div className={`video-call ${isFullScreen ? 'fullscreen-mode' : ''}`}>
@@ -1660,11 +1574,13 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         />
       )}
 
+
       {connectionError && (
         <div className="connection-error">
           <span>{connectionError}</span>
         </div>
       )}
+
 
       <div className="content-container">
         {!isFullScreen && (
@@ -1731,9 +1647,11 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
           </div>
         )}
 
+
         <div className="main-study-area">
           {getMainContent()}
         </div>
+
 
         {!isFullScreen && (
           <div className="right-sidebar">
@@ -1768,20 +1686,19 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         )}
       </div>
 
+
       {showChatPanel && !isFullScreen && (
         <>
           <div className="chat-overlay" onClick={handleCloseChat}></div>
-          {/* 3. Update ChatPanel props */}
           <ChatPanel
             messages={chatMessages}
             onSendMessage={handleSendChatMessage}
             currentUserId={user?.userId}
             onClose={handleCloseChat}
-            typingUsers={[]} 
-            embedded={true} 
           />
         </>
       )}
+
 
       {showParticipantsPanel && !isFullScreen && (
         <ParticipantList
@@ -1802,6 +1719,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         />
       )}
 
+
       {!isFullScreen && (
         <FloatingToolbar
           isMuted={isMuted}
@@ -1820,8 +1738,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
           onToggleParticipants={() => setShowParticipantsPanel(prev => !prev)}
           onLeaveRoom={handleLeaveRoom}
           participantCount={participants.length}
-         
-          unreadMessages={chatMessages.filter(msg => !msg.read && msg.userId !== user?.userId).length}
+          unreadMessages={0} // You can implement unread message counting
           isCreator={isCreator}
           isRoomLocked={isRoomLocked}
           onToggleRoomLock={toggleRoomLock}
@@ -1834,6 +1751,7 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
         />
       )}
 
+
       {/* Fullscreen exit button - Only shown when in Fullscreen mode */}
       {isFullScreen && (
         <button className="exit-fullscreen-btn" onClick={toggleFullScreen}>
@@ -1844,4 +1762,6 @@ const updatePeerConnectionTracks = useCallback(async (newStream) => {
   );
 }
 
+
 export default VideoCall;
+
