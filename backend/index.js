@@ -65,7 +65,7 @@ const startServer = async () => {
 
         // --- MIDDLEWARE SETUP ---
         app.use(cors({
-            origin: [process.env.FRONTEND_URL || 'http://localhost:3000', 'http://localhost:5173'],
+            origin: [process.env.FRONTEND_URL || 'http://localhost:3000', 'http://localhost:5173', 'https://studysphere-n4up.onrender.com', 'https://the-study-sphere.vercel.app',"https://study-sphere-git-final-redfyels-projects.vercel.app",'https://studysphere-n4up.onrender.com'],
             credentials: true
         }));
         app.use(express.json());
