@@ -865,7 +865,7 @@ function VideoCall() {
     }
 
 
-    socketRef.current = io('http://localhost:5000', {
+    socketRef.current = io('https://studysphere-n4up.onrender.com', {
       transports: ['websocket'],
       upgrade: false,
       rememberUpgrade: false,
