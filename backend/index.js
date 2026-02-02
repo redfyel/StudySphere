@@ -57,7 +57,7 @@ const startServer = async () => {
         // Configure CORS for Socket.IO
         const io = socketIo(server, {
             cors: {
-                origin: ["http://localhost:5173", "http://localhost:3000"],
+                origin: ["http://localhost:5173", "http://localhost:3000", "https://studysphere-n4up.onrender.com", "https://the-study-sphere.vercel.app","https://study-sphere-git-final-redfyels-projects.vercel.app",'https://studysphere-n4up.onrender.com'],
                 methods: ["GET", "POST", "PUT", "DELETE"],
                 credentials: true
             }
